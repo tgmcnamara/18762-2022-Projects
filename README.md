@@ -1,4 +1,4 @@
-# 18762 (Spring 2022) - Circuit Simulation and Optimization Methods: A Power Systems Perspective
+# 18762 - Circuit Simulation and Optimization Methods: A Power Systems Perspective
 
 This repository will house all projects for the course. Follow the setup and submission instructions outlined below.
 
@@ -22,14 +22,13 @@ Cheatsheet](http://ndpsoftware.com/git-cheatsheet.html#loc=workspace;).
 In the top right corner, click **fork**. Forking this repository will allow you to implement your work without 
 changing the original repository.
 
-![image](https://user-images.githubusercontent.com/65242847/148839202-06b283ad-bb46-4ab5-b6fd-c1407cb653b3.png)
+![fork](docs/media/GitHub-Fork.png)
 
 
 ### Step 2: Create a local clone of your fork
 ```
 git clone https://github.com/YOUR-USERNAME/18762-2021-Projects
 ```
-
 ### Step 3: Create a working directory
 ```
 mkdir project/YOUR-ANDREWID
@@ -45,13 +44,10 @@ work is ready for review.
 ### Step 1: Start a Pull Request
 In GitHub, on the navbar at the top, click **Pull Requests**.
 Next, click **New pull request**.
-![new_request]
-(docs/media/GitHub-NewPullRequest.png)
+![new_request](docs/media/GitHub-NewPullRequest.png)
 
 ### Step 2: Compare the Source Branch with Your Project Branch
-![select_branch]
-
-(docs/media/GitHub-Select_Source_Target.png)
+![select_branch](docs/media/GitHub-Select_Source_Target.png)
 Compare across forks by comparing your project branch with the base repository project branch. For the source branch, 
 select the source branch that matches the project you are preparing to submit (e.g., project1, project2, project3). 
 Do the same thing for the target branch (e.g., project1, project2, project3). Once finished, hit compare branches and 
