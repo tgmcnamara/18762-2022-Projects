@@ -55,7 +55,7 @@ continue.
 
 ### Step 2: Enter the details of your Pull Request and submit
 Under the title field, please put the name of the project you're submitting. Under "Write", please put any 
-comments you'd like to make about your project submission. Next, set the **Assignee** to Naeem Turner-Bandele and 
+comments you'd like to make about your project submission. Next, set the **Assignee** to tgmcnamara and 
 the **Milestone** to the project you've just completed. Finally, submit the pull request.
 ![pull_form](docs/media/GitHub-PullRequest-Title-Description.png)
 
