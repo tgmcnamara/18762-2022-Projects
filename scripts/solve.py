@@ -40,7 +40,7 @@ def solve(TESTCASE, SETTINGS):
     # needed for companion models or the model of the induction motor.
     # determine the size of the Y matrix by looking at the total number of nodes in the system
     size_Y = assign_nodes(devices)
-
+    
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
     V_init = initialize(devices, size_Y)
