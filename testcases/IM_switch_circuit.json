@@ -125,7 +125,7 @@
             "name": "v_a",
             "vp_node": "n1_a",
             "vn_node": "gnd",
-            "amplitude": 460,
+            "amp_ph_ph_rms": 460,
             "phase_deg": 0,
             "frequency_hz": 60
         },
@@ -133,7 +133,7 @@
             "name": "v_b",
             "vp_node": "n1_b",
             "vn_node": "gnd",
-            "amplitude": 460,
+            "amp_ph_ph_rms": 460,
             "phase_deg": -120,
             "frequency_hz": 60
         },
@@ -141,7 +141,7 @@
             "name": "v_c",
             "vp_node": "n1_c",
             "vn_node": "gnd",
-            "amplitude": 460,
+            "amp_ph_ph_rms": 460,
             "phase_deg": 120,
             "frequency_hz": 60
         }

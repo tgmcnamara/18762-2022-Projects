@@ -26,7 +26,7 @@
             "name": "l1",
             "from_node": "n2_a",
             "to_node": "gnd",
-            "l": 2e-6
+            "c": 2e-6
         }        
     ],
     "inductors": [
@@ -38,7 +38,7 @@
             "name": "v_a",
             "vp_node": "n1_a",
             "vn_node": "gnd",
-            "amplitude": 20,
+            "amp_ph_ph_rms": 20,
             "phase_deg": 90,
             "frequency_hz": 60
         }
