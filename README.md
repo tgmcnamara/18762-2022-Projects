@@ -27,19 +27,19 @@ changing the original repository.
 
 ### Step 2: Create a local clone of your fork
 ```
-git clone https://github.com/YOUR-USERNAME/18762-2021-Projects
+git clone https://github.com/YOUR-USERNAME/18762-2022-Projects
 ```
 ### Step 3: Change branches to the appropriate project
 For example, for Project 1, you would execute:
 ```
-cd <path to 18762-2021-Projects>
+cd <path to 18762-2022-Projects>
 git checkout project1
 ```
 
 ### Step 4: Create a working directory for yourself and copy the distribution files into it
 For example, For Project 1, if you wanted to copy all the files we have provided into your working directory, you would execute:
 ```
-cd <path to 18762-2021-Projects>
+cd <path to 18762-2022-Projects>
 mkdir YOUR-ANDREWID
 mkdir YOUR-ANDREWID/classes
 cp -r classes YOUR-ANDREWID/classes
