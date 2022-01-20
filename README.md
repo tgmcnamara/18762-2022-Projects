@@ -29,13 +29,35 @@ changing the original repository.
 ```
 git clone https://github.com/YOUR-USERNAME/18762-2021-Projects
 ```
-### Step 3: Create a working directory
+### Step 3: Change branches to the appropriate project
+For example, for Project 1, you would execute:
 ```
-mkdir project/YOUR-ANDREWID
+cd <path to 18762-2021-Projects>
+git checkout project1
+```
+
+### Step 4: Create a working directory for yourself and copy the distribution files into it
+For example, For Project 1, if you wanted to copy all the files we have provided into your working directory, you would execute:
+```
+cd <path to 18762-2021-Projects>
+mkdir YOUR-ANDREWID
+mkdir YOUR-ANDREWID/classes
+cp -r classes YOUR-ANDREWID/classes
+mkdir YOUR-ANDREWID/lib
+cp -r lib YOUR-ANDREWID/lib
+mkdir YOUR-ANDREWID/scripts
+cp -r scripts YOUR-ANDREWID/scripts
+mkdir YOUR-ANDREWID/testcases
+cp -r testcases YOUR-ANDREWID/testcases
+mkdir YOUR-ANDREWID/testcases
+cp -r testcases YOUR-ANDREWID/testcases
+mkdir YOUR-ANDREWID/validate
+cp -r testcases YOUR-ANDREWID/validate
+cp -r run_solver.py YOUR-ANDREWID/run_solver.py
 ```
 You will work on your solution in this working directory. Please do this for each project you work on.
 
-### Step 4: Implement your solution
+### Step 5: Implement your solution
 Implement your solution to the project assignment within the working directory.
 
 ## Submission
