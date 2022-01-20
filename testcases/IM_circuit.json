@@ -108,7 +108,7 @@
             "name": "v_a",
             "vp_node": "n1_a",
             "vn_node": "gnd",
-            "amplitude": 120,
+            "amplitude": 460,
             "phase_deg": 0,
             "frequency_hz": 60
         },
@@ -116,7 +116,7 @@
             "name": "v_b",
             "vp_node": "n1_b",
             "vn_node": "gnd",
-            "amplitude": 120,
+            "amplitude": 460,
             "phase_deg": -120,
             "frequency_hz": 60
         },
@@ -124,7 +124,7 @@
             "name": "v_c",
             "vp_node": "n1_c",
             "vn_node": "gnd",
-            "amplitude": 120,
+            "amplitude": 460,
             "phase_deg": 120,
             "frequency_hz": 60
         }
@@ -136,6 +136,7 @@
             "phase_b_node": "n3_b",
             "phase_c_node": "n3_c",
             "power_nom": 10,
+            "v_nom": 460,
             "motor_freq": 60,
             "lm": 0.0761,
             "rs": 0.2761,

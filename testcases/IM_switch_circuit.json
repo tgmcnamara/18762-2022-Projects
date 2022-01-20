@@ -153,6 +153,7 @@
             "phase_b_node": "n3_b",
             "phase_c_node": "n3_c",
             "power_nom": 10,
+            "v_nom": 160,
             "motor_freq": 60,
             "lm": 0.0761,
             "rs": 0.2761,

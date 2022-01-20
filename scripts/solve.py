@@ -1,5 +1,5 @@
 from lib.parse_json import parse_json
-from lib.assign_nodes import assign_nodes
+from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
 from scripts.run_time_domain_simulation import run_time_domain_simulation
 from scripts.process_results import process_results
@@ -36,10 +36,12 @@ def solve(TESTCASE, SETTINGS):
 
     # # # Assign system nodes # # #
     # We assign a node index for every node in our Y matrix and J vector.
-    # In addition to voltages, nodes track currents of voltage sources and other state variables
-    # needed for companion models or the model of the induction motor.
-    # determine the size of the Y matrix by looking at the total number of nodes in the system
-    size_Y = assign_nodes(devices)
+    # In addition to voltages, nodes track currents of voltage sources and
+    # other state variablesneeded for companion models or the model of the 
+    # induction motor.
+    # You can determine the size of the Y matrix by looking at the total
+    # number of nodes in the system.
+    size_Y = assign_node_indexes(devices)
     
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.

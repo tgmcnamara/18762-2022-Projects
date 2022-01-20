@@ -19,10 +19,10 @@ class InductionMotors:
         rr,
         lls,
         llr,
-        j_im,
+        j,
         tm,
         d_fric,
-        n_poles):
+        n_pole_pairs):
         self.name = name
         self.phase_a_node = phase_a_node
         self.phase_b_node = phase_b_node
@@ -35,16 +35,16 @@ class InductionMotors:
         self.rr = rr
         self.lls = lls
         self.llr = llr
-        self.lss = self.lls + self.lm
-        self.lrr = self.llr + self.lm
-        self.j_im = j_im
+        self.j = j
         self.tm = tm
         self.d_fric = d_fric
-        self.n_poles = n_poles
+        self.n_pole_pairs = n_pole_pairs
+        self.lss = self.lls + self.lm
+        self.lrr = self.llr + self.lm
         # You are welcome to / may be required to add additional class variables   
 
     # Some suggested functions to implement, 
-    def assign_nodes(self,):
+    def assign_node_indexes(self,):
         pass
         
     def stamp_sparse(self,):
@@ -53,5 +53,5 @@ class InductionMotors:
     def stamp_dense(self,):
         pass
 
-    def stamp_open(self,):
+    def stamp_t0(self,):
         pass

@@ -14,7 +14,7 @@ class Switches:
         # You are welcome to / may be required to add additional class variables   
 
     # Some suggested functions to implement, 
-    def assign_nodes(self,):
+    def assign_node_indexes(self,):
         pass
         
     def stamp_sparse(self,):
