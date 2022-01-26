@@ -37,7 +37,7 @@ git checkout project1
 ```
 
 ### Step 4: Create a working directory for yourself and copy the distribution files into it
-For example, For Project 1, if you wanted to copy all the files we have provided into your working directory, you would execute:
+For example, For Project 1, if you wanted to copy all the files we have provided into your working directory (on a MAC), you would execute:
 ```
 cd <path to 18762-2022-Projects>
 mkdir YOUR-ANDREWID
@@ -52,7 +52,7 @@ cp -r testcases YOUR-ANDREWID/testcases
 mkdir YOUR-ANDREWID/testcases
 cp -r testcases YOUR-ANDREWID/testcases
 mkdir YOUR-ANDREWID/validate
-cp -r testcases YOUR-ANDREWID/validate
+cp -r validate YOUR-ANDREWID/validate
 cp -r run_solver.py YOUR-ANDREWID/run_solver.py
 ```
 You will work on your solution in this working directory. Please do this for each project you work on.
