@@ -1,11 +1,12 @@
+from classes.Settings import Settings
 from lib.parse_json import parse_json
 from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
-from scripts.run_time_domain_simulation import run_time_domain_simulation
+from scripts.run_time_domain_simulation import execute_simulation
 from scripts.process_results import process_results
 
 
-def solve(TESTCASE, SETTINGS):
+def solve(testCaseFile: str, settings: Settings):
     """Run the power flow solver.
     Args:
         TESTCASE (str): A string with the path to the network json file.
@@ -17,22 +18,7 @@ def solve(TESTCASE, SETTINGS):
     #  yourself with the parameters of each model.
 
     # # # Parse the test case data # # #
-    case_name = TESTCASE
-    devices = parse_json(case_name)
-
-    # # # Unpack parsed device objects in case you need them # # #
-    nodes = devices['nodes']
-    voltage_sources = devices['voltage_sources']
-    resistors = devices['resistors']
-    capacitors = devices['capacitors']
-    inductors = devices['inductors']
-    switches = devices['switches']
-    induction_motors = devices['induction_motors']
-
-    # # # Solver settings # # #
-    t_final = SETTINGS['Simulation Time']
-    tol = SETTINGS['Tolerance']  # NR solver tolerance
-    max_iters = SETTINGS['Max Iters']  # maximum NR iterations
+    devices = parse_json(testCaseFile)
 
     # # # Assign system nodes # # #
     # We assign a node index for every node in our Y matrix and J vector.
@@ -41,15 +27,15 @@ def solve(TESTCASE, SETTINGS):
     # induction motor.
     # You can determine the size of the Y matrix by looking at the total
     # number of nodes in the system.
-    size_Y = assign_node_indexes(devices)
+    nodeLookup = assign_node_indexes(devices.nodes)
     
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
-    V_init = initialize(devices, size_Y)
+    initialFrame = initialize(devices, nodeLookup)
 
     # TODO: STEP 2 - Run the time domain simulation and return an array that contains
     #                time domain waveforms of all the state variables # # #
-    V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS)
+    V_waveform = execute_simulation(devices, initialFrame, nodeLookup, settings)
 
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current

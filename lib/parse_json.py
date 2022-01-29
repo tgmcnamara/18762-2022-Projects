@@ -20,29 +20,22 @@ from classes.Inductors import Inductors
 from classes.Switches import Switches
 from classes.VoltageSources import VoltageSources
 from classes.InductionMotors import InductionMotors
+from classes.Devices import Devices
 
 def parse_json(json_file):
     with open(json_file, 'r') as f:
         json_data = load(f)
 
-    device_dict = {
-        'nodes': [],
-        'resistors': [],
-        'capacitors': [],
-        'inductors': [],
-        'switches': [],
-        'voltage_sources': [],
-        'induction_motors': []
-    }
+    devices = Devices()
 
     for ele_data in json_data['nodes']:
-        device_dict['nodes'].append(Nodes(
+        devices.nodes.append(Nodes(
             ele_data['name'],
             ele_data['phase']
         ))
 
     for ele_data in json_data['resistors']:
-        device_dict['resistors'].append(Resistors(
+        devices.resistors.append(Resistors(
             ele_data['name'],
             ele_data['from_node'], 
             ele_data['to_node'],
@@ -50,7 +43,7 @@ def parse_json(json_file):
         ))
 
     for ele_data in json_data['capacitors']:
-        device_dict['capacitors'].append(Capacitors(
+        devices.capacitors.append(Capacitors(
             ele_data['name'],
             ele_data['from_node'], 
             ele_data['to_node'],
@@ -58,7 +51,7 @@ def parse_json(json_file):
         ))
 
     for ele_data in json_data['inductors']:
-        device_dict['inductors'].append(Inductors(
+        devices.inductors.append(Inductors(
             ele_data['name'],
             ele_data['from_node'], 
             ele_data['to_node'],
@@ -66,7 +59,7 @@ def parse_json(json_file):
         ))
 
     for ele_data in json_data['switches']:
-        device_dict['switches'].append(Switches(
+        devices.switches.append(Switches(
             ele_data['name'],
             ele_data['from_node'], 
             ele_data['to_node'],
@@ -75,7 +68,7 @@ def parse_json(json_file):
         ))
 
     for ele_data in json_data['voltage_sources']:
-        device_dict['voltage_sources'].append(VoltageSources(
+        devices.voltage_sources.append(VoltageSources(
             ele_data['name'],
             ele_data['vp_node'], 
             ele_data['vn_node'],
@@ -85,7 +78,7 @@ def parse_json(json_file):
         ))
 
     for ele_data in json_data['induction_motors']:
-        device_dict['induction_motors'].append(InductionMotors(
+        devices.induction_motors.append(InductionMotors(
             ele_data['name'],
             ele_data['phase_a_node'],
             ele_data['phase_b_node'],
@@ -104,6 +97,6 @@ def parse_json(json_file):
             ele_data['n_pole_pairs']
         ))
 
-    return device_dict
+    return devices
 
 
