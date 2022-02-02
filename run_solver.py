@@ -1,7 +1,7 @@
 from scripts.solve import solve
 
 # path to the grid network RAW file
-casename = 'testcases/IM_circuit.json'
+casename = 'testcases/single_phase_R_circuit.json'
 
 # the settings for the solver
 settings = {
