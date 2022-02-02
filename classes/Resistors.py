@@ -12,13 +12,25 @@ class Resistors:
         self.to_node = to_node
         self.r = r
         # You are welcome to / may be required to add additional class variables   
+  
+    def assign_node_indexes(self, nodeLookup: dict):
+        self.from_index = nodeLookup[self.from_node]
+        self.to_index = nodeLookup[self.to_node]
 
-    # Some suggested functions to implement, 
-    def assign_node_indexes(self,):
-        pass
-        
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self,):
-        pass
+    def stamp_dense(self, Y, J, v_previous, timestep):
+        Y[self.from_index, self.from_index] += 1/self.r
+        Y[self.to_index, self.to_index] += 1/self.r
+
+        Y[self.from_index, self.to_index] += -1/self.r
+        Y[self.to_index, self.from_index] += -1/self.r
+
+
+
+
+
+        
+
+        

@@ -1,17 +1,29 @@
-from Nodes import Nodes
-from Resistors import Resistors
-from Capacitors import Capacitors
-from Inductors import Inductors
-from Switches import Switches
-from VoltageSources import VoltageSources
-from InductionMotors import InductionMotors
+from classes.Nodes import Nodes
+from classes.Resistors import Resistors
+from classes.Capacitors import Capacitors
+from classes.Inductors import Inductors
+from classes.Switches import Switches
+from classes.VoltageSources import VoltageSources
+from classes.InductionMotors import InductionMotors
 
 class Devices:
     def __init__(self):
-        self.nodes = [Nodes]
-        self.resistors = [Resistors]
-        self.capacitors = [Capacitors]
-        self.inductors = [Inductors]
-        self.switches = [Switches]
-        self.voltage_sources = [VoltageSources]
-        self.induction_motors = [InductionMotors]
+        self.nodes = []
+        self.resistors = []
+        self.capacitors = []
+        self.inductors = []
+        self.switches = []
+        self.voltage_sources = []
+        self.induction_motors = []
+        self.current_sources = []
+
+    def all_devices_but_nodes(self):
+        return [] \
+            + self.resistors \
+            + self.capacitors \
+            + self.inductors \
+            + self.switches \
+            + self.voltage_sources \
+            + self.induction_motors \
+            + self.current_sources
+        

@@ -43,9 +43,10 @@ class InductionMotors:
         self.lrr = self.llr + self.lm
         # You are welcome to / may be required to add additional class variables   
 
-    # Some suggested functions to implement, 
-    def assign_node_indexes(self,):
-        pass
+    def assign_node_indexes(self, nodeLookup: dict):
+        self.phase_a_index = nodeLookup[self.phase_a_node]
+        self.phase_b_index = nodeLookup[self.phase_b_node]
+        self.phase_c_index = nodeLookup[self.phase_c_node]
         
     def stamp_sparse(self,):
         pass

@@ -1,9 +1,6 @@
 import numpy as np
 
-from classes.CircuitFrame import CircuitFrame
+def initialize(devices, y_size):
+    v_init = np.full(y_size, 0.1)
 
-def initialize(devices, nodeLookup):
-    v_init = np.zeros(len(nodeLookup))
-    j_init = np.zeros(len(nodeLookup))
-
-    return CircuitFrame(v=v_init, j=j_init, timestep=0)
+    return v_init

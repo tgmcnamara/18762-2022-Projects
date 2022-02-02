@@ -11,9 +11,9 @@ class Capacitors:
         self.to_node = to_node
         # You are welcome to / may be required to add additional class variables   
 
-    # Some suggested functions to implement, 
-    def assign_node_indexes(self,):
-        pass
+    def assign_node_indexes(self, nodeLookup: dict):
+        self.from_index = nodeLookup[self.from_node]
+        self.to_index = nodeLookup[self.to_node]
         
     def stamp_sparse(self,):
         pass
