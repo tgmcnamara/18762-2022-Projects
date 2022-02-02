@@ -16,12 +16,14 @@ class VoltageSources:
         self.frequency_hz = frequency_hz
         
         self.v_max = amp_ph_ph_rms * math.sqrt(2)
+        self.frequency_rad_per_sec = frequency_hz * HERTZ_TO_RADIANS_PER_SECOND
+        self.phase_rad = phase_deg * math.pi / 180
 
     def assign_node_indexes(self, nodeLookup: dict):
         self.vp_index = nodeLookup[self.vp_node]
         self.vn_index = nodeLookup[self.vn_node]
 
-        modified_index = len(nodeLookup) + 1
+        modified_index = len(nodeLookup)
         nodeLookup[self.name] = modified_index
         self.voltage_index = modified_index
         
@@ -32,7 +34,7 @@ class VoltageSources:
         Y[self.voltage_index, self.vn_index] = -1
         Y[self.vn_index, self.voltage_index] = -1
 
-        J[self.voltage_index] = math.cos(self.frequency_hz * HERTZ_TO_RADIANS_PER_SECOND * timestep)
+        J[self.voltage_index] = self.v_max * math.cos(self.frequency_rad_per_sec * timestep + self.phase_rad)
 
     def stamp_sparse(self,):
         pass

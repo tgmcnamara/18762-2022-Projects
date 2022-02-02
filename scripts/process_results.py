@@ -11,9 +11,8 @@ def process_results(v_waveform, devices: Devices):
             node_voltage_dict[node.index] = []
 
     for v in v_waveform:
-        for i in range(len(v)):
-            if i != 0:
-                node_voltage_dict[i].append(v[i])
+        for i in node_voltage_dict.keys():
+            node_voltage_dict[i].append(v[i])
 
     for node in devices.nodes:
         if node.name != "gnd":

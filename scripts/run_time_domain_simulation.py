@@ -8,12 +8,12 @@ def execute_simulation(devices: Devices, v_init, settings: Settings):
 
     v_waveform = [v_init]
 
-    timestep = 0
+    runtime = 0
     v_previous = v_init
 
-    while timestep <= settings.simulationTime:
-        timestep += 0.001 #wild guess
-        v_next = execute_time_step(devices, node_count, v_previous, timestep, settings)
+    while runtime <= settings.simulationTime:
+        runtime += settings.timestep
+        v_next = execute_time_step(devices, node_count, v_previous, runtime, settings)
         v_waveform.append(v_next)
         v_previous = v_next
 

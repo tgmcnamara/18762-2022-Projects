@@ -47,5 +47,13 @@ class CircuitSimulatorTests(unittest.TestCase):
 
         results = solve(devices)
 
+        v_waveform_a = results.get_node_voltage("a")
+        v_waveform_b = results.get_node_voltage("b")
+
+        self.assertAlmostEqual(169, max(v_waveform_a), delta=1)
+        self.assertAlmostEqual(75, max(v_waveform_b), delta=1)
+
+
+
 if __name__ == '__main__':
     unittest.main()
