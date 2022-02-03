@@ -10,20 +10,22 @@ def execute_simulation(devices: Devices, v_init, settings: Settings):
 
     runtime = 0
     v_previous = v_init
+    J_previous = np.zeros(node_count)
 
     while runtime <= settings.simulationTime:
         runtime += settings.timestep
-        v_next = execute_time_step(devices, node_count, v_previous, runtime, settings)
+        (v_next, J_next) = execute_time_step(devices, node_count, v_previous, J_previous, runtime, settings)
         v_waveform.append(v_next)
         v_previous = v_next
+        J_previous = J_next
 
     return v_waveform
 
-def execute_time_step(devices: Devices, node_count, v_previous, runtime: float, settings: Settings):
+def execute_time_step(devices: Devices, node_count, v_previous, J_previous, runtime: float, settings: Settings):
     Y = np.zeros((node_count, node_count))
     J = np.zeros(node_count)
 
-    stamp_devices(devices, Y, J, v_previous, runtime, settings.timestep)
+    stamp_devices(devices, Y, J, v_previous, J_previous, runtime, settings.timestep)
 
     clear_ground(Y, J, node_count)
 
@@ -31,11 +33,11 @@ def execute_time_step(devices: Devices, node_count, v_previous, runtime: float, 
 
     v_next = np.dot(J, Y_inverse)
 
-    return v_next
+    return (v_next, J)
 
-def stamp_devices(devices, Y, J, v_previous, runtime, timestep):
+def stamp_devices(devices, Y, J, v_previous, J_previous, runtime, timestep):
     for device in devices.all_devices_but_nodes():
-        device.stamp_dense(Y, J, v_previous, runtime, timestep)
+        device.stamp_dense(Y, J, v_previous, J_previous, runtime, timestep)
 
 def clear_ground(Y, J, node_count):
     J[0] = 1

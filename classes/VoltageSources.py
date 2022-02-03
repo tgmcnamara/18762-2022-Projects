@@ -27,7 +27,7 @@ class VoltageSources:
         nodeLookup[self.name] = modified_index
         self.current_index = modified_index
         
-    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
+    def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
         Y[self.current_index, self.vp_index] = 1
         Y[self.vp_index, self.current_index] = 1
 

@@ -8,14 +8,14 @@ class CurrentSources:
         self.i = i
         # You are welcome to / may be required to add additional class variables   
   
-    def assign_node_indexes(self, nodeLookup: dict):
+    def assign_node_indexes(self, nodeLookup: dict = {}, from_index = -1, to_index = -1):
         self.from_index = nodeLookup[self.from_node]
         self.to_index = nodeLookup[self.to_node]
 
-    def assign_node_indexes(self, from_index, to_index):
+    def assign_node_indexes_direct(self, from_index, to_index):
         self.from_index = from_index
         self.to_index = to_index
 
-    def stamp_dense(self,  Y, J, v_previous, runtime, timestep):
+    def stamp_dense(self,  Y, J, v_previous, J_previous, runtime, timestep):
         J[self.from_index] += -self.i
         J[self.to_index] += self.i
