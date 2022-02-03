@@ -1,10 +1,11 @@
 import unittest
-from classes.CurrentSource import CurrentSources
+from classes.CurrentSources import CurrentSources
 from classes.Devices import Devices
+from classes.Inductors import Inductors
 from classes.Nodes import Nodes
 from classes.Resistors import Resistors
 from classes.Settings import Settings
-from classes.VoltageSources import CurrentSensor, VoltageSources
+from classes.VoltageSources import CurrentSensors, VoltageSources
 from scripts.solve import solve
 
 class CircuitSimulatorTests(unittest.TestCase):
@@ -44,7 +45,20 @@ class CircuitSimulatorTests(unittest.TestCase):
         self.assertAlmostEqual(169, max(v_waveform_a), delta=1)
         self.assertAlmostEqual(75, max(v_waveform_b), delta=1)
 
+    def test_inductor(self):
+        devices = Devices([
+            Nodes("gnd"),
+            Nodes("a"),
+            Nodes("b"),
+            Nodes("c"),
+            VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 60),
+            CurrentSensors("c", "gnd", index=1),
+            Resistors("r-a-b", "b", "c", 4),
+            #Resistors("r-a-b", "b", "c", 4),
+            Inductors("i-b-c", "a", "b", 0.1)
+        ])
 
+        results = solve(devices, Settings(simulationTime=0.1))
 
 
 if __name__ == '__main__':

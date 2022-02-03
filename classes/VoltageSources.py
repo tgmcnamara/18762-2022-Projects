@@ -42,6 +42,6 @@ class VoltageSources:
     def stamp_open(self,):
         pass
         
-class CurrentSensor(VoltageSources):
+class CurrentSensors(VoltageSources):
     def __init__(self, node_1, node_2, index):
         VoltageSources.__init__(self, "currentsensor-" + str(index), node_1, node_2, 0, 0, 0)
