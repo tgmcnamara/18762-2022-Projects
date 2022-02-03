@@ -1,4 +1,4 @@
-from classes.CurrentSource import CurrentSources
+from classes.CurrentSources import CurrentSources
 from classes.Nodes import Nodes
 from classes.Resistors import Resistors
 from classes.Capacitors import Capacitors

@@ -1,5 +1,5 @@
 import sys
-from classes.CurrentSource import CurrentSources
+from classes.CurrentSources import CurrentSources
 
 from classes.Resistors import Resistors
 sys.path.append("..")
