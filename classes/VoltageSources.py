@@ -25,16 +25,16 @@ class VoltageSources:
 
         modified_index = len(nodeLookup)
         nodeLookup[self.name] = modified_index
-        self.voltage_index = modified_index
+        self.current_index = modified_index
         
-    def stamp_dense(self, Y, J, v_previous, timestep):
-        Y[self.voltage_index, self.vp_index] = 1
-        Y[self.vp_index, self.voltage_index] = 1
+    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
+        Y[self.current_index, self.vp_index] = 1
+        Y[self.vp_index, self.current_index] = 1
 
-        Y[self.voltage_index, self.vn_index] = -1
-        Y[self.vn_index, self.voltage_index] = -1
+        Y[self.current_index, self.vn_index] = -1
+        Y[self.vn_index, self.current_index] = -1
 
-        J[self.voltage_index] = self.v_max * math.cos(self.frequency_rad_per_sec * timestep + self.phase_rad)
+        J[self.current_index] = self.v_max * math.cos(self.frequency_rad_per_sec * runtime + self.phase_rad)
 
     def stamp_sparse(self,):
         pass
@@ -42,3 +42,6 @@ class VoltageSources:
     def stamp_open(self,):
         pass
         
+class CurrentSensor(VoltageSources):
+    def __init__(self, node_1, node_2, index):
+        VoltageSources.__init__(self, "currentsensor-" + str(index), node_1, node_2, 0, 0, 0)

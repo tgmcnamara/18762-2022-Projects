@@ -19,11 +19,11 @@ def execute_simulation(devices: Devices, v_init, settings: Settings):
 
     return v_waveform
 
-def execute_time_step(devices: Devices, node_count, v_previous, timestep: float, settings: Settings):
+def execute_time_step(devices: Devices, node_count, v_previous, runtime: float, settings: Settings):
     Y = np.zeros((node_count, node_count))
     J = np.zeros(node_count)
 
-    stamp_devices(devices, Y, J, v_previous, timestep)
+    stamp_devices(devices, Y, J, v_previous, runtime, settings.timestep)
 
     clear_ground(Y, J, node_count)
 
@@ -33,9 +33,9 @@ def execute_time_step(devices: Devices, node_count, v_previous, timestep: float,
 
     return v_next
 
-def stamp_devices(devices, Y, J, v_previous, timestep):
+def stamp_devices(devices, Y, J, v_previous, runtime, timestep):
     for device in devices.all_devices_but_nodes():
-        device.stamp_dense(Y, J, v_previous, timestep)
+        device.stamp_dense(Y, J, v_previous, runtime, timestep)
 
 def clear_ground(Y, J, node_count):
     J[0] = 1

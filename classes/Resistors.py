@@ -17,10 +17,14 @@ class Resistors:
         self.from_index = nodeLookup[self.from_node]
         self.to_index = nodeLookup[self.to_node]
 
+    def assign_node_indexes(self, from_index, to_index):
+        self.from_index = from_index
+        self.to_index = to_index
+
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self, Y, J, v_previous, timestep):
+    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
         Y[self.from_index, self.from_index] += 1/self.r
         Y[self.to_index, self.to_index] += 1/self.r
 

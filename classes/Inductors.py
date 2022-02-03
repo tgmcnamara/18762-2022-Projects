@@ -1,4 +1,7 @@
 import sys
+from classes.CurrentSource import CurrentSources
+
+from classes.Resistors import Resistors
 sys.path.append("..")
 import numpy as np
 from itertools import count
@@ -17,10 +20,20 @@ class Inductors:
         self.from_index = nodeLookup[self.from_node]
         self.to_index = nodeLookup[self.to_node]
         
-    def stamp_sparse(self,):
-        pass
+    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
+        companion_r = timestep / (2 * self.l)
+        resistor = Resistors(self.name + "-companion-resistor", self.from_node, self.to_node, companion_r)
+        resistor.assign_node_indexes(self.from_index, self.to_index)
+        resistor.stamp_dense(Y, J, v_previous, runtime, timestep)
 
-    def stamp_dense(self,):
+        previous_voltage = v_previous[self.to_index] - v_previous[self.from_index]
+        previous_current = 1 #todo
+        companion_i = previous_current + timestep / (2 * self.l) * previous_voltage
+        current_source = CurrentSources(self.name + "-companion-current-source", self.from_node, self.to_node, companion_i)
+        current_source.assign_node_indexes(self.from_index, self.to_index)
+        current_source.stamp_dense(Y, J, v_previous, runtime, timestep)
+
+    def stamp_sparse(self,):
         pass
 
     def stamp_short(self,):

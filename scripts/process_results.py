@@ -19,4 +19,4 @@ def process_results(v_waveform, devices: Devices):
             node_voltage_dict[node.name] = node_voltage_dict[node.index]
             del node_voltage_dict[node.index]
 
-    return SimulationResults(node_voltage_dict)
+    return SimulationResults(node_voltage_dict, v_waveform, devices)
