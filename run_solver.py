@@ -1,11 +1,13 @@
 from classes.Settings import Settings
-from scripts.solve import solve_from_file
+from lib.parse_json import parse_json
+from scripts.solve import solve
 
 # path to the grid network RAW file
-casefile = 'testcases/IM_circuit.json'
+casefile = 'testcases/RL_circuit.json'
 
 # the settings for the solver
 settings = Settings()
 
-# run the solver
-solve_from_file(casefile, settings)
+devices = parse_json(casefile)
+
+results = solve(devices, settings)

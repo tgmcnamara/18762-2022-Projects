@@ -9,7 +9,11 @@ def assign_node_indexes(devices: Devices):
     if len(devices.nodes) == 0:
         devices.nodes = autogenerate_nodes(devices)
 
+    print(f'Circuit has {len(devices.nodes)} original nodes')
+
     enforce_element_isolation(devices)
+
+    print(f'Circuit has {len(devices.nodes)} total nodes')
 
     nodeLookup = {}
     count = 1
@@ -26,10 +30,14 @@ def assign_node_indexes(devices: Devices):
     for device in devices.all_devices_but_nodes():
         device.assign_node_indexes(nodeLookup)
 
+    print(f'Total Y matrix size for circuit will be {len(nodeLookup)}')
+
     return len(nodeLookup)
 
 #For when I'm lazy and don't want to specify node names.
 def autogenerate_nodes(devices: Devices):
+    print("Autogenerating nodes...")
+
     nodes = {}
     for device in devices.all_devices_but_nodes():
         for nodeName in device.get_nodes_connections():
@@ -44,6 +52,7 @@ def autogenerate_nodes(devices: Devices):
 #We create an extra node specifically for these elments, which gives them the 
 #state space they need. This method assumes that these elements use their 'to' node for this.
 def enforce_element_isolation(devices: Devices):
+    count = 0
     for device in devices.all_devices_but_nodes():
         if not isinstance(device, Inductors) and not isinstance(device, Capacitors):
             continue
@@ -55,11 +64,16 @@ def enforce_element_isolation(devices: Devices):
         device.to_node = new_node_name
 
         #current sensors implicitly act as a short between nodes.
-        node_branch = CurrentSensors(device.name + "-extension", original_node, new_node_name)
+        node_branch = CurrentSensors(device.name + "-branch", original_node, new_node_name)
 
         devices.voltage_sources.append(node_branch)
 
         devices.nodes.append(new_node)
+
+        print(f'Added extension node "{new_node_name}"')
+        count += 1
+    
+    print (f'Added {count} extension nodes')
         
         
     

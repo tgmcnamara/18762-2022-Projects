@@ -1,27 +1,9 @@
 from classes.Devices import Devices
 from classes.Settings import Settings
-from lib.parse_json import parse_json
 from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
 from scripts.run_time_domain_simulation import execute_simulation
 from scripts.process_results import process_results
-
-
-def solve_from_file(testCaseFile: str, settings: Settings):
-    """Run the power flow solver.
-    Args:
-        TESTCASE (str): A string with the path to the network json file.
-        SETTINGS (dict): Contains all the solver settings in a dictionary.
-    Returns:
-        None
-    """
-    # TODO: STEP 0 - Initialize all the model classes in the models directory (models/) and familiarize
-    #  yourself with the parameters of each model.
-
-    # # # Parse the test case data # # #
-    devices = parse_json(testCaseFile)
-
-    solve(devices, settings)
 
 def solve(devices: Devices, settings: Settings = Settings()):
 

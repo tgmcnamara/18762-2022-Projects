@@ -41,12 +41,19 @@ class CircuitSimulatorTests(unittest.TestCase):
 
     def test_inductor(self):
         devices = Devices([
-            VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 60),
-            Resistors("r-b-gnd", "b", "gnd", 4),
-            Inductors("i-a-b", "a", "b", 0.1)
+            VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 15),
+            Resistors("r-1", "a", "b", 5),
+            Inductors("i-1", "b", "c", 0.1),
+            Resistors("r-2", "c", "gnd", 5)
         ])
 
         results = solve(devices, Settings(simulationTime=0.1))
+
+        v_waveform_b = results.get_node_voltage("b")
+        v_waveform_c = results.get_node_voltage("c")
+
+        self.assertAlmostEqual(115, max(v_waveform_b), delta=1)
+        self.assertAlmostEqual(61, max(v_waveform_c), delta=1)
 
 
 if __name__ == '__main__':

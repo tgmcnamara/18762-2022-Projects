@@ -37,7 +37,7 @@ class VoltageSources:
         Y[self.current_index, self.vn_index] = -1
         Y[self.vn_index, self.current_index] = -1
 
-        J[self.current_index] = self.v_max * math.cos(self.frequency_rad_per_sec * runtime + self.phase_rad)
+        J[self.current_index] = self.v_max * math.sin(self.frequency_rad_per_sec * runtime + self.phase_rad)
 
     def stamp_sparse(self,):
         pass
