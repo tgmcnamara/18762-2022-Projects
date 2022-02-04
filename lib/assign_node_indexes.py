@@ -1,6 +1,9 @@
 
+from classes.Capacitors import Capacitors
 from classes.Devices import Devices
+from classes.Inductors import Inductors
 from classes.Nodes import Nodes
+from classes.VoltageSources import CurrentSensors, VoltageSources
 
 def assign_node_indexes(devices: Devices):
     if len(devices.nodes) == 0:
@@ -36,4 +39,27 @@ def autogenerate_nodes(devices: Devices):
         return Nodes(nodeName)
 
     return list(map(mapNode, nodes.keys()))
+
+#Inductors and capacitors need their own space on the J vector to track their current.
+#We create an extra node specifically for these elments, which gives them the 
+#state space they need. This method assumes that these elements use their 'to' node for this.
+def enforce_element_isolation(devices: Devices):
+    for device in devices.all_devices_but_nodes():
+        if not isinstance(device, Inductors) and not isinstance(device, Capacitors):
+            continue
+
+        original_node = device.to_node
+        new_node_name = device.name + "-extension-" + original_node
+
+        new_node = Nodes(new_node_name)
+        device.to_node = new_node_name
+
+        #current sensors implicitly act as a short between nodes.
+        node_branch = CurrentSensors(device.name + "-extension", original_node, new_node_name)
+
+        devices.voltage_sources.append(node_branch)
+
+        devices.nodes.append(new_node)
+        
+        
     

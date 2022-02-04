@@ -42,10 +42,8 @@ class CircuitSimulatorTests(unittest.TestCase):
     def test_inductor(self):
         devices = Devices([
             VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 60),
-            CurrentSensors("c", "gnd", index=1),
-            Resistors("r-a-b", "b", "c", 4),
-            #Resistors("r-a-b", "b", "c", 4),
-            Inductors("i-b-c", "a", "b", 0.1)
+            Resistors("r-b-gnd", "b", "gnd", 4),
+            Inductors("i-a-b", "a", "b", 0.1)
         ])
 
         results = solve(devices, Settings(simulationTime=0.1))
