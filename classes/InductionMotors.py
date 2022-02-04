@@ -47,7 +47,10 @@ class InductionMotors:
         self.phase_a_index = nodeLookup[self.phase_a_node]
         self.phase_b_index = nodeLookup[self.phase_b_node]
         self.phase_c_index = nodeLookup[self.phase_c_node]
-        
+
+    def get_nodes_connections(self):
+        return [self.phase_a_node, self.phase_b_node, self.phase_c_node]
+
     def stamp_sparse(self,):
         pass
 

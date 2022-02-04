@@ -11,9 +11,6 @@ from scripts.solve import solve
 class CircuitSimulatorTests(unittest.TestCase):
     def test_resistor(self):
         devices = Devices([
-            Nodes("gnd", "A"),
-            Nodes("a", "A"),
-            Nodes("b", "A"),
             CurrentSources("cs-gnd-a", "gnd", "a", 5),
             Resistors("r-a-b", "a", "b", 5),
             Resistors("r-a-b", "b", "gnd", 4)
@@ -29,9 +26,6 @@ class CircuitSimulatorTests(unittest.TestCase):
 
     def test_voltage_source(self):
         devices = Devices([
-            Nodes("gnd", "A"),
-            Nodes("a", "A"),
-            Nodes("b", "A"),
             VoltageSources("v-gnd-a", "a", "gnd", 120, 0, 60),
             Resistors("r-a-b", "a", "b", 5),
             Resistors("r-a-b", "b", "gnd", 4)
@@ -47,10 +41,6 @@ class CircuitSimulatorTests(unittest.TestCase):
 
     def test_inductor(self):
         devices = Devices([
-            Nodes("gnd"),
-            Nodes("a"),
-            Nodes("b"),
-            Nodes("c"),
             VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 60),
             CurrentSensors("c", "gnd", index=1),
             Resistors("r-a-b", "b", "c", 4),

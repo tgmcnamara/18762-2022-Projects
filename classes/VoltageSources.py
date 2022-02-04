@@ -26,7 +26,10 @@ class VoltageSources:
         modified_index = len(nodeLookup)
         nodeLookup[self.name] = modified_index
         self.current_index = modified_index
-        
+
+    def get_nodes_connections(self):
+        return [self.vp_node, self.vn_node]
+
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
         Y[self.current_index, self.vp_index] = 1
         Y[self.vp_index, self.current_index] = 1

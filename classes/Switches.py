@@ -17,6 +17,9 @@ class Switches:
         self.from_index = nodeLookup[self.from_node]
         self.to_index = nodeLookup[self.to_node]
         
+    def get_nodes_connections(self):
+        return [self.from_node, self.to_node]
+
     def stamp_sparse(self,):
         pass
 

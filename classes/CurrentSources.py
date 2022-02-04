@@ -16,6 +16,9 @@ class CurrentSources:
         self.from_index = from_index
         self.to_index = to_index
 
+    def get_nodes_connections(self):
+        return [self.from_node, self.to_node]
+
     def stamp_dense(self,  Y, J, v_previous, J_previous, runtime, timestep):
         J[self.from_index] += -self.i
         J[self.to_index] += self.i

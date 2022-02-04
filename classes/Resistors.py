@@ -17,6 +17,9 @@ class Resistors:
         self.from_index = nodeLookup[self.from_node]
         self.to_index = nodeLookup[self.to_node]
 
+    def get_nodes_connections(self):
+        return [self.from_node, self.to_node]
+
     def assign_node_indexes_direct(self, from_index, to_index):
         self.from_index = from_index
         self.to_index = to_index

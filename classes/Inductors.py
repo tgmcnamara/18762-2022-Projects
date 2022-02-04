@@ -20,6 +20,9 @@ class Inductors:
         self.from_index = nodeLookup[self.from_node]
         self.to_index = nodeLookup[self.to_node]
         
+    def get_nodes_connections(self):
+        return [self.from_node, self.to_node]
+
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
         conductance = timestep / (2 * self.l)
         companion_r = 1 / conductance
