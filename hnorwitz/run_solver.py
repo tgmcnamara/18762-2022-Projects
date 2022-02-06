@@ -1,7 +1,7 @@
-from scripts import solve ###Should I be remove .solve or .____ from all my files
+from scripts.solve import solve 
 
 # path to the grid network RAW file
-casename = 'single_phase_R_circuit.jason'#'testcases/IM_circuit.json'
+casename = 'single_phase_R_circuit.json'#'testcases/IM_circuit.json'
 
 # the settings for the solver
 settings = {

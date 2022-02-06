@@ -35,7 +35,7 @@ class VoltageSources:
     def stamp_dense(self,Y_dim):
         Y_mtx = np.zeros((Y_dim,Y_dim))
         if self.vn_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
-            Y_mtx[self.current_index, self.vp_index] = self.amp_ph_ph_rms #voltage (extra row)
+            Y_mtx[self.current_index, self.vp_index] = self.amp_ph_ph_rms #voltage (extra row) (should this be stamped into Jmatrix)
             Y_mtx[self.vp_index, self.current_index] = -1 #current(extra columb)
             return Y_mtx
         if self.vp_index == 'gnd':

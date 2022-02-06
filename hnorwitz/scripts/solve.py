@@ -31,7 +31,7 @@ def solve(TESTCASE, SETTINGS): #these are set in run_solver.py
 
     # # # Solver settings # # #
     t_final = SETTINGS['Simulation Time']
-    tol = SETTINGS['Tolerance']  # NR solver tolerance
+    tol = SETTINGS['Tolerance']  # NR solver tolerance (is this detla_t)
     max_iters = SETTINGS['Max Iters']  # maximum NR iterations
 
     # # # Assign system nodes # # #

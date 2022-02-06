@@ -27,29 +27,29 @@ class Capacitors:
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self,Y_dim):#do we need to include delta t
+    def stamp_dense(self,Y_dim, d_t):#do we need to include delta t
         Y_mtx= np.zeros((Y_dim,Y_dim))
         if self.to_node != 'gnd': #may need an or here for self.from_node
             Y_mtx[self.from_index,self.from_index] = d_t/(2*self.c) #Yii index
-            Y_mtx[self.from_index,self.to_index] = -1/self.r #Yij index
-            Y_mtx[self.to_index,self.from_index] = -1/self.r #Yji index
-            Y_mtx[self.to_index,self.to_index] = 1/self.r #Yjj index
+            Y_mtx[self.from_index,self.to_index] = -d_t/(2*self.c) #Yij index
+            Y_mtx[self.to_index,self.from_index] = -d_t/(2*self.c) #Yji index
+            Y_mtx[self.to_index,self.to_index] = d_t/(2*self.c) #Yjj index
         else:
-            Y_mtx[self.from_index,self.from_index] = 1/self.r #Yii index
+            Y_mtx[self.from_index,self.from_index] = d_t/(2*self.c) #Yii index
             Y_mtx[self.from_index,self.to_index] = 0 #Yij index
             Y_mtx[self.to_index,self.from_index] = 0 #Yji index
             Y_mtx[self.to_index,self.to_index] = 0 #Yjj index
 
         return Y_mtx
-        if to_node != gnd:
+        #if to_node != gnd:
             #construct
             #[1/(deltat/2c), -1/(deltat/2c); -1/(deltat/2c), 1/(deltat/2c)]
             #[irow + icol=from_node, irow + jcol==to_node]
             #[jrow + icol=from_node, jrow + jcol==to_node]
-        else:
+        #else:
             #[1/(deltat/2c), 0; 0, 0]
 
-        pass
+        #pass
 
     def stamp_open(self,):#not sure what to do
         pass
