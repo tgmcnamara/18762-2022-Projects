@@ -1,0 +1,48 @@
+{
+    "nodes": [
+        {
+            "name": "n1_a",
+            "phase": "A"
+        },
+        {
+            "name": "n2_a",
+            "phase": "A"
+        },
+        {
+            "name": "gnd",
+            "phase": "N"
+        }
+    ],
+    "resistors": [
+        {
+            "name": "r1",
+            "from_node": "n1_a",
+            "to_node": "n2_b",
+            "r": 10
+        }
+    ],
+    "capacitors": [
+    ],
+    "inductors": [
+        {
+            "name": "l1",
+            "from_node": "n2_a",
+            "to_node": "gnd",
+            "l": 5e-3
+        }        
+    ],
+    "switches": [
+    ],
+    "voltage_sources": [
+    {
+            "name": "v_a",
+            "vp_node": "n1_a",
+            "vn_node": "gnd",
+            "amp_ph_ph_rms": 20,
+            "phase_deg": 45,
+            "frequency_hz": 60
+        }
+    ],
+    "induction_motors": [
+    ]
+}
