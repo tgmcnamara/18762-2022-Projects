@@ -58,7 +58,7 @@ def enforce_element_isolation(devices: Devices):
             continue
 
         original_node = device.to_node
-        new_node_name = device.name + "-extension-" + original_node
+        new_node_name = f'{device.name}:{device.from_node}-extension-{original_node}'
 
         new_node = Nodes(new_node_name)
         device.to_node = new_node_name

@@ -47,7 +47,7 @@ class CircuitSimulatorTests(unittest.TestCase):
             Resistors("r-2", "c", "gnd", 5)
         ])
 
-        results = solve(devices, Settings(simulationTime=0.1))
+        results = solve(devices, Settings(simulationTime=0.2))
 
         v_waveform_b = results.get_node_voltage("b")
         v_waveform_c = results.get_node_voltage("c")

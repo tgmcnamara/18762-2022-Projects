@@ -27,6 +27,6 @@ def solve(devices: Devices, settings: Settings = Settings()):
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
-    results = process_results(v_waveform, devices)
+    results = process_results(v_waveform, devices, settings)
 
     return results

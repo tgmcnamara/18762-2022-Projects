@@ -1,13 +1,18 @@
 from typing import List
-
+import numpy as np
 from classes.Devices import Devices
+from classes.Settings import Settings
 
 class SimulationResults:
-    def __init__(self, node_voltage_dict, v_waveform, devices: Devices):
+    def __init__(self, node_voltage_dict, v_waveform, devices: Devices, settings: Settings):
         self.node_voltage_dict = node_voltage_dict
         self.v_waveform = v_waveform
         self.devices = devices
+        self.settings = settings
     
+    def get_timesteps(self):
+        return np.arange(0, len(self.v_waveform) * self.settings.timestep, self.settings.timestep)
+
     def get_node_voltage(self, node_name):
         return self.node_voltage_dict[node_name]
 
