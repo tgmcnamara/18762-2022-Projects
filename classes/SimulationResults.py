@@ -11,10 +11,25 @@ class SimulationResults:
         self.settings = settings
     
     def get_timesteps(self):
-        return np.arange(0, len(self.v_waveform) * self.settings.timestep, self.settings.timestep)
+        count = len(self.v_waveform)
+
+        timesteps = range(count)
+
+        def translate_timestep(x):
+            return x * self.settings.timestep
+        
+        return list(map(translate_timestep, timesteps))
 
     def get_node_voltage(self, node_name):
+        if node_name == "gnd":
+            return [0] * len(self.v_waveform)
         return self.node_voltage_dict[node_name]
+
+    def get_voltage_drop(self, from_node, to_node):
+        from_v = self.get_node_voltage(from_node)
+        to_v = self.get_node_voltage(to_node)
+
+        return [(x[0] - x[1]) for x in zip(from_v, to_v)]
 
     def get_voltage_source_current(self, vs_name):
         voltagesource = next(vs for vs in self.devices.voltage_sources if vs.name == vs_name)
