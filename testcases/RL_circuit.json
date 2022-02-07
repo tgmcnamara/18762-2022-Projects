@@ -57,7 +57,7 @@
         {
             "name": "r1_a",
             "from_node": "n1_a",
-            "to_node": "n2_b",
+            "to_node": "n2_a",
             "r": 0.1
         },
         {

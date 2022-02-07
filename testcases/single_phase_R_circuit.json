@@ -1,0 +1,70 @@
+{
+    "nodes": [
+        {
+            "name": "n1_a",
+            "phase": "A"
+        },
+        {
+            "name": "n2_a",
+            "phase": "A"
+        },
+        {
+            "name": "n3_a",
+            "phase": "A"
+        },
+        {
+            "name": "gnd",
+            "phase": "N"
+        }
+    ],
+    "resistors": [
+        {
+            "name": "r1",
+            "from_node": "n1_a",
+            "to_node": "n2_b",
+            "r": 10
+        },
+        {
+            "name": "r2",
+            "from_node": "n2_a",
+            "to_node": "gnd",
+            "r": 20
+        },
+        {
+            "name": "r3",
+            "from_node": "n2_a",
+            "to_node": "n3_b",
+            "r": 40
+        },
+        {
+            "name": "r4",
+            "from_node": "n2_a",
+            "to_node": "n3_b",
+            "r": 50
+        },
+        {
+            "name": "r5",
+            "from_node": "n3_a",
+            "to_node": "gnd",
+            "r": 5
+        }
+    ],
+    "capacitors": [    
+    ],
+    "inductors": [
+    ],
+    "switches": [
+    ],
+    "voltage_sources": [
+    {
+            "name": "v_a",
+            "vp_node": "n1_a",
+            "vn_node": "gnd",
+            "amp_ph_ph_rms": 20,
+            "phase_deg": 0,
+            "frequency_hz": 60
+        }
+    ],
+    "induction_motors": [
+    ]
+}
