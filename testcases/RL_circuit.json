@@ -97,7 +97,7 @@
         {
             "name": "l1_a",
             "from_node": "n2_a",
-            "to_node": "n3_b",
+            "to_node": "n3_a",
             "l": 0.0083
         },
         {
