@@ -18,13 +18,17 @@ class VoltageSources:
 
     # Some suggested functions to implement, 
     def assign_node_indexes(self,val):
-        for i in range(val):
-            if Nodes.index[i].name == self.vp_node:
-                self.vp_index = Nodes.index[i]
-            if Nodes.index[i].name == self.vn_node:
-                self.np_index = Nodes.index[i]
-        val = val + 1
+        self.vp_index = Nodes.node_index_dict[self.vp_node]
+        self.np_index = Nodes.node_index_dict[self.vn_node]
+        
+        #for i in range(val):
+         #   if Nodes.index[i].name == self.vp_node:
+          #      self.vp_index = Nodes.index[i]
+           # if Nodes.index[i].name == self.vn_node:
+            #    self.np_index = Nodes.index[i]
+        #val = val + 1
         self.current_index = val
+        val = val + 1
         return val
         
         
@@ -35,12 +39,12 @@ class VoltageSources:
     def stamp_dense(self,Y_dim):
         Y_mtx = np.zeros((Y_dim,Y_dim))
         if self.vn_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
-            Y_mtx[self.current_index, self.vp_index] = self.amp_ph_ph_rms #voltage (extra row) (should this be stamped into Jmatrix)
-            Y_mtx[self.vp_index, self.current_index] = -1 #current(extra columb)
+            Y_mtx[self.current_index, self.vp_index] += 1 #voltage (extra row) (should this be stamped into Jmatrix)
+            Y_mtx[self.vp_index, self.current_index] += -1 #current(extra columb)
             return Y_mtx
         if self.vp_index == 'gnd':
-            Y_mtx[self.current_index, self.np_index] = -self.amp_ph_ph_rms #voltage 
-            Y_mtx[self.np_index, self.current_index] = 1 #current
+            Y_mtx[self.current_index, self.np_index] += -1 #voltage 
+            Y_mtx[self.np_index, self.current_index] += 1 #current
             return Y_mtx
 
         else: #voltage source not connected to a ground (struggling to figure this out)

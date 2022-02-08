@@ -45,13 +45,15 @@ def solve(TESTCASE, SETTINGS): #these are set in run_solver.py
     
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
-    V_init = initialize(devices, size_Y)
+    V_init = initialize(devices, size_Y) 
 
     # TODO: STEP 2 - Run the time domain simulation and return an array that contains
     #                time domain waveforms of all the state variables # # #
-    V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS)
+    V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS)#works till get to voltage source stamp
 
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
-    process_results(V_waveform, devices)
+    #process_results(V_waveform, devices)
+
+    return V_waveform
