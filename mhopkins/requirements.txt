@@ -1,0 +1,3 @@
+numpy (include version)
+scipy (include version)
+schemdraw (include version)

@@ -9,6 +9,10 @@
             "phase": "A"
         },
         {
+            "name": "n3_a",
+            "phase": "A"
+        },
+        {
             "name": "gnd",
             "phase": "N"
         }
@@ -17,17 +21,35 @@
         {
             "name": "r1",
             "from_node": "n1_a",
-            "to_node": "n2_a",
+            "to_node": "n2_b",
             "r": 10
-        }
-    ],
-    "capacitors": [
+        },
         {
-            "name": "l1",
+            "name": "r2",
             "from_node": "n2_a",
             "to_node": "gnd",
-            "c": 2e-6
-        }        
+            "r": 20
+        },
+        {
+            "name": "r3",
+            "from_node": "n2_a",
+            "to_node": "n3_b",
+            "r": 40
+        },
+        {
+            "name": "r4",
+            "from_node": "n2_a",
+            "to_node": "n3_b",
+            "r": 50
+        },
+        {
+            "name": "r5",
+            "from_node": "n3_a",
+            "to_node": "gnd",
+            "r": 5
+        }
+    ],
+    "capacitors": [    
     ],
     "inductors": [
     ],
@@ -39,7 +61,7 @@
             "vp_node": "n1_a",
             "vn_node": "gnd",
             "amp_ph_ph_rms": 20,
-            "phase_deg": 90,
+            "phase_deg": 0,
             "frequency_hz": 60
         }
     ],
