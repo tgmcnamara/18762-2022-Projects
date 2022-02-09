@@ -18,15 +18,14 @@ class VoltageSources:
 
     # Some suggested functions to implement, 
     def assign_node_indexes(self,val):
-        self.vp_index = Nodes.node_index_dict[self.vp_node]
-        self.np_index = Nodes.node_index_dict[self.vn_node]
-        
-        #for i in range(val):
-         #   if Nodes.index[i].name == self.vp_node:
-          #      self.vp_index = Nodes.index[i]
-           # if Nodes.index[i].name == self.vn_node:
-            #    self.np_index = Nodes.index[i]
-        #val = val + 1
+        if self.vp_node == 'gnd':
+            self.np_index = Nodes.node_index_dict[self.vn_node]
+        elif self.vn_node == 'gnd':
+            self.vp_index = Nodes.node_index_dict[self.vp_node]
+        else:
+            self.vp_index = Nodes.node_index_dict[self.vp_node]
+            self.np_index = Nodes.node_index_dict[self.vn_node]
+    
         self.current_index = val
         val = val + 1
         return val
@@ -36,22 +35,25 @@ class VoltageSources:
     def stamp_sparse(self,):#not worring about how to make sparse yet
         pass
 
-    def stamp_dense(self,Y_dim):
-        Y_mtx = np.zeros((Y_dim,Y_dim))
+    def stamp_dense(self,Y_mtx, J_mtx): #(THIS WORKS)
         if self.vn_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
             Y_mtx[self.current_index, self.vp_index] += 1 #voltage (extra row) (should this be stamped into Jmatrix)
             Y_mtx[self.vp_index, self.current_index] += -1 #current(extra columb)
-            return Y_mtx
-        if self.vp_index == 'gnd':
+            J_mtx[self.vp_index,0] += 0
+            J_mtx[self.current_index,0] += self.amp_ph_ph_rms
+
+        elif self.vp_index == 'gnd':
             Y_mtx[self.current_index, self.np_index] += -1 #voltage 
             Y_mtx[self.np_index, self.current_index] += 1 #current
-            return Y_mtx
+            J_mtx[self.np_index,0] += self.amp_ph_ph_rms
+            J_mtx[self.current_index,0] += 0
 
         else: #voltage source not connected to a ground (struggling to figure this out)
+            Y_mtx[self.vp_index,self.vp_index] = 1 #Yii index
+            Y_mtx[self.vp_index,self.np_index] = -1 #Yij index
+            Y_mtx[self.np_index,self.vp_index] = -1 #Yji index
+            Y_mtx[self.np_index,self.np_index] = 1 #Yjj index
 
-
-        
-            return Y_mtx 
         
 
     def stamp_open(self,): #not sure what this one is about

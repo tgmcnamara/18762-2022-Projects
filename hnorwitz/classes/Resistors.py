@@ -18,49 +18,24 @@ class Resistors:
 
     # Some suggested functions to implement, 
     def assign_node_indexes(self,val):#not sure if I implemented correctly
-        self.from_index = Nodes.node_index_dict[self.from_node]
-        self.to_index = Nodes.node_index_dict[self.to_node]
-        #for i in range(val):
-         #   if Nodes[i].__dict__['name'] == self.from_node: #not sure how to call specific node and and compare it
-          #      self.from_index = Nodes[i].index
-           # if Nodes == self.to_node:
-            #    self.to_index = Nodes.index[i]
-        #if from_node = node
-        #from_index = node_index
-        #if to_node = node
-        #to_index = node_index
+        if self.to_node == 'gnd':
+            self.from_index = Nodes.node_index_dict[self.from_node]
+        else:
+            self.from_index = Nodes.node_index_dict[self.from_node]
+            self.to_index = Nodes.node_index_dict[self.to_node]
         return val
         
         
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self, Y_dim):
-        Y_mtx= np.zeros((Y_dim,Y_dim))
-        if self.to_node != 'gnd': 
-            Y_mtx[self.from_index,self.from_index] = 1/self.r #Yii index
-            Y_mtx[self.from_index,self.to_index] = -1/self.r #Yij index
-            Y_mtx[self.to_index,self.from_index] = -1/self.r #Yji index
-            Y_mtx[self.to_index,self.to_index] = 1/self.r #Yjj index
+    def stamp_dense(self, Y_mtx, J_mtx):#(TESTING THIS METHODE
+        if self.to_node == 'gnd':
+            Y_mtx[self.from_index,self.from_index] += 1/self.r #Yii index
+            pass
         else:
-            Y_mtx[self.from_index,self.from_index] = 1/self.r #Yii index
-            #Y_mtx[self.from_index,self.to_index] = 0 #Yij index
-            #Y_mtx[self.to_index,self.from_index] = 0 #Yji index
-            #Y_mtx[self.to_index,self.to_index] = 0 #Yjj index
-
-        return Y_mtx
-        #alternate
-        #(Y,J)
-        #if self.to_node != 'gnd': 
-            #Y[self.from_index,self.from_index] += 1/self.r #Yii index
-            #Y[self.from_index,self.to_index] += -1/self.r #Yij index
-            #Y[self.to_index,self.from_index] += -1/self.r #Yji index
-            #Y[self.to_index,self.to_index] += 1/self.r #Yjj index
-            #J[1,from_index] +=0
-
-        #else:
-            #Y[self.from_index,self.from_index] += 1/self.r #Yii index
-            #Y[self.from_index,self.to_index] += 0 #Yij index
-            #Y[self.to_index,self.from_index] += 0 #Yji index
-            #Y[self.to_index,self.to_index] += 0 #Yjj index
-            #J[1,from_index] += 0
+            Y_mtx[self.from_index,self.from_index] += 1/self.r #Yii index
+            Y_mtx[self.from_index,self.to_index] += -1/self.r #Yij index
+            Y_mtx[self.to_index,self.from_index] += -1/self.r #Yji index
+            Y_mtx[self.to_index,self.to_index] += 1/self.r #Yjj index
+            J_mtx[self.from_index,0] +=0
