@@ -14,12 +14,14 @@ class Nodes(object):
           
 
     # Some suggested functions to implement, 
-    def assign_node_indexes(self, index_counter): #calls function assign_node_indexes
-        
-        if self.name != 'gnd':
-            self.node_index_dict[self.name] = Nodes.index_counter
-            Nodes.index_counter += 1
-            print(self.node_index_dict)
-        else:
-            pass
+    def assign_node_indexes(self,): #calls function assign_node_indexes
+        self.node_index_dict[self.name] = Nodes.index_counter
+        Nodes.index_counter += 1
+        print(self.node_index_dict)
+        #if self.name != 'gnd':
+            #self.node_index_dict[self.name] = Nodes.index_counter
+            #Nodes.index_counter += 1
+            #print(self.node_index_dict)
+        #else:
+            #pass
               
