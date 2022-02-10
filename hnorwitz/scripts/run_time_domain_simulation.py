@@ -24,7 +24,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
         resistor.stamp_dense(Y)
 
     for capacitors in devices['capacitors']:
-        capacitors.stamp_dense(Y, J, d_t, V_init)#not sure what things it need to take in
+        capacitors.stamp_dense(Y, J, d_t, V_init, t_init)#not sure what things it need to take in
         #Think I should be calling stamp_op 
 
     for inductors in devices['inductors']:
@@ -57,6 +57,8 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
         else:
             for voltage_sources in devices['voltage_sources']:
                 voltage_sources.stamp_dense(Y,J, t)
+            for capacitors in devices['capacitors']:
+                capacitors.stamp_dense(Y, J, d_t, Prevs_v, t)
             Y[Nodes.node_index_dict['gnd'],:] = 0
             Y[:,Nodes.node_index_dict['gnd']] = 0
             Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1

@@ -22,10 +22,11 @@ class Capacitors:
     def assign_node_indexes(self,):#in this methode we do count the gnd
         self.from_index = Nodes.node_index_dict[self.from_node]
         self.to_index = Nodes.node_index_dict[self.to_node]
-        Nodes.index_counter += 1
         self.comp_index = Nodes.index_counter
         Nodes.index_counter += 1
         self.c_curr_index = Nodes.index_counter
+        Nodes.index_counter += 1
+        
         
         ##
         #self.from_index = Nodes.node_index_dict[self.from_node]
