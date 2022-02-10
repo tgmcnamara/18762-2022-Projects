@@ -93,6 +93,7 @@ class Simulator():
             #self.init_Y(devices)
             self.generate_Y_r()
             self.perform_mna()
+            self.delete_ground_node()
      
     def init_solver(self, settings):   
         self.solving_dict["sim_time"] = settings['Simulation Time']
@@ -136,21 +137,41 @@ class Simulator():
                         
         
     def perform_mna(self):
-        # loop through sources
-        # numpy.append(arr, values, axis=None)[source]
+        # preliminaries Y
         size_Y = self.Y.shape[0]
+        new_size = size_Y + len(self.source_list)
+        dummy_Y = np.zeros((new_size, new_size))
+        dummy_Y[:size_Y,:size_Y] = self.Y
+        # preliminaries J
+        dummy_J = np.zeros((new_size,1))
+        dummy_J[:size_Y] = self.J
+        
+        s_counter = 0
+        # loop through the sources
         for source in self.source_list:
-            from_val = source.vp_node
-            to_val = source.vn_node
-            new_row = np.eye(size_Y)[self.node_map[from_val]]
-            new_col = np.eye(size_Y)[self.node_map[to_val]]
-            #
+            # update Y
+            to_val = source.vp_node
+            from_val = source.vn_node
+            from_comp = np.eye(new_size)[self.node_map[from_val]]
+            to_comp = np.eye(new_size)[self.node_map[to_val]]
+            new_row = to_comp - from_comp
+            new_col = new_row.T
+            dummy_Y[size_Y + s_counter,:] = np.array(new_row)
+            dummy_Y[:,size_Y + s_counter] = np.array(new_col)
+            # update J
+            dummy_J[size_Y + s_counter] = source.get_nom_voltage()
+            s_counter += 1
+            
             print("new row:{}\n new col:{}\n from:{}\n to:{}".format(new_row, new_col, from_val, to_val))
+        print("dummy Y", dummy_Y)
+        self.Y = dummy_Y
+        self.J = dummy_J
     
     def delete_ground_node(self):
         datum = self.node_map["gnd"]
         # delete rows and columns associated with datum/ground node
         self.Y = np.delete(np.delete(self.Y, datum, 0), datum, 1)
+        self.J = np.delete(self.J, datum, 0)
          
                 
     def init_Y(self, devices):

@@ -13,6 +13,9 @@ class VoltageSources:
         self.frequency_hz = frequency_hz
         # You are welcome to / may be required to add additional class variables   
 
+    def get_nom_voltage(self):
+        return self.amp_ph_ph_rms
+    
     # Some suggested functions to implement, 
     def assign_node_indexes(self,):
         pass

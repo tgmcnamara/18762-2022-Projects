@@ -56,6 +56,7 @@ def solve(TESTCASE, SETTINGS):
     simulator.init_solver(SETTINGS)
     print("node indices", node_indices)
     print("admittance matrix", simulator.Y)
+    print("J matrix", simulator.J)
     print("circuit", simulator.circuit)
     
     # # # Initialize solution vector # # #
