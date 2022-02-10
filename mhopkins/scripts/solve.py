@@ -50,14 +50,14 @@ def solve(TESTCASE, SETTINGS):
     # number of nodes in the system.
     node_indices, size_Y = assign_node_indexes(devices)
     print("node_indices", node_indices)
-    print("ciricuit elements", resistors + capacitors + inductors + voltage_sources)
+    print("circuit elements", resistors + capacitors + inductors + voltage_sources)
     simulator = Simulator(devices = devices, size_Y = size_Y, 
                            node_indices = node_indices)
     simulator.init_solver(SETTINGS)
-    print("node indices", node_indices)
     print("admittance matrix", simulator.Y)
-    print("J matrix", simulator.J)
     print("circuit", simulator.circuit)
+    print("eq circuit", simulator.circuit_ecm)
+    print("solving dict", simulator.solving_dict)
     
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
