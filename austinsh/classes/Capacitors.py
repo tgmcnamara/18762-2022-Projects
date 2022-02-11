@@ -23,4 +23,3 @@ class Capacitors:
 
     def stamp_open(self,):
         pass
-Changes?
