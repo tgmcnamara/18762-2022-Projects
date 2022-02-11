@@ -24,15 +24,22 @@ class Switches:
 
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
         if runtime >= self.t_open and runtime <= self.t_close:
-            J[self.switch_index] = 0
+            #Basically the same as a voltage source. just need to set the two nodes equal to each other.
 
             Y[self.switch_index, self.from_index] = 1
             Y[self.switch_index, self.to_index] = -1
-            pass
+
+            Y[self.from_index, self.switch_index] = 1
+            Y[self.to_index, self.switch_index] = -1
+
+            J[self.switch_index] = 0
         else:
-            # if its an open circuit, then there's no relationship between the nodes. just
-            # leave it un-stamped (unless there's another circuit in parallel).
-            pass
+            # if its an open circuit, then there's no relationship between the nodes.
+            # instead, we make a 'dumby' function a 1 * vn = 1. Same as how we configure
+            # the ground row.
+
+            J[self.switch_index] = 1
+            Y[self.switch_index, self.switch_index] = 1
 
     def stamp_sparse(self,):
         pass

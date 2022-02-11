@@ -29,9 +29,7 @@ def execute_time_step(devices: Devices, node_count, v_previous, J_previous, runt
 
     clear_ground(Y, J, node_count)
 
-    Y_inverse = np.linalg.inv(Y)
-
-    v_next = np.dot(J, Y_inverse)
+    v_next = np.linalg.solve(Y, J)
 
     return (v_next, J)
 
