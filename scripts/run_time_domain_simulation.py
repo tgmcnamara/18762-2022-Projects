@@ -1,5 +1,4 @@
 import numpy as np
-from numpy import ndarray
 from classes.Devices import Devices
 from classes.Settings import Settings
 

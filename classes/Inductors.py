@@ -31,7 +31,7 @@ class Inductors:
 
         companion_r = 1 / conductance
 
-        resistor = Resistors(self.name + "-companion-resistor", self.from_node, self.to_node, companion_r)
+        resistor = Resistors(None, None, None, companion_r)
         resistor.assign_node_indexes_direct(self.from_index, self.extension_index_1)
         resistor.stamp_dense(Y, J, v_previous, J_previous, runtime, timestep)
 
@@ -41,7 +41,7 @@ class Inductors:
 
         companion_i = previous_current + conductance * previous_voltage
         
-        current_source = CurrentSources(self.name + "-companion-current-source", self.from_node, self.to_node, companion_i)
+        current_source = CurrentSources(None, None, None, companion_i)
         current_source.assign_node_indexes_direct(self.from_index, self.extension_index_1)
         current_source.stamp_dense(Y, J, v_previous, J_previous, runtime, timestep)
 
