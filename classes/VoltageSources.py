@@ -2,6 +2,8 @@ import numpy as np
 from itertools import count
 from classes.Nodes import Nodes
 import math
+
+from lib.stamp import stamp_voltage_source
 # from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
 
 HERTZ_TO_RADIANS_PER_SECOND = 6.283
@@ -31,13 +33,9 @@ class VoltageSources:
         return [self.vp_node, self.vn_node]
 
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
-        Y[self.current_index, self.vp_index] = 1
-        Y[self.current_index, self.vn_index] = -1
+        v = self.v_max * math.sin(self.frequency_rad_per_sec * runtime + self.phase_rad)
 
-        Y[self.vp_index, self.current_index] = 1
-        Y[self.vn_index, self.current_index] = -1
-
-        J[self.current_index] = self.v_max * math.sin(self.frequency_rad_per_sec * runtime + self.phase_rad)
+        stamp_voltage_source(Y, J, self.vp_index, self.vn_index, self.current_index, v)
 
     def stamp_sparse(self,):
         pass

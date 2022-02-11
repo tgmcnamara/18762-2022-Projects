@@ -6,7 +6,7 @@ from classes.Nodes import Nodes
 from classes.Resistors import Resistors
 from classes.Settings import Settings
 from classes.VoltageSources import CurrentSensors, VoltageSources
-from scripts.solve import solve
+from lib.solve import solve
 
 class CircuitSimulatorTests(unittest.TestCase):
     def test_resistor(self):

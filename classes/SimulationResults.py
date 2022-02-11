@@ -9,11 +9,10 @@ class SimulationResults:
         self.v_waveform = v_waveform
         self.devices = devices
         self.settings = settings
+        self.count = len(self.v_waveform)
     
     def get_timesteps(self):
-        count = len(self.v_waveform)
-
-        timesteps = range(count)
+        timesteps = range(self.count)
 
         def translate_timestep(x):
             return x * self.settings.timestep
@@ -22,7 +21,7 @@ class SimulationResults:
 
     def get_node_voltage(self, node_name):
         if node_name == "gnd":
-            return [0] * len(self.v_waveform)
+            return [0] * self.count
         return self.node_voltage_dict[node_name]
 
     def get_voltage_drop(self, from_node, to_node):

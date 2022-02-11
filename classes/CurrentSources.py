@@ -1,4 +1,4 @@
-
+from lib.stamp import stamp_current_source
 
 class CurrentSources:
     def __init__(self, name, from_node, to_node, i):
@@ -20,5 +20,4 @@ class CurrentSources:
         return [self.from_node, self.to_node]
 
     def stamp_dense(self,  Y, J, v_previous, J_previous, runtime, timestep):
-        J[self.from_index] += -self.i
-        J[self.to_index] += self.i
+        stamp_current_source(J, self.from_index, self.to_index, self.i)

@@ -2,8 +2,8 @@ from classes.Devices import Devices
 from classes.Settings import Settings
 from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
-from scripts.run_time_domain_simulation import execute_simulation
-from scripts.process_results import process_results
+from lib.process_results import process_results
+from lib.run_time_domain_simulation import execute_simulation
 
 def solve(devices: Devices, settings: Settings = Settings()):
 

@@ -1,8 +1,4 @@
-import numpy as np
-from itertools import count
-from classes.Nodes import Nodes
-from classes.Resistors import Resistors
-#from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
+from lib.stamp import stamp_resistor, stamp_voltage_source
 
 class Capacitors:
     def __init__(self, name, from_node, to_node, c):
@@ -30,9 +26,14 @@ class Capacitors:
         
         companion_r = timestep / (2 * self.c)
 
-        resistor = Resistors(self.name + "-companion-resistor", self.from_node, self.to_node, companion_r)
-        resistor.assign_node_indexes_direct(self.from_index, self.extension_index_1)
-        resistor.stamp_dense(Y, J, v_previous, J_previous, runtime, timestep)
+        stamp_resistor(Y, self.from_index, self.extension_index_1, companion_r)
+
+        previous_voltage = v_previous[self.from_index] - v_previous[self.to_index]
+        previous_current = J_previous[self.extension_index_2]
+
+        companion_v = previous_voltage + companion_r * previous_current
+
+        stamp_voltage_source(Y, J, self.extension_index_1, self.to_index, self.extension_index_2, companion_v)
 
     def stamp_sparse(self,):
         pass

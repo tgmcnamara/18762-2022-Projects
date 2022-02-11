@@ -2,7 +2,7 @@
 import numpy as np
 from itertools import count
 from classes.Nodes import Nodes
-# from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
+from lib.stamp import stamp_resistor
 
 
 class Resistors:
@@ -28,11 +28,7 @@ class Resistors:
         pass
 
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
-        Y[self.from_index, self.from_index] += 1/self.r
-        Y[self.to_index, self.to_index] += 1/self.r
-
-        Y[self.from_index, self.to_index] += -1/self.r
-        Y[self.to_index, self.from_index] += -1/self.r
+        stamp_resistor(Y, self.from_index, self.to_index, self.r)
 
 
 
