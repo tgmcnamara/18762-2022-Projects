@@ -1,8 +1,10 @@
+import sys
+sys.path.append("..")
 from lib.parse_json import parse_json
 from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
-from scripts.run_time_domain_simulation import run_time_domain_simulation
-from scripts.process_results import process_results
+#from scripts.run_time_domain_simulation import run_time_domain_simulation
+#from scripts.process_results import process_results
 
 
 def solve(TESTCASE, SETTINGS):
@@ -13,10 +15,11 @@ def solve(TESTCASE, SETTINGS):
     Returns:
         None
     """
-    # TODO: STEP 0 - Initialize all the model classes in the models directory (models/) and familiarize
-    #  yourself with the parameters of each model.
 
     # # # Parse the test case data # # #
+    # TODO: STEP 0 - Initialize all the model classes in the models directory (models/) and familiarize
+    # yourself with the parameters of each model.
+
     case_name = TESTCASE
     devices = parse_json(case_name)
 
@@ -29,6 +32,8 @@ def solve(TESTCASE, SETTINGS):
     switches = devices['switches']
     induction_motors = devices['induction_motors']
 
+    
+
     # # # Solver settings # # #
     t_final = SETTINGS['Simulation Time']
     tol = SETTINGS['Tolerance']  # NR solver tolerance
@@ -37,7 +42,7 @@ def solve(TESTCASE, SETTINGS):
     # # # Assign system nodes # # #
     # We assign a node index for every node in our Y matrix and J vector.
     # In addition to voltages, nodes track currents of voltage sources and
-    # other state variablesneeded for companion models or the model of the 
+    # other state variables needed for companion models or the model of the 
     # induction motor.
     # You can determine the size of the Y matrix by looking at the total
     # number of nodes in the system.
