@@ -62,6 +62,8 @@ class Capacitors:
             J_mtx[self.c_curr_index,0] = prev[self.c_curr_index] + (d_t/(2*self.c))*prev[self.to_index]
         else:
             J_mtx[self.c_curr_index,0] = prev[self.c_curr_index] + (d_t/(2*self.c))*prev[self.to_index]
+        
+        #EVERY THING BELOW IS NO LONVER NEED
         #if self.to_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
         #    Y_mtx[self.c_curr_index, self.Vcp_index] += 1 #voltage (extra row) (should this be stamped into Jmatrix)
         #    Y_mtx[self.Vcp_index, self.c_curr_index] += -1 #current(extra columb)
@@ -77,7 +79,7 @@ class Capacitors:
         
         
         
-
+    #KEEP THIS
     def stamp_open(self,Y_mtx):#not sure what to do
         Y_mtx[self.comp_index, self.to_index] += -1
         Y_mtx[self.comp_index, self.comp_index] += 1

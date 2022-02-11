@@ -24,11 +24,10 @@ class Inductors:
     def assign_node_indexes(self,):
         self.from_index = Nodes.node_index_dict[self.from_node]
         self.to_index = Nodes.node_index_dict[self.to_node]
-        Nodes.index_counter += 1
         self.comp_index = Nodes.index_counter
         Nodes.index_counter += 1
-        self.c_curr_index = Nodes.index_counter
-        
+        self.l_curr_index = Nodes.index_counter
+        Nodes.index_counter += 1
     #####    
         #Nodes.index_counter += 1
         #self.comp_index = Nodes.index_counter
@@ -48,10 +47,24 @@ class Inductors:
         pass
 
     def stamp_dense(self, Y_mtx, J_mtx, d_t, prev, time): 
-        Y_mtx[self.from_index,self.from_index] += d_t/(2*self.l) #Yii index
-        Y_mtx[self.from_index,self.comp_index] += -d_t/(2*self.l) #Yij index
-        Y_mtx[self.comp_index,self.from_index] += -d_t/(2*self.l) #Yji index
-        Y_mtx[self.comp_index,self.comp_index] += d_t/(2*self.l) #Yjj index
+        #need and inf at time ==0 here
+        if time == 0:
+            Y_mtx[self.from_index,self.from_index] += d_t/(2*self.l) #Yii index
+            Y_mtx[self.from_index,self.comp_index] += -d_t/(2*self.l) #Yij index
+            Y_mtx[self.comp_index,self.from_index] += -d_t/(2*self.l) #Yji index
+            Y_mtx[self.comp_index,self.comp_index] += d_t/(2*self.l) #Yjj index
+            Y_mtx[self.to_index,self.l_curr_index] +=-1 
+            Y_mtx[self.comp_index, self.l_curr_index] += 1#Yab
+            Y_mtx[self.l_curr_index, self.to_index] += -1#Ybj
+            Y_mtx[self.l_curr_index, self.comp_index] += 1#Yba
+            J_mtx[self.l_curr_index,0] = prev[self.l_curr_index] + (d_t/(2*self.l))*prev[self.to_index]
+            J_mtx[self.from_index,0] = -(prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
+            J_mtx[self.comp_index,0] = (prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
+        else:
+            J_mtx[self.l_curr_index,0] = prev[self.l_curr_index] + (d_t/(2*self.l))*prev[self.to_index]
+            J_mtx[self.from_index,0] = -(prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
+            J_mtx[self.comp_index,0] = (prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
+        #still need to make J matrix
  ######       
         #if self.to_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
         #    Y_mtx[self.l_curr_index, self.Vlp_index] += 1 #voltage (extra row) (should this be stamped into Jmatrix)
