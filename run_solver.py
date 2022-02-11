@@ -1,6 +1,6 @@
 from classes.Settings import Settings
 from lib.parse_json import parse_json
-from scripts.solve import solve
+from lib.solve import solve
 
 # path to the grid network RAW file
 casefile = 'testcases/RL_circuit.json'
