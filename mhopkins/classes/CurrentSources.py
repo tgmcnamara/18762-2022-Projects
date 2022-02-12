@@ -10,6 +10,8 @@ class CurrentSources:
         self.ip_node = ip_node
         self.in_node = in_node
         self.amps = amps
+        self.ecm_type = ""
+        self.ecm_val = 0
 
     # Some suggested functions to implement, 
     def assign_node_indexes(self,):

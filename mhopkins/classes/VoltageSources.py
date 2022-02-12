@@ -11,6 +11,8 @@ class VoltageSources:
         self.amp_ph_ph_rms = amp_ph_ph_rms
         self.phase_deg = phase_deg
         self.frequency_hz = frequency_hz
+        self.ecm_type = ""
+        self.ecm_val = 0
         # You are welcome to / may be required to add additional class variables   
 
     def get_nom_voltage(self):

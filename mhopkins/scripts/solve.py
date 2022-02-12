@@ -4,6 +4,7 @@ from lib.initialize import initialize
 from lib.stamp import *
 from scripts.run_time_domain_simulation import run_time_domain_simulation
 from scripts.process_results import process_results
+import time
 
 # my code
 from lib.circuit import *
@@ -51,12 +52,16 @@ def solve(TESTCASE, SETTINGS):
     node_indices, size_Y = assign_node_indexes(devices)
     print("node_indices", node_indices)
     print("circuit elements", resistors + capacitors + inductors + voltage_sources)
+    
+    t_start = time.time_ns()
     simulator = Simulator(devices = devices, size_Y = size_Y, 
                            node_indices = node_indices)
     simulator.init_solver(SETTINGS)
     print("admittance matrix", simulator.Y)
     print("circuit", simulator.circuit)
     print("eq circuit", simulator.circuit_ecm)
+    print("solving dict", simulator.solving_dict)
+    simulator.iteration(sparse = True)
     print("solving dict", simulator.solving_dict)
     
     # # # Initialize solution vector # # #
@@ -66,7 +71,10 @@ def solve(TESTCASE, SETTINGS):
     # TODO: STEP 2 - Run the time domain simulation and return an array that contains
     #                time domain waveforms of all the state variables # # #
     V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS)
-
+    
+    t_end = time.time_ns()
+    t_total = t_end - t_start
+    print("total time solving the circuit:", t_total," nanoseconds")
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink

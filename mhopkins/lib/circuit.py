@@ -1,5 +1,7 @@
 import numpy as np
 import scipy
+import scipy.sparse.linalg
+from scipy import sparse as sp
 import copy
 from classes.CurrentSources import CurrentSources
 from classes.Resistors import Resistors
@@ -95,9 +97,9 @@ class Simulator():
         
         self.timestep = 0
         self.source_list = []
-        self.Y_hist = None
-        self.v_hist = None
-        self.J_hist = None
+        self.Y_hist = []
+        self.v_hist = []
+        self.J_hist = []
         self.t_inc = None
         self.Y = np.zeros((size_Y, size_Y))
         self.v = np.zeros((size_Y, 1))
@@ -106,6 +108,8 @@ class Simulator():
         
         if (node_indices != None):
             self.node_map = node_indices
+            inv_map = {v: k for k, v in self.node_map.items()}
+            self.node_map_reverse = inv_map
             
         if (devices == None):
             pass
@@ -119,12 +123,24 @@ class Simulator():
             for source in devices['voltage_sources']:
                 self.source_list.append(source)
                 
-            #self.init_Y(devices)
             self.generate_companion_model()
             self.generate_Y_r()
             self.perform_mna()
             self.delete_ground_node()
+            self.solve_Yvj()
             print(self.circuit_ecm)
+            
+    def iteration(self, sparse = False):
+        self.update_ecm_values()
+        self.init_Yvj(self.orig_size)
+        self.generate_Y_r()
+        self.perform_mna()
+        self.delete_ground_node()
+        v_result = self.solve_Yvj(sparse = sparse)
+        self.Y_hist.append(self.Y)
+        self.J_hist.append(self.J)
+        self.v_hist.append(v_result)
+        self.timestep +=1
      
     def init_solver(self, settings):   
         self.solving_dict["sim_time"] = settings['Simulation Time']
@@ -146,9 +162,13 @@ class Simulator():
                             # remove the inductor
                             self.circuit_ecm.obj_mat[i][j].remove(x)
                             # add equivalent circuit
-                            ecm_current = CurrentSources("ecm{}{}".format(i,j), j, i, 
+                            ecm_current = CurrentSources("ecm{}{}".format(i,j), self.node_map_reverse[j],
+                                                         self.node_map_reverse[i], 
                                                          prev_current + delta_t/ (2*L) + prev_voltage)
-                            ecm_resistor = Resistors("ecm{}{}".format(i,j), i, j, delta_t/ (2*L))
+                            ecm_current.ecm_type = "l"
+                            ecm_current.ecm_val = L
+                            ecm_resistor = Resistors("ecm{}{}".format(i,j), self.node_map_reverse[i],
+                                                      self.node_map_reverse[j], delta_t/ (2*L))
                             self.circuit_ecm.obj_mat[i][j].append(ecm_current)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)
                             # log the current source in the solving dictionary so it can be updated
@@ -161,6 +181,8 @@ class Simulator():
                             # add equivalent circuit
                             ecm_current = CurrentSources("ecm{}{}".format(i,j), i, j, 
                                                          prev_current + (2*C) / delta_t + prev_voltage)
+                            ecm_current.ecm_type = "c"
+                            ecm_current.ecm_val = C
                             ecm_resistor = Resistors("ecm{}{}".format(i,j), i, j, (2*C) /delta_t)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_current)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)
@@ -174,9 +196,12 @@ class Simulator():
         for i in (devices['resistors'] + devices['inductors'] + devices['capacitors']):
             i_from = i.from_node
             i_to = i.to_node
-            print("create_obj_matrix debug", self.circuit.obj_mat[self.node_map[i_from]][self.node_map[i_to]])
             self.circuit.obj_mat[self.node_map[i_from]][self.node_map[i_to]].append(copy.deepcopy(i))
-            print("circuit object matrix", self.circuit.obj_mat)
+        for i in (devices['voltage_sources']):
+            i_from = i.vn_node
+            i_to = i.vp_node
+            self.circuit.obj_mat[self.node_map[i_from]][self.node_map[i_to]].append(copy.deepcopy(i))
+            
             
     def _RLC_stamp(self, x, y, matrix, val):
         matrix[x][x] = matrix[x][x] + val
@@ -191,9 +216,28 @@ class Simulator():
         self.v = np.zeros((orig_size, 1))
         self.J = np.zeros((orig_size, 1))
     
+    def update_source_list(self):
+        for i in range(size):
+            for j in range(size):
+                element_list = self.circuit_ecm.obj_mat[i][j]
+                if (element_list.is_null() == False):
+                    for k in element_list.elements:
+                        element_name = k.__class__.__name__
+                        if (element_name == "VoltageSources"):
+                            self.source_list.append()
+        
+    def update_ecm_values(self, delta_t = 0.1):
+        for comp in self.solving_dict["prev-ecm-vals"]:
+            # current sources 
+            if comp[0] == "I":
+                if comp[1].ecm_type == "c":
+                    comp[1].amps = comp[2] + (2 * comp[1].ecm_val / delta_t) * comp[3]
+                if comp[1].ecm_type == "l":
+                    comp[1].amps = comp[2] + (delta_t / (2 * comp[1].ecm_val)) * comp[3]
+                
+                
     def generate_Y_r(self):
         size = len(self.circuit_ecm.obj_mat)
-        print("size", size)
         for i in range(size):
             for j in range(size):
                 element_list = self.circuit_ecm.obj_mat[i][j]
@@ -231,15 +275,46 @@ class Simulator():
             s_counter += 1
             # add currents
             for cur in self.solving_dict["ecm-currents"]:
-                print("cur amps", cur.amps)
-                dummy_J[cur.ip_node] = cur.amps
-                dummy_J[cur.in_node] = -cur.amps
+                dummy_J[self.node_map[cur.ip_node]] = cur.amps
+                dummy_J[self.node_map[cur.in_node]] = -cur.amps
             
             
-            print("new row:{}\n new col:{}\n from:{}\n to:{}".format(new_row, new_col, from_val, to_val))
-        print("dummy Y", dummy_Y, "dummy J", dummy_J)
         self.Y = dummy_Y
         self.J = dummy_J
+    
+    
+    def solve_Yvj(self, sparse = False):
+        if (sparse == False):
+            # use non-sparse numpy solver
+            v = np.linalg.solve(self.Y, self.J)
+            print("v", v)
+        else:
+            self.sY = sp.csr_matrix(self.Y)
+            self.sJ = sp.csr_matrix(self.J)
+            v = sp.linalg.spsolve(self.sY, self.sJ)
+            
+        # find ecm values
+        
+        # CURRENT SOURCES
+        self.solving_dict["prev-ecm-vals"] = []
+        for i in self.solving_dict["ecm-currents"]:
+            prev_cur = i.amps
+            vp = vn = 0
+            # making sure connections account for ground node being removed
+            if (i.ip_node == "gnd"):
+                vp = 0
+            else:
+                vp = v[self.node_map[i.ip_node]]
+            #
+            if (i.in_node == "gnd"):
+                vn = 0
+            else:
+                vn = v[self.node_map[i.in_node]]
+                
+            prev_vdrop = float(vp - vn)
+            self.solving_dict["prev-ecm-vals"].append(["I", i, prev_cur, prev_vdrop])
+        return v  
+            
     
     def delete_ground_node(self):
         datum = self.node_map["gnd"]
@@ -248,23 +323,3 @@ class Simulator():
         self.J = np.delete(self.J, datum, 0)
          
                 
-    def init_Y(self, devices):
-        """
-        nodes = devices['nodes']
-        voltage_sources = devices['voltage_sources']
-        resistors = devices['resistors']
-        capacitors = devices['capacitors']
-        inductors = devices['inductors']
-        switches = devices['switches']
-        induction_motors = devices['induction_motors']
-        """
-        for i in (devices['resistors'] + devices['inductors'] + devices['capacitors']):
-            i_from = i.from_node
-            i_to = i.to_node
-            
-            # this will change depending on whether we are using dense or sparse matrices
-            self._RLC_stamp(self.node_map(i_from), self.node_map(i_to), self.Y, i.stamp_dense())
-            
-        datum = self.node_map["gnd"]
-        # delete rows and columns associated with datum/ground node
-        self.Y = np.delete(np.delete(self.Y, datum, 0), datum, 1)
