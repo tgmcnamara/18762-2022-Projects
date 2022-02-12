@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import count
-from classes.Nodes import Nodes
+import Nodes
+# from classes.Nodes import Nodes
 # from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
 
 class VoltageSources:
@@ -15,8 +16,9 @@ class VoltageSources:
 
     # Some suggested functions to implement, 
     def assign_node_indexes(self,):
-        pass
-        
+        self.from_node_index = Nodes.node_index_dict[self.vp_node] 
+        self.to_node_index = Nodes.node_index_dict[self.vn_node]
+        return self.from_node_index, self.to_node_index
     def stamp_sparse(self,):
         pass
 
@@ -26,3 +28,6 @@ class VoltageSources:
     def stamp_open(self,):
         pass
         
+voltage_3 = VoltageSources("N", "1a", "3a", 1, 0, 0)
+
+print(VoltageSources.assign_node_indexes(voltage_3))

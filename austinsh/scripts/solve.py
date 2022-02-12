@@ -5,8 +5,6 @@ from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
 #from scripts.run_time_domain_simulation import run_time_domain_simulation
 #from scripts.process_results import process_results
-
-
 def solve(TESTCASE, SETTINGS):
     """Run the power flow solver.
     Args:
@@ -19,7 +17,6 @@ def solve(TESTCASE, SETTINGS):
     # # # Parse the test case data # # #
     # TODO: STEP 0 - Initialize all the model classes in the models directory (models/) and familiarize
     # yourself with the parameters of each model.
-
     case_name = TESTCASE
     devices = parse_json(case_name)
 
@@ -32,7 +29,7 @@ def solve(TESTCASE, SETTINGS):
     switches = devices['switches']
     induction_motors = devices['induction_motors']
 
-    
+    print(nodes)
 
     # # # Solver settings # # #
     t_final = SETTINGS['Simulation Time']

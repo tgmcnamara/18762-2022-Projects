@@ -1,5 +1,5 @@
 
 def assign_node_indexes(devices):
     node_index_counter = 0
-    print(node_index_counter)
+    #TODO
     return node_index_counter
