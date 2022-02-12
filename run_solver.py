@@ -3,7 +3,7 @@ from lib.parse_json import parse_json
 from lib.solve import solve
 
 # path to the grid network RAW file
-casefile = 'testcases/RL_circuit.json'
+casefile = 'testcases/single_phase_RL_circuit.json'
 
 # the settings for the solver
 settings = Settings()

@@ -26,17 +26,22 @@ class Inductors:
 
         companion_r = 1 / conductance
 
-        stamp_resistor(Y, self.from_index, self.extension_index_1, companion_r)
+        stamp_resistor(Y, self.from_index, self.to_index, companion_r)
 
-        previous_voltage = v_previous[self.from_index] - v_previous[self.extension_index_1]
+        previous_voltage = v_previous[self.from_index] - v_previous[self.to_index]
 
-        previous_current = J_previous[self.extension_index_1]
+        #Current flowing across at tn is the current that was injected by the current source
+        #plus the current flowing across the resistor.
+        previous_resistor_current = previous_voltage / companion_r
+        previous_current_source_current = J_previous[self.extension_index_1]
+        previous_current = previous_current_source_current + previous_resistor_current
 
         companion_i = previous_current + conductance * previous_voltage
         
         stamp_current_source(J, self.from_index, self.extension_index_1, companion_i)
 
-        stamp_short(Y, J, self.extension_index_1, self.to_index, self.extension_index_2)
+        stamp_short(Y, J, self.to_index, self.extension_index_1, self.extension_index_2)
+
 
     def stamp_sparse(self,):
         pass
