@@ -167,8 +167,9 @@ class Simulator():
                                                          prev_current + delta_t/ (2*L) + prev_voltage)
                             ecm_current.ecm_type = "l"
                             ecm_current.ecm_val = L
+                            # remember the value in the ECM is conductance
                             ecm_resistor = Resistors("ecm{}{}".format(i,j), self.node_map_reverse[i],
-                                                      self.node_map_reverse[j], delta_t/ (2*L))
+                                                      self.node_map_reverse[j], (2*L)/ delta_t)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_current)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)
                             # log the current source in the solving dictionary so it can be updated
@@ -183,6 +184,7 @@ class Simulator():
                                                          prev_current + (2*C) / delta_t + prev_voltage)
                             ecm_current.ecm_type = "c"
                             ecm_current.ecm_val = C
+                            # remember the value in the ECM is conductance
                             ecm_resistor = Resistors("ecm{}{}".format(i,j), i, j, (2*C) /delta_t)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_current)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)

@@ -75,6 +75,7 @@ def solve(TESTCASE, SETTINGS):
     t_end = time.time_ns()
     t_total = t_end - t_start
     print("total time solving the circuit:", t_total," nanoseconds")
+    
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
