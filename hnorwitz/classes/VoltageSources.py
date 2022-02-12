@@ -43,10 +43,10 @@ class VoltageSources:
 
     def stamp_dense(self,Y_mtx, J_mtx, time): #(THIS WORKS)
         if time == 0:
-            Y_mtx[self.vp_index,self.V_current_index] = 1
-            Y_mtx[self.np_index,self.V_current_index] = -1
-            Y_mtx[self.V_current_index,self.vp_index] = 1
-            Y_mtx[self.V_current_index,self.vp_index] = -1
+            Y_mtx[self.vp_index,self.V_current_index] += 1
+            Y_mtx[self.np_index,self.V_current_index] += -1
+            Y_mtx[self.V_current_index,self.vp_index] += 1
+            Y_mtx[self.V_current_index,self.np_index] += -1
             J_mtx[self.V_current_index,0] = np.sqrt(2/3)*self.amp_ph_ph_rms*np.sin(2*(np.pi)*self.frequency_hz*time + self.phase_deg)
         else:
             J_mtx[self.V_current_index,0] = np.sqrt(2/3)*self.amp_ph_ph_rms*np.sin(2*(np.pi)*self.frequency_hz*time + self.phase_deg)

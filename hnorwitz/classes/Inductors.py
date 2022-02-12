@@ -24,7 +24,7 @@ class Inductors:
     def assign_node_indexes(self,):
         self.from_index = Nodes.node_index_dict[self.from_node]
         self.to_index = Nodes.node_index_dict[self.to_node]
-        self.comp_index = Nodes.index_counter
+        self.l_comp_index = Nodes.index_counter
         Nodes.index_counter += 1
         self.l_curr_index = Nodes.index_counter
         Nodes.index_counter += 1
@@ -50,20 +50,21 @@ class Inductors:
         #need and inf at time ==0 here
         if time == 0:
             Y_mtx[self.from_index,self.from_index] += d_t/(2*self.l) #Yii index
-            Y_mtx[self.from_index,self.comp_index] += -d_t/(2*self.l) #Yij index
-            Y_mtx[self.comp_index,self.from_index] += -d_t/(2*self.l) #Yji index
-            Y_mtx[self.comp_index,self.comp_index] += d_t/(2*self.l) #Yjj index
-            Y_mtx[self.to_index,self.l_curr_index] +=-1 
-            Y_mtx[self.comp_index, self.l_curr_index] += 1#Yab
-            Y_mtx[self.l_curr_index, self.to_index] += -1#Ybj
-            Y_mtx[self.l_curr_index, self.comp_index] += 1#Yba
-            J_mtx[self.l_curr_index,0] = prev[self.l_curr_index] + (d_t/(2*self.l))*prev[self.to_index]
-            J_mtx[self.from_index,0] = -(prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
-            J_mtx[self.comp_index,0] = (prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
+            Y_mtx[self.from_index,self.l_comp_index] += -d_t/(2*self.l) #Yij index
+            Y_mtx[self.l_comp_index,self.from_index] += -d_t/(2*self.l) #Yji index
+            Y_mtx[self.l_comp_index,self.l_comp_index] += d_t/(2*self.l) #Yjj index
+            Y_mtx[self.to_index,self.l_curr_index] += 1 #(may need to inver these ones)
+            Y_mtx[self.l_comp_index, self.l_curr_index] += -1#Yab
+            Y_mtx[self.l_curr_index, self.to_index] += 1#Ybj
+            Y_mtx[self.l_curr_index, self.l_comp_index] += -1#Yba
+            ####(EVERYTHING BELOW HERE IS WRONG)
+            J_mtx[self.l_curr_index,0] = prev[self.l_curr_index] + (d_t/(2*self.l))*prev[self.l_comp_index]
+            J_mtx[self.from_index,0] = -(prev[self.l_comp_index]+ d_t/(2*self.l)*prev[self.l_curr_index])#from_index also seems to work
+            J_mtx[self.l_comp_index,0] = (prev[self.l_comp_index]+ d_t/(2*self.l)*prev[self.to_index])#same
         else:
-            J_mtx[self.l_curr_index,0] = prev[self.l_curr_index] + (d_t/(2*self.l))*prev[self.to_index]
-            J_mtx[self.from_index,0] = -(prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
-            J_mtx[self.comp_index,0] = (prev[self.to_index]+d_t/(2*self.l)*prev[self.l_curr_index])
+            J_mtx[self.l_curr_index,0] = prev[self.l_curr_index] + (d_t/(2*self.l))*prev[self.l_comp_index]
+            J_mtx[self.from_index,0] = -(prev[self.l_comp_index]+ d_t/(2*self.l)*prev[self.l_curr_index])#from_index also seems to work
+            J_mtx[self.l_comp_index,0] = (prev[self.l_comp_index]+ d_t/(2*self.l)*prev[self.to_index])
         #still need to make J matrix
  ######       
         #if self.to_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
@@ -80,7 +81,10 @@ class Inductors:
         #    Y_mtx[self.Vln_index,self.Vln_index] = 1 #Yjj index
          
 
-    def stamp_short(self,):#not sure what to do withi this
+    def stamp_short(self,Y_mtx):#not sure what to do withi this
+        Y_mtx[self.l_comp_index, self.to_index] = -1
+        Y_mtx[self.l_comp_index, self.l_comp_index] = 1
+        Y_mtx[self.l_curr_index,self.l_curr_index] = 1
         #if it is a sort then the from_node and to_node have the same voltage
         #[1, 1; 1, 1]
-        pass
+        

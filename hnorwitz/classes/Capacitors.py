@@ -55,13 +55,13 @@ class Capacitors:
             Y_mtx[self.from_index,self.comp_index] += -d_t/(2*self.c) #Yia index
             Y_mtx[self.comp_index,self.from_index] += -d_t/(2*self.c) #Yai index
             Y_mtx[self.comp_index,self.comp_index] += d_t/(2*self.c) #Yaa index
-            Y_mtx[self.to_index, self.c_curr_index] += -1#Yjb
-            Y_mtx[self.comp_index, self.c_curr_index] += 1#Yab
-            Y_mtx[self.c_curr_index, self.to_index] += -1#Ybj
-            Y_mtx[self.c_curr_index, self.comp_index] += 1#Yba
-            J_mtx[self.c_curr_index,0] = prev[self.c_curr_index] + (d_t/(2*self.c))*prev[self.to_index]
+            Y_mtx[self.to_index, self.c_curr_index] += -1#Yjb (+)may need to swap all of these
+            Y_mtx[self.comp_index, self.c_curr_index] += 1#Yab (-)
+            Y_mtx[self.c_curr_index, self.to_index] += -1#Ybj(+)
+            Y_mtx[self.c_curr_index, self.comp_index] += 1#Yba(-)
+            J_mtx[self.c_curr_index,0] = prev[self.comp_index] + (d_t/(2*self.c))*prev[self.c_curr_index]#to index also seemed to work
         else:
-            J_mtx[self.c_curr_index,0] = prev[self.c_curr_index] + (d_t/(2*self.c))*prev[self.to_index]
+            J_mtx[self.c_curr_index,0] = prev[self.comp_index] + (d_t/(2*self.c))*prev[self.c_curr_index]
         
         #EVERY THING BELOW IS NO LONVER NEED
         #if self.to_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
