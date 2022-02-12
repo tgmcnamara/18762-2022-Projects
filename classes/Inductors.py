@@ -30,15 +30,12 @@ class Inductors:
 
         previous_voltage = v_previous[self.from_index] - v_previous[self.extension_index_1]
 
-        # We need to allocate an extra slot on the v vector to isolate the current of
-        # this element from other capacitors that may be connected to the same node....
         previous_current = J_previous[self.extension_index_1]
 
         companion_i = previous_current + conductance * previous_voltage
         
         stamp_current_source(J, self.from_index, self.extension_index_1, companion_i)
 
-        # ...but that means we also need a short to connect back to the original 'to' node.
         stamp_short(Y, J, self.extension_index_1, self.to_index, self.extension_index_2)
 
     def stamp_sparse(self,):

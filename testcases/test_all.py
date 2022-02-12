@@ -1,11 +1,12 @@
 import unittest
+from classes.Capacitors import Capacitors
 from classes.CurrentSources import CurrentSources
 from classes.Devices import Devices
 from classes.Inductors import Inductors
 from classes.Nodes import Nodes
 from classes.Resistors import Resistors
 from classes.Settings import Settings
-from classes.VoltageSources import CurrentSensors, VoltageSources
+from classes.VoltageSources import VoltageSources
 from lib.solve import solve
 
 class CircuitSimulatorTests(unittest.TestCase):
@@ -52,7 +53,23 @@ class CircuitSimulatorTests(unittest.TestCase):
         v_waveform_b = results.get_node_voltage("b")
         v_waveform_c = results.get_node_voltage("c")
 
-        self.assertAlmostEqual(115, max(v_waveform_b), delta=1)
+        self.assertAlmostEqual(131, max(v_waveform_b), delta=1)
+        self.assertAlmostEqual(61, max(v_waveform_c), delta=1)
+
+    def test_capacitor(self):
+        devices = Devices([
+            VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 15),
+            Resistors("r-1", "a", "b", 5),
+            Capacitors("i-1", "b", "c", 0.001),
+            Resistors("r-2", "c", "gnd", 5)
+        ])
+
+        results = solve(devices, Settings(simulationTime=0.2))
+
+        v_waveform_b = results.get_node_voltage("b")
+        v_waveform_c = results.get_node_voltage("c")
+
+        self.assertAlmostEqual(131, max(v_waveform_b), delta=1)
         self.assertAlmostEqual(61, max(v_waveform_c), delta=1)
 
 

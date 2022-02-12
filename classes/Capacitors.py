@@ -1,4 +1,4 @@
-from lib.stamp import stamp_resistor, stamp_voltage_source
+from lib.stamp import stamp_resistor, stamp_short, stamp_voltage_source
 
 class Capacitors:
     def __init__(self, name, from_node, to_node, c):
@@ -18,6 +18,12 @@ class Capacitors:
         modified_index += 1
         nodeLookup[self.name + "-2"] = modified_index
         self.extension_index_2 = modified_index
+        modified_index += 1
+        nodeLookup[self.name + "-3"] = modified_index
+        self.extension_index_3 = modified_index
+        modified_index += 1
+        nodeLookup[self.name + "-4"] = modified_index
+        self.extension_index_4 = modified_index
 
     def get_nodes_connections(self):
         return [self.from_node, self.to_node]
@@ -26,14 +32,16 @@ class Capacitors:
         
         companion_r = timestep / (2 * self.c)
 
-        stamp_resistor(Y, self.from_index, self.extension_index_1, companion_r)
+        stamp_short(Y, J, self.from_index, self.extension_index_1, self.extension_index_2)
+
+        stamp_resistor(Y, self.extension_index_1, self.extension_index_3, companion_r)
 
         previous_voltage = v_previous[self.from_index] - v_previous[self.to_index]
         previous_current = J_previous[self.extension_index_2]
 
         companion_v = previous_voltage + companion_r * previous_current
 
-        stamp_voltage_source(Y, J, self.extension_index_1, self.to_index, self.extension_index_2, companion_v)
+        stamp_voltage_source(Y, J, self.extension_index_3, self.to_index, self.extension_index_4, companion_v)
 
     def stamp_sparse(self,):
         pass
