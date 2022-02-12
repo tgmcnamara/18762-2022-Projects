@@ -7,8 +7,7 @@ from sympy import Ray3D
 import Nodes
 from lib.assign_node_indexes import assign_node_indexes
 # from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
-Y_matrix = np.zeros((4,4))
-Stamp_Matrix = np.zero((4,4))
+Y_matrix = np.zeros((5,5))
 
 class Resistors:
     def __init__(self, name, from_node, to_node, r):
@@ -29,16 +28,32 @@ class Resistors:
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self,):
-        for index in range(len(Nodes.node_index_dict)):
-            Y_matrix[Resistors.assign_node_indexes(self.stamp_dense)[0]][Resistors.assign_node_indexes(self.stamp)[1]] += -1/(Resistors.self.r)
-            Y_matrix[Resistors.assign_node_indexes(self)[0]][Resistors.assign_node_indexes(self)[1]] += 1/self.r
-
+    def stamp_dense(self, matrix):
+        i,j = self.assign_node_indexes()
+        if i == 0 or j == 0:
+            if i == 0:
+                i, j = j, i
+            # i != 0, j == 0
+            matrix[i,i] += 1/self.r
+        else:
+            matrix[i,i] += 1/self.r
+            matrix[j,j] += 1/self.r
+            matrix[i,j] += (-1)/self.r
+            matrix[j,i] += -1/self.r
+        return matrix
+        
 r1 = Resistors("r1", "1a", "2a", .1)
-r2 = Resistors("r1", "2a", "3a", .1)
-r3 = Resistors("r1", "3a", "4a", .1)
-r4 = Resistors("r1", "4a", "1a", .1)
+r2 = Resistors("r2", "2a", "3a", .1)
+r3 = Resistors("r3", "3a", "4a", .1)
+r4 = Resistors("r4", "4a", "1a", .1)
+r5 = Resistors("r5", "1a", "gnd", 5000)
 
-print(Resistors.assign_node_indexes(r1))
-print(Resistors.assign_node_indexes(r2)[0])
-print(Resistors.stamp_dense(Y_matrix))
+resist = [r1, r2, r3, r4, r5]
+for r in resist:
+    r.stamp_dense(Y_matrix)
+print(Y_matrix)
+# print(r1.assign_node_indexes())
+# print(r2.assign_node_indexes()[0])
+# Y_matrix = r1.stamp_dense(Y_matrix)
+# print(Y_matrix)
+# print(r2.stamp_dense(Y_matrix))
