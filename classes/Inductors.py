@@ -42,6 +42,17 @@ class Inductors:
 
         stamp_short(Y, J, self.to_index, self.extension_index_1, self.extension_index_2)
 
+    def calculate_current(self, v, J, timestep):
+        conductance = timestep / (2 * self.l)
+
+        companion_r = 1 / conductance
+
+        previous_voltage = v[self.from_index] - v[self.to_index]
+
+        previous_resistor_current = previous_voltage / companion_r
+        previous_current_source_current = J[self.extension_index_1]
+        return previous_current_source_current + previous_resistor_current
+
 
     def stamp_sparse(self,):
         pass

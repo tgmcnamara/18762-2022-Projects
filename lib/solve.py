@@ -22,11 +22,11 @@ def solve(devices: Devices, settings: Settings = Settings()):
 
     # TODO: STEP 2 - Run the time domain simulation and return an array that contains
     #                time domain waveforms of all the state variables # # #
-    v_waveform = execute_simulation(devices, v_init, settings)
+    (v_waveform, J_waveform) = execute_simulation(devices, v_init, settings)
 
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
-    results = process_results(v_waveform, devices, settings)
+    results = process_results(v_waveform, J_waveform, devices, settings)
 
     return results

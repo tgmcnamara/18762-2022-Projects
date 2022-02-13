@@ -1,12 +1,15 @@
 from typing import List
 import numpy as np
 from classes.Devices import Devices
+from classes.Inductors import Inductors
+from classes.Resistors import Resistors
 from classes.Settings import Settings
 
 class SimulationResults:
-    def __init__(self, node_voltage_dict, v_waveform, devices: Devices, settings: Settings):
+    def __init__(self, node_voltage_dict, v_waveform, J_waveform, devices: Devices, settings: Settings):
         self.node_voltage_dict = node_voltage_dict
         self.v_waveform = v_waveform
+        self.J_waveform = J_waveform
         self.devices = devices
         self.settings = settings
         self.count = len(self.v_waveform)
@@ -30,11 +33,21 @@ class SimulationResults:
 
         return [(x[0] - x[1]) for x in zip(from_v, to_v)]
 
-    def get_voltage_source_current(self, vs_name):
-        voltagesource = next(vs for vs in self.devices.voltage_sources if vs.name == vs_name)
+    def get_current_flow(self, from_node, to_node):
+        #assumes one or more elements are in parallel in between the two nodes.
+        parallel_devices = []
+        for device in self.devices.all_devices_but_nodes():
+            if not isinstance(device, Resistors) and not isinstance(device, Inductors):
+                continue
+            elif device.from_node == from_node and device.to_node == to_node:
+                parallel_devices.append(device)
 
         current_waveform = []
-        for v in self.v_waveform:
-            current_waveform.append(v[voltagesource.current_index])
-        
+
+        for (v, J) in zip(self.v_waveform, self.J_waveform):
+            current = 0
+            for device in parallel_devices:
+                current += device.calculate_current(v, J, self.settings.timestep)
+            current_waveform.append(current)
+
         return current_waveform

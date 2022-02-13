@@ -5,20 +5,22 @@ from classes.Settings import Settings
 def execute_simulation(devices: Devices, v_init, settings: Settings):
     node_count = len(v_init)
 
-    v_waveform = [v_init]
-
     runtime = 0
     v_previous = v_init
     J_previous = np.zeros(node_count)
+
+    v_waveform = [v_previous]
+    J_waveform = [J_previous]
 
     while runtime <= settings.simulationTime:
         runtime += settings.timestep
         (v_next, J_next) = execute_time_step(devices, node_count, v_previous, J_previous, runtime, settings)
         v_waveform.append(v_next)
+        J_waveform.append(J_next)
         v_previous = v_next
         J_previous = J_next
 
-    return v_waveform
+    return (v_waveform, J_waveform)
 
 def execute_time_step(devices: Devices, node_count, v_previous, J_previous, runtime: float, settings: Settings):
     Y = np.zeros((node_count, node_count))

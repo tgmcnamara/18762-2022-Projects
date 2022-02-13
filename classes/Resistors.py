@@ -27,6 +27,11 @@ class Resistors:
     def stamp_sparse(self,):
         pass
 
+    def calculate_current(self, v, J, timestep):
+        voltage = v[self.from_index] - v[self.to_index]
+
+        return voltage / self.r
+
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
         stamp_resistor(Y, self.from_index, self.to_index, self.r)
 
