@@ -26,7 +26,7 @@ class Capacitors:
         Nodes.index_counter += 1
         self.c_curr_index = Nodes.index_counter
         Nodes.index_counter += 1
-        
+        print(self.name + '_voltage' + str(self.comp_index) + '_current'+str(self.c_curr_index))
         
         ##
         #self.from_index = Nodes.node_index_dict[self.from_node]
@@ -62,20 +62,6 @@ class Capacitors:
             J_mtx[self.c_curr_index,0] = prev[self.from_index] + (d_t/(2*self.c))*prev[self.c_curr_index]#for v(tn) need to use from index
         else:
             J_mtx[self.c_curr_index,0] = prev[self.from_index] + (d_t/(2*self.c))*prev[self.c_curr_index]
-        
-        #EVERY THING BELOW IS NO LONVER NEED
-        #if self.to_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
-        #    Y_mtx[self.c_curr_index, self.Vcp_index] += 1 #voltage (extra row) (should this be stamped into Jmatrix)
-        #    Y_mtx[self.Vcp_index, self.c_curr_index] += -1 #current(extra columb)
-        #    J_mtx[self.Vcp_index,0] += 0
-        #    J_mtx[self.c_curr_index,0] += prev[self.c_curr_index] + (d_t/(2*self.c))*prev[self.to_index] #(I think these come from Vinit)
-            #how am I supposed to know how to accuratly sellect Vn and In, do the corrospond to Vcp and c_curr
-
-        #else: #voltage source not connected to a ground (struggling to figure this out)
-        #    Y_mtx[self.Vcp_index,self.Vcp_index] = 1 #Yii index
-        #    Y_mtx[self.Vcp_index,self.Vcp_index] = -1 #Yij index
-        #    Y_mtx[self.Vcn_index,self.Vcp_index] = -1 #Yji index
-        #    Y_mtx[self.Vcn_index,self.Vcn_index] = 1 #Yjj index
         
         
         

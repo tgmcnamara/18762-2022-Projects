@@ -22,21 +22,7 @@ class VoltageSources:
         self.np_index = Nodes.node_index_dict[self.vn_node]
         self.V_current_index = Nodes.index_counter
         Nodes.index_counter += 1
-######
-        #if self.vp_node == 'gnd':
-         #   self.np_index = Nodes.node_index_dict[self.vn_node]
-        #elif self.vn_node == 'gnd':
-        #    self.vp_index = Nodes.node_index_dict[self.vp_node]
-        #else:
-        #    self.vp_index = Nodes.node_index_dict[self.vp_node]
-        #    self.np_index = Nodes.node_index_dict[self.vn_node]
-    
-        
-        #Nodes.index_counter += 1
-        #self.V_current_index = Nodes.index_counter
-     #####   
-        
-        
+        print(self.name + '_voltage' + str(self.vp_index) + '_current' + str(self.V_current_index))        
         
     def stamp_sparse(self,):#not worring about how to make sparse yet
         pass
@@ -51,23 +37,7 @@ class VoltageSources:
         else:
             J_mtx[self.V_current_index,0] = np.sqrt(2/3)*self.amp_ph_ph_rms*np.sin(2*(np.pi)*self.frequency_hz*time + self.phase_deg)
         
-        #if self.vn_node == 'gnd': #only one groud index so need to make sure accounting for which end is connected to ground
-        #    Y_mtx[self.V_current_index, self.vp_index] += 1 #voltage (extra row) (should this be stamped into Jmatrix)
-        #    Y_mtx[self.vp_index, self.V_current_index] += -1 #current(extra columb)
-        #    J_mtx[self.vp_index,0] += 0
-        #    J_mtx[self.current_index,0] += np.sqrt(2/3)*self.amp_ph_ph_rms*np.sin(2*(np.pi)*self.frequency_hz*t + self.phase_deg)
-
-        #elif self.vp_index == 'gnd':
-        #    Y_mtx[self.current_index, self.np_index] += -1 #voltage 
-        #    Y_mtx[self.np_index, self.current_index] += 1 #current
-        #   J_mtx[self.np_index,0] += np.sqrt(2/3)*self.amp_ph_ph_rms*np.sin(2*(np.pi)*self.frequency_hz*t + self.phase_deg)
-        #    J_mtx[self.current_index,0] += 0
-
-        #else: #voltage source not connected to a ground (struggling to figure this out)
-        #    Y_mtx[self.vp_index,self.vp_index] = 1 #Yii index
-        #    Y_mtx[self.vp_index,self.np_index] = -1 #Yij index
-        #   Y_mtx[self.np_index,self.vp_index] = -1 #Yji index
-        #    Y_mtx[self.np_index,self.np_index] = 1 #Yjj index
+        
 
         
 

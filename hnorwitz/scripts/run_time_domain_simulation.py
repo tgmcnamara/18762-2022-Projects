@@ -19,19 +19,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     #THis constructs the overall y and J matrixes
     Y= np.zeros((size_Y,size_Y),dtype=float) #creates the Y matrix of 0s Matrix seems incorrect several rows and columbs of 0
     J = np.zeros((size_Y,1))
-    
-    #for resistor in devices['resistors']:
-       # resistor.stamp_dense(Y)
 
-    #for capacitors in devices['capacitors']:
-     #   capacitors.stamp_dense(Y, J, d_t, V_init, t_init)
-        #should I be calling stamp_op 
-
-    #for inductors in devices['inductors']:
-        #inductors.stamp_dense(Y,J, d_t, V_init, t_init)
-
-    #for voltage_sources in devices['voltage_sources']:
-        #voltage_sources.stamp_dense(Y,J, t_init)
 ######
 
     #SECOND begin iterating over time
@@ -46,7 +34,8 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 resistor.stamp_dense(Y)
                 #print(Y)
             for capacitors in devices['capacitors']:
-                capacitors.stamp_open(Y)
+                #capacitors.stamp_open(Y)
+                capacitors.stamp_dense(Y,J,d_t,V_init,t)
             for inductors in devices['inductors']:
                 inductors.stamp_dense(Y,J,d_t,V_init,t)
             for voltage_sources in devices['voltage_sources']:
@@ -94,12 +83,43 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
         
     #print(V_waveform)
     #need to get labeling and be able to distinguish lines
+    #EVERYTHING BELOW THIS POINT COULD BE PUT IN PROCESSING
     V_waveform_T = np.transpose(V_waveform)
-    #time = np.transpose(time)
-    #plt.plot(time,V_waveform_T[:,4])#capacitor current
-    #plt.plot(time,V_waveform_T[:,3])
-    #plt.plot(time,V_waveform_T[:,1])#capacitor voltage
-    plt.plot(time,V_waveform_T)
+    figure, axis = plt.subplots(3,2)
+    #note only need on set of labels
+    ##l1 inductor voltages phase a b c
+    axis[0,0].plot(time,V_waveform_T[:,13], label='l1_a')
+    axis[0,0].plot(time,V_waveform_T[:,15], label='l1_b')
+    axis[0,0].plot(time,V_waveform_T[:,17], label='l1_c')
+    axis[0,0].set_title("inductor 1 voltages")
+    ##l1 inductor current phase a b c
+    axis[0,1].plot(time,V_waveform_T[:,14], label='l1_a')
+    axis[0,1].plot(time,V_waveform_T[:,16], label='l1_b')
+    axis[0,1].plot(time,V_waveform_T[:,18], label='l1_c')
+    axis[0,1].set_title("inductor 1 currents")
+    ##l2 inductor voltages phase a b c
+    axis[1,0].plot(time,V_waveform_T[:,19], label='l2_a')
+    axis[1,0].plot(time,V_waveform_T[:,21], label='l2_b')
+    axis[1,0].plot(time,V_waveform_T[:,23], label='l2_c')
+    axis[1,0].set_title("inductor 2 voltages")
+    ##l2 inductor currents phase a b c
+    axis[1,1].plot(time,V_waveform_T[:,20], label='l2_a')
+    axis[1,1].plot(time,V_waveform_T[:,22], label='l2_b')
+    axis[1,1].plot(time,V_waveform_T[:,24], label='l2_c')
+    axis[1,1].set_title("inductor 2 currents")
+    ##voltage source voltages phase a b c
+    axis[2,0].plot(time,V_waveform_T[:,0], label='v_a')
+    axis[2,0].plot(time,V_waveform_T[:,1], label='v_b')
+    axis[2,0].plot(time,V_waveform_T[:,2], label='v_c')
+    axis[2,0].set_title("voltage sources voltages")
+    ##voltage source currents phase a b c
+    axis[2,1].plot(time,V_waveform_T[:,25], label='phase_a')
+    axis[2,1].plot(time,V_waveform_T[:,26], label='phase_b')
+    axis[2,1].plot(time,V_waveform_T[:,27], label='phase_c')
+    axis[2,1].set_title("voltage sources currents")
+    plt.tight_layout()
+    plt.legend()
     plt.show()
     
+    #don't really need to return anything
     return V_waveform
