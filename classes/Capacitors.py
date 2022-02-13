@@ -32,13 +32,16 @@ class Capacitors:
         
         companion_r = timestep / (2 * self.c)
 
-        stamp_short(Y, J, self.from_index, self.extension_index_1, self.extension_index_2)
+        stamp_short(Y, J, self.extension_index_1, self.from_index, self.extension_index_2)
 
         stamp_resistor(Y, self.extension_index_1, self.extension_index_3, companion_r)
 
-        previous_voltage = v_previous[self.from_index] - v_previous[self.to_index]
-        previous_current = J_previous[self.extension_index_2]
+        previous_current = v_previous[self.extension_index_2]
 
+        previous_resistor_voltage = previous_current * companion_r
+        previous_voltage_source_voltage = J_previous[self.extension_index_4]
+        previous_voltage = previous_voltage_source_voltage + previous_resistor_voltage
+        
         companion_v = previous_voltage + companion_r * previous_current
 
         stamp_voltage_source(Y, J, self.extension_index_3, self.to_index, self.extension_index_4, companion_v)

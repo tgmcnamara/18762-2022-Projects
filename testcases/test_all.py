@@ -54,14 +54,14 @@ class CircuitSimulatorTests(unittest.TestCase):
         v_waveform_c = results.get_node_voltage("c")
 
         self.assertAlmostEqual(131, max(v_waveform_b), delta=1)
-        self.assertAlmostEqual(61, max(v_waveform_c), delta=1)
+        self.assertAlmostEqual(65, max(v_waveform_c), delta=1)
 
     def test_capacitor(self):
         devices = Devices([
             VoltageSources("vs-gnd-a", "a", "gnd", 120, 0, 15),
             Resistors("r-1", "a", "b", 5),
             Capacitors("i-1", "b", "c", 0.001),
-            Resistors("r-2", "c", "gnd", 5)
+            Resistors("r-2", "c", "gnd", 2.5)
         ])
 
         results = solve(devices, Settings(simulationTime=0.2))
@@ -69,8 +69,8 @@ class CircuitSimulatorTests(unittest.TestCase):
         v_waveform_b = results.get_node_voltage("b")
         v_waveform_c = results.get_node_voltage("c")
 
-        self.assertAlmostEqual(131, max(v_waveform_b), delta=1)
-        self.assertAlmostEqual(61, max(v_waveform_c), delta=1)
+        self.assertAlmostEqual(145, max(v_waveform_b), delta=1)
+        self.assertAlmostEqual(32, max(v_waveform_c), delta=1)
 
 
 if __name__ == '__main__':
