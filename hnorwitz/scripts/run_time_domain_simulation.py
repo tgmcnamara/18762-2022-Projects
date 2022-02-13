@@ -48,12 +48,15 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             for capacitors in devices['capacitors']:
                 capacitors.stamp_open(Y)
             for inductors in devices['inductors']:
-                inductors.stamp_short(Y)
+                inductors.stamp_dense(Y,J,d_t,V_init,t)
             for voltage_sources in devices['voltage_sources']:
                 voltage_sources.stamp_dense(Y,J, t)
+
+
             Y[Nodes.node_index_dict['gnd'],:] = 0
             Y[:,Nodes.node_index_dict['gnd']] = 0
-            Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+            Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1 
+            #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands
             v = np.linalg.solve(Y,J)
             print(type(v))
             #V_waveform.append(v)
@@ -74,12 +77,12 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 voltage_sources.stamp_dense(Y,J, t)
 
         else:
-            for voltage_sources in devices['voltage_sources']:
-                voltage_sources.stamp_dense(Y,J, t)
             for capacitors in devices['capacitors']:
                 capacitors.stamp_dense(Y, J, d_t, Prevs_v, t)
             for inductors in devices['inductors']:
                 inductors.stamp_dense(Y,J, d_t, Prevs_v, t)
+            for voltage_sources in devices['voltage_sources']:
+                voltage_sources.stamp_dense(Y,J, t)
             Y[Nodes.node_index_dict['gnd'],:] = 0
             Y[:,Nodes.node_index_dict['gnd']] = 0
             Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1

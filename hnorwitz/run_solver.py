@@ -1,8 +1,8 @@
 from scripts.solve import solve 
 
 # path to the grid network RAW file
-casename = 'testcases/single_phase_RC_circuit.json'#'testcases/IM_circuit.json'
-
+#casename = 'testcases/single_phase_RL_circuit.json'#'testcases/IM_circuit.json'
+casename = 'testcases/RL_circuit.json'
 # the settings for the solver
 settings = {
 	"Tolerance": 1E-05, # Tolerance for Newton-Raphson
