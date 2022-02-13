@@ -37,7 +37,7 @@ def run_time_domain_simulation(devices, V_init, size_Y,  SETTINGS, step):
         for ind in inductors:
             ind.stamp_time(devices, V_init, J_time, step)
 
-        print(J_time)
+        #print(J_time)
         V_init = np.linalg.solve(Y_matrix, J_time)
 
 

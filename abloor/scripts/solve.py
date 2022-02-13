@@ -33,7 +33,7 @@ def solve(TESTCASE, SETTINGS):
     t_final = SETTINGS['Simulation Time']
     tol = SETTINGS['Tolerance']  # NR solver tolerance
     max_iters = SETTINGS['Max Iters']  # maximum NR iterations
-    step = 0.0001
+    step = 0.001
     # # # Assign system nodes # # #
     # We assign a node index for every node in our Y matrix and J vector.
     # In addition to voltages, nodes track currents of voltage sources and
