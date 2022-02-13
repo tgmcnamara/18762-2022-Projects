@@ -43,5 +43,4 @@ class VoltageSources:
 
     def stamp_J(self, J_time, time):
         v = self.index
-        J_time[v][0] = np.sqrt(2)*self.amp_ph_ph_rms*np.cos(np.pi*(self.frequency_hz*time + self.phase_deg)/180)
-
+        J_time[v][0] += np.sqrt(2)*self.amp_ph_ph_rms*np.cos(2*np.pi*(self.frequency_hz*time + self.phase_deg/360))

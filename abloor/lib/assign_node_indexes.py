@@ -4,15 +4,15 @@ def assign_node_indexes(devices):
     nodes = devices['nodes']
     voltage_sources = devices['voltage_sources']
     resistors = devices['resistors']
+    inductors = devices['inductors']
 
     for node in nodes:
-        node_index_counter += node.assign_node_indexes(node_index_counter);
+        node_index_counter += node.assign_node_indexes(node_index_counter)
 
     for voltage_source in voltage_sources:
-        node_index_counter += voltage_source.assign_node_indexes(node_index_counter);
+        node_index_counter += voltage_source.assign_node_indexes(node_index_counter)
 
-    print(node_index_counter)
-    print(nodes[2].index)
-    print(voltage_sources[0].index)
+    for ind in inductors:
+        node_index_counter += ind.assign_node_indexes(node_index_counter)
 
     return node_index_counter

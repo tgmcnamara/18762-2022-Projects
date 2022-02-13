@@ -33,7 +33,7 @@ def solve(TESTCASE, SETTINGS):
     t_final = SETTINGS['Simulation Time']
     tol = SETTINGS['Tolerance']  # NR solver tolerance
     max_iters = SETTINGS['Max Iters']  # maximum NR iterations
-
+    step = 0.0001
     # # # Assign system nodes # # #
     # We assign a node index for every node in our Y matrix and J vector.
     # In addition to voltages, nodes track currents of voltage sources and
@@ -41,7 +41,6 @@ def solve(TESTCASE, SETTINGS):
     # induction motor.
     # You can determine the size of the Y matrix by looking at the total
     # number of nodes in the system.
-
 
     size_Y = assign_node_indexes(devices)
 
@@ -51,9 +50,9 @@ def solve(TESTCASE, SETTINGS):
 
     # TODO: STEP 2 - Run the time domain simulation and return an array that contains
     #                time domain waveforms of all the state variables # # #
-    V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS)
+    V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS, step)
 
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
-    process_results(V_waveform, devices)
+    process_results(V_waveform, devices, SETTINGS, step)
