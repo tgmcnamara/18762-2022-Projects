@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import count
 from classes.Nodes import Nodes
+from lib.stamp import stamp_short
 
 class Switches:
     def __init__(self, name, from_node, to_node, t_open, t_close):
@@ -24,15 +25,7 @@ class Switches:
 
     def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
         if runtime >= self.t_open and runtime <= self.t_close:
-            #Basically the same as a voltage source. just need to set the two nodes equal to each other.
-
-            Y[self.switch_index, self.from_index] = 1
-            Y[self.switch_index, self.to_index] = -1
-
-            Y[self.from_index, self.switch_index] = 1
-            Y[self.to_index, self.switch_index] = -1
-
-            J[self.switch_index] = 0
+            stamp_short(Y, J, self.from_index, self.to_index, self.switch_index)
         else:
             # if its an open circuit, then there's no relationship between the nodes.
             # instead, we make a 'dumby' function a 1 * vn = 1. Same as how we configure
