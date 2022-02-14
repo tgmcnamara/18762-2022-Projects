@@ -14,11 +14,11 @@ def solve(devices: Devices, settings: Settings = Settings()):
     # induction motor.
     # You can determine the size of the Y matrix by looking at the total
     # number of nodes in the system.
-    (node_size, total_size) = assign_node_indexes(devices)
+    Y_size = assign_node_indexes(devices)
     
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
-    v_init = initialize(devices, node_size, total_size)
+    v_init = initialize(devices, Y_size)
 
     # TODO: STEP 2 - Run the time domain simulation and return an array that contains
     #                time domain waveforms of all the state variables # # #

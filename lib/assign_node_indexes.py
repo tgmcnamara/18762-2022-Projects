@@ -25,11 +25,11 @@ def assign_node_indexes(devices: Devices):
     for device in devices.all_devices_but_nodes():
         device.assign_node_indexes(nodeLookup)
 
-    total_size = len(nodeLookup)
+    Y_size = len(nodeLookup)
 
-    print(f'Total Y matrix size for circuit will be {total_size}')
+    print(f'Total Y matrix size for circuit will be {Y_size}')
 
-    return (node_size, total_size)
+    return Y_size
 
 #For when I'm lazy and don't want to specify node names.
 def autogenerate_nodes(devices: Devices):
