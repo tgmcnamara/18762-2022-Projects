@@ -5,10 +5,8 @@ from lib.stamp import *
 from scripts.run_time_domain_simulation import run_time_domain_simulation
 from scripts.process_results import process_results
 import time
-
 # my code
 from lib.circuit import *
-
 
 def solve(TESTCASE, SETTINGS):
     """Run the power flow solver.
@@ -54,14 +52,13 @@ def solve(TESTCASE, SETTINGS):
     print("circuit elements", resistors + capacitors + inductors + voltage_sources)
     
     t_start = time.time_ns()
-    simulator = Simulator(devices = devices, size_Y = size_Y, 
+    simulator = Simulator(SETTINGS, devices = devices, size_Y = size_Y, 
                            node_indices = node_indices)
-    simulator.init_solver(SETTINGS)
     print("admittance matrix", simulator.Y)
     print("circuit", simulator.circuit)
     print("eq circuit", simulator.circuit_ecm)
     print("solving dict", simulator.solving_dict)
-    simulator.iteration(sparse = True)
+    simulator.iterate(sparse = True)
     print("solving dict", simulator.solving_dict)
     
     # # # Initialize solution vector # # #
@@ -79,4 +76,4 @@ def solve(TESTCASE, SETTINGS):
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
-    process_results(V_waveform, devices)
+    process_results(simulator, SETTINGS)

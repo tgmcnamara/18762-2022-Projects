@@ -86,7 +86,7 @@ and solves the circuit output while iterating through time
 """
 class Simulator():
     # initialization
-    def __init__(self, devices = None, size_Y = 0, node_indices = None):
+    def __init__(self, settings, devices = None, size_Y = 0, node_indices = None):
         """
         the solving dictionary should contain values that help with
         integrations
@@ -95,7 +95,7 @@ class Simulator():
                              "ecm-voltages": []
                              }
         
-        self.timestep = 0
+        self.t = 0
         self.source_list = []
         self.Y_hist = []
         self.v_hist = []
@@ -105,6 +105,8 @@ class Simulator():
         self.v = np.zeros((size_Y, 1))
         self.J = np.zeros((size_Y, 1))
         self.orig_size = size_Y
+        self.delta_t = 0.001
+        self.settings = settings
         
         if (node_indices != None):
             self.node_map = node_indices
@@ -123,15 +125,20 @@ class Simulator():
             for source in devices['voltage_sources']:
                 self.source_list.append(source)
                 
-            self.generate_companion_model()
+            self.generate_companion_model(delta_t = self.delta_t)
             self.generate_Y_r()
             self.perform_mna()
             self.delete_ground_node()
             self.solve_Yvj()
             print(self.circuit_ecm)
             
+    
+    def iterate(self, sparse = False):
+        while (self.t < self.settings['Simulation Time']):
+            self.iteration(sparse = sparse)
+        
     def iteration(self, sparse = False):
-        self.update_ecm_values()
+        self.update_ecm_values(delta_t = self.delta_t)
         self.init_Yvj(self.orig_size)
         self.generate_Y_r()
         self.perform_mna()
@@ -140,14 +147,9 @@ class Simulator():
         self.Y_hist.append(self.Y)
         self.J_hist.append(self.J)
         self.v_hist.append(v_result)
-        self.timestep +=1
-     
-    def init_solver(self, settings):   
-        self.solving_dict["sim_time"] = settings['Simulation Time']
-        self.solving_dict["tol"] = settings['Tolerance']  # NR solver tolerance
-        self.solving_dict["max_iters"] = settings['Max Iters']  # maximum NR iteration
+        self.t += self.delta_t
     
-    def generate_companion_model(self, prev_current = 0.1, prev_voltage = 0.1, delta_t = 0.1, norton = True):
+    def generate_companion_model(self, prev_current = 0, prev_voltage = 0, delta_t = 0.1, norton = True):
         # prev_current and prev_voltage are very important
         for i in range(self.circuit_ecm.get_size()):
             for j in range(self.circuit_ecm.get_size()):
@@ -233,9 +235,9 @@ class Simulator():
             # current sources 
             if comp[0] == "I":
                 if comp[1].ecm_type == "c":
-                    comp[1].amps = comp[2] + (2 * comp[1].ecm_val / delta_t) * comp[3]
+                    comp[1].amps = 0 # comp[2] + (2 * comp[1].ecm_val / delta_t) * comp[3]
                 if comp[1].ecm_type == "l":
-                    comp[1].amps = comp[2] + (delta_t / (2 * comp[1].ecm_val)) * comp[3]
+                    comp[1].amps = 0 # comp[2] + (delta_t / (2 * comp[1].ecm_val)) * comp[3]
                 
                 
     def generate_Y_r(self):
@@ -273,7 +275,7 @@ class Simulator():
             dummy_Y[size_Y + s_counter,:] = np.array(new_row)
             dummy_Y[:,size_Y + s_counter] = np.array(new_col)
             # update J
-            dummy_J[size_Y + s_counter] = source.get_nom_voltage()
+            dummy_J[size_Y + s_counter] = source.get_current_voltage(self.t)
             s_counter += 1
             # add currents
             for cur in self.solving_dict["ecm-currents"]:
@@ -315,6 +317,7 @@ class Simulator():
                 
             prev_vdrop = float(vp - vn)
             self.solving_dict["prev-ecm-vals"].append(["I", i, prev_cur, prev_vdrop])
+        
         return v  
             
     
