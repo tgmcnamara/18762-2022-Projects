@@ -37,22 +37,22 @@ class Inductors:
     def stamp_dense(self, Y_mtx, J_mtx, d_t, prev, time): 
         #need and inf at time ==0 here
         if time == 0:
-            Y_mtx[self.from_index,self.from_index] += d_t/(2*self.l) #Yii index
-            Y_mtx[self.from_index,self.l_comp_index] += -d_t/(2*self.l) #Yij index
-            Y_mtx[self.l_comp_index,self.from_index] += -d_t/(2*self.l) #Yji index
-            Y_mtx[self.l_comp_index,self.l_comp_index] += d_t/(2*self.l) #Yjj index
+            Y_mtx[self.from_index,self.from_index] += (d_t/(2*self.l)) #Yii index
+            Y_mtx[self.from_index,self.l_comp_index] += -(d_t/(2*self.l)) #Yij index
+            Y_mtx[self.l_comp_index,self.from_index] += -(d_t/(2*self.l)) #Yji index
+            Y_mtx[self.l_comp_index,self.l_comp_index] += (d_t/(2*self.l)) #Yjj index
             Y_mtx[self.to_index,self.l_curr_index] += -1 #(THIS WORKS)
             Y_mtx[self.l_comp_index, self.l_curr_index] += 1#Yab
             Y_mtx[self.l_curr_index, self.to_index] += -1#Ybj
             Y_mtx[self.l_curr_index, self.l_comp_index] += 1#Yba
             ####(EVERYTHING is now correct)
             J_mtx[self.l_curr_index,0] = prev[self.l_comp_index] + (d_t/(2*self.l))*prev[self.l_curr_index]
-            J_mtx[self.from_index,0] = -(prev[self.l_curr_index]+ d_t/(2*self.l)*prev[self.from_index])#from_index also seems to work
-            J_mtx[self.l_comp_index,0] = (prev[self.l_curr_index]+ d_t/(2*self.l)*prev[self.from_index])#same
+            J_mtx[self.from_index,0] = -(prev[self.l_curr_index]+ (d_t/(2*self.l))*prev[self.l_comp_index])#from_index also seems to work
+            J_mtx[self.l_comp_index,0] = (prev[self.l_curr_index]+ (d_t/(2*self.l))*prev[self.l_comp_index])#same
         else:
             J_mtx[self.l_curr_index,0] = prev[self.l_comp_index] + (d_t/(2*self.l))*prev[self.l_curr_index]
-            J_mtx[self.from_index,0] = -(prev[self.l_curr_index]+ d_t/(2*self.l)*prev[self.from_index])#from_index also seems to work
-            J_mtx[self.l_comp_index,0] = (prev[self.l_curr_index]+ d_t/(2*self.l)*prev[self.from_index])
+            J_mtx[self.from_index,0] = -(prev[self.l_curr_index]+ (d_t/(2*self.l))*prev[self.l_comp_index])#from_index also seems to work
+            J_mtx[self.l_comp_index,0] = (prev[self.l_curr_index]+ (d_t/(2*self.l))*prev[self.l_comp_index])
         
          
 
