@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+
 def get_cmap(n, name='hsv'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
     RGB color; the keyword argument name must be a standard mpl colormap name.'''
@@ -36,19 +37,31 @@ def process_results(simulator, SETTINGS):
         integer_mapping.append((i,v))
     """
     
+    # determining whether or not we have specific nodes of interest
+    try:
+        noi = SETTINGS['noi']
+        have_noi = (len(noi) > 0)
+    except:
+        have_noi = False
+        noi = []
+    
+    # voltages
     for i in range(n):
         label = ""
         label = "v{}".format(i)
-        plt.plot(np.array(list(range(L))) * simulator.delta_t, unknowns[:,i], 
-                 c = get_cmap(N*2)(i*2), label = label)
-        plt.legend()
+        if ((not have_noi) or (i in noi)):
+            label = simulator.node_map_reverse[i]
+            plt.plot(np.array(list(range(L))) * simulator.delta_t, unknowns[:,i], 
+                     c = get_cmap(N*2)(i*2), label = label)
+            plt.legend()
     
+    plt.title("Circuit Voltages")
     plt.ylabel("Volts [V]")
     plt.xlabel("Time (seconds)")
-    plt.title("")
     plt.show()
             
-            
+    
+    # currents
     for i in range(n,N):
         label = ""
         label = "i{}".format(i - n)
@@ -56,9 +69,9 @@ def process_results(simulator, SETTINGS):
                  c = get_cmap(N*2)(i*2), label = label)
         plt.legend()
     
+    plt.title("Circuit Currents")
     plt.ylabel("Amps [A]")
     plt.xlabel("Time (seconds)")
-    plt.title("")
     plt.show()
             
     
