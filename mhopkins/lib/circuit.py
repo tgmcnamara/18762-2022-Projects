@@ -235,9 +235,9 @@ class Simulator():
             # current sources 
             if comp[0] == "I":
                 if comp[1].ecm_type == "c":
-                    comp[1].amps = 0 # comp[2] + (2 * comp[1].ecm_val / delta_t) * comp[3]
+                    comp[1].amps = comp[2] + (2 * comp[1].ecm_val / delta_t) * comp[3]
                 if comp[1].ecm_type == "l":
-                    comp[1].amps = 0 # comp[2] + (delta_t / (2 * comp[1].ecm_val)) * comp[3]
+                    comp[1].amps = comp[2] + (delta_t / (2 * comp[1].ecm_val)) * comp[3]
                 
                 
     def generate_Y_r(self):

@@ -58,7 +58,7 @@ def solve(TESTCASE, SETTINGS):
     print("circuit", simulator.circuit)
     print("eq circuit", simulator.circuit_ecm)
     print("solving dict", simulator.solving_dict)
-    simulator.iterate(sparse = True)
+    simulator.iterate(sparse = False)
     print("solving dict", simulator.solving_dict)
     
     # # # Initialize solution vector # # #
@@ -77,3 +77,4 @@ def solve(TESTCASE, SETTINGS):
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
     process_results(simulator, SETTINGS)
+    print("total time solving the circuit:", t_total," nanoseconds")
