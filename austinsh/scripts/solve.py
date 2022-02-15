@@ -3,8 +3,9 @@ sys.path.append("..")
 from lib.parse_json import parse_json
 from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
-#from scripts.run_time_domain_simulation import run_time_domain_simulation
-#from scripts.process_results import process_results
+from classes import Nodes
+from scripts.run_time_domain_simulation import run_time_domain_simulation
+from scripts.process_results import process_results
 def solve(TESTCASE, SETTINGS):
     """Run the power flow solver.
     Args:
@@ -29,8 +30,6 @@ def solve(TESTCASE, SETTINGS):
     switches = devices['switches']
     induction_motors = devices['induction_motors']
 
-    print(nodes)
-
     # # # Solver settings # # #
     t_final = SETTINGS['Simulation Time']
     tol = SETTINGS['Tolerance']  # NR solver tolerance
@@ -43,7 +42,7 @@ def solve(TESTCASE, SETTINGS):
     # induction motor.
     # You can determine the size of the Y matrix by looking at the total
     # number of nodes in the system.
-    size_Y = assign_node_indexes(devices)
+    size_Y = Nodes.node_index_counter
     
     # # # Initialize solution vector # # #
     # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
