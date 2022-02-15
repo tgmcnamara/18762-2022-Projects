@@ -26,7 +26,7 @@ class VoltageSources:
             return self.get_nom_voltage()
         else:
             f = self.frequency_hz
-            return 1/math.sqrt(2) * self.amp_ph_ph_rms * math.cos(2 * math.pi * f * t + self.phase_deg)
+            return math.sqrt(2/3) * self.amp_ph_ph_rms * math.cos(2 * math.pi * f * t + math.radians(self.phase_deg))
     
     # Some suggested functions to implement, 
     def assign_node_indexes(self,):

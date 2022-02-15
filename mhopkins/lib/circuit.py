@@ -233,6 +233,8 @@ class Simulator():
     def update_ecm_values(self, delta_t = 0.1):
         for comp in self.solving_dict["prev-ecm-vals"]:
             # current sources 
+            # ecm_val is the original ecm capacitance or inductance
+            # comp = [indicator, ecm object, current, voltage drop]
             if comp[0] == "I":
                 if comp[1].ecm_type == "c":
                     comp[1].amps = comp[2] + (2 * comp[1].ecm_val / delta_t) * comp[3]
@@ -291,7 +293,6 @@ class Simulator():
         if (sparse == False):
             # use non-sparse numpy solver
             v = np.linalg.solve(self.Y, self.J)
-            print("v", v)
         else:
             self.sY = sp.csr_matrix(self.Y)
             self.sJ = sp.csr_matrix(self.J)
@@ -315,9 +316,11 @@ class Simulator():
             else:
                 vn = v[self.node_map[i.in_node]]
                 
-            prev_vdrop = float(vp - vn)
+            prev_vdrop = float(vn - vp)
             self.solving_dict["prev-ecm-vals"].append(["I", i, prev_cur, prev_vdrop])
         
+        print("ecm currents", self.solving_dict["prev-ecm-vals"])
+        print("v", v)
         return v  
             
     
