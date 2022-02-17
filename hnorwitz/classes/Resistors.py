@@ -23,6 +23,7 @@ class Resistors:
         #else:
         self.from_index = Nodes.node_index_dict[self.from_node]
         self.to_index = Nodes.node_index_dict[self.to_node]
+        print("voltage across " + str(self.name)+ " is "+str(self.from_index) + " minus " + str(self.to_index))
         
         
     def stamp_sparse(self,):
