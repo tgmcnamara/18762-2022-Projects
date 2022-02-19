@@ -1,5 +1,5 @@
 
-#not sure what to do here
+####HAVE NOT TOUCHED NOT REALLY SURE WHAT TO DO HERE
 def stamp_sparse():
     pass
 

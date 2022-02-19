@@ -1,13 +1,13 @@
 
 from classes.Nodes import Nodes #Not needed 
 
-
-def assign_node_indexes(devices): #not sure how to use his or where this is being called
+#####PARSEING THROUGH EACH OBJECT AND ASSIGNING NODE INDEX
+def assign_node_indexes(devices): 
     for node in devices['nodes']:
-        node.assign_node_indexes() #need to make these functions in classes
+        node.assign_node_indexes() 
 
     for resistor in devices['resistors']:
-        resistor.assign_node_indexes()#is the node index counter all it really needs
+        resistor.assign_node_indexes()
 
     for capacitors in devices['capacitors']:
         capacitors.assign_node_indexes()
