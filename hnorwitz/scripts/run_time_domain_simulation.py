@@ -1,4 +1,6 @@
 from platform import node
+from telnetlib import SE
+from typing import Set
 import numpy as np #think need to call np.linalg.solve(Y_mtx,J_mtx)
 import scipy as sp
 from classes.Capacitors import Capacitors #tried importning scipy but said it was already installed
@@ -10,6 +12,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     d_t = .0001# detlat t time step
     #time = np.linspace((0,SETTINGS['Simulation Time'],d_t)) ####ANNOTHER WAY i WAS TRYING TO INCREMENT MY TIME
     time = np.arange(0,SETTINGS['Simulation Time'],d_t)
+    NR = np.arrange(0,SETTINGS['Max Iters']) ####setting the maximume number of NR iterations
     size_t = len(time)
     V_waveform =np.zeros((size_Y, size_t)) #INITIALIZES THE WAVEFORM SO I CAN ADD V VECT EACH TIME STEP
     t_init = 0
@@ -48,6 +51,10 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 inductors.stamp_dense(Y,J,d_t,V_init,t)
                 #print(Y)
                 #print(J)
+            ######INDUCTION  Motor
+            for InductionMotors in devices['induction_motors']:
+                InductionMotors.stamp_t0(Y)
+            #######
             for voltage_sources in devices['voltage_sources']:
                 voltage_sources.stamp_dense(Y,J, t)
                 #print(Y)
@@ -62,11 +69,16 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #print(Y)
             #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
             v = np.linalg.solve(Y,J)
+            
             print(type(v))
             V_waveform[:,t_ind] = v.reshape(-1)#V_waveform[v,t_ind] 
             #print(V_waveform)
             Prevs_v = v
             print(v)
+
+            ######MAY NEED NEWTON RAPHSON HERER#############################
+            
+            ################################################################
 
             ############THIS PART WAS WHEN I WAS TRYING TO USE SHORTS AND OPENS FOR DC ANALYSIS AND THEN NEEDED TO RESTAMP BEFORE GOING FORWARD
             #####(reset Y and Z)
@@ -83,24 +95,31 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #    voltage_sources.stamp_dense(Y,J, t)
             #################################################
         else:
-            Y= np.zeros((size_Y,size_Y),dtype=float) #####RESETS Y AND J TO BEING MATRIXES OF 0 AFTER EACH ITERATATION
-            J = np.zeros((size_Y,1))
-            for resistor in devices['resistors']:
-                resistor.stamp_dense(Y)
-                #print(Y)
-                #print(J)
-            for capacitors in devices['capacitors']:
-                capacitors.stamp_dense(Y, J, d_t, Prevs_v, t)
-                #print(Y)
-                #print(J)
-            for inductors in devices['inductors']:
-                inductors.stamp_dense(Y,J, d_t, Prevs_v, t)
-                #print(Y)
-                #print(J)
-            for voltage_sources in devices['voltage_sources']:
-                voltage_sources.stamp_dense(Y,J, t)
-                #print(Y)
-                #print(J)
+            ##################Implement Newton Raphson (this may need to go before linsolve)##################################
+            for k in range(len(NR)):
+                Y= np.zeros((size_Y,size_Y),dtype=float) #####RESETS Y AND J TO BEING MATRIXES OF 0 AFTER EACH ITERATATION
+                J = np.zeros((size_Y,1))
+                for resistor in devices['resistors']:
+                    resistor.stamp_dense(Y)
+                    #print(Y)
+                    #print(J)
+                for capacitors in devices['capacitors']:
+                    capacitors.stamp_dense(Y, J, d_t, Prevs_v, t)
+                    #print(Y)
+                    #print(J)
+                for inductors in devices['inductors']:
+                    inductors.stamp_dense(Y,J, d_t, Prevs_v, t)
+                    #print(Y)
+                    #print(J)
+
+                ######INDUCTION  Motor
+                for InductionMotors in devices['induction_motors']:
+                    InductionMotors.stamp_dense(Y)
+            #######
+                for voltage_sources in devices['voltage_sources']:
+                    voltage_sources.stamp_dense(Y,J, t)
+                    #print(Y)
+                    #print(J)
             #####(SAME AS COMMENT ON LINE 56)
             Y[Nodes.node_index_dict['gnd'],:] = 0
             Y[:,Nodes.node_index_dict['gnd']] = 0
@@ -115,7 +134,12 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #print(v[21]-v[12])
             #print(v[23]-v[12])
             #print("next")
+
+           
+
+
             
+            #############################################################
             #V_waveform.append(v)
             V_waveform[:,t_ind] = v.reshape(-1)
             #print(V_waveform)
