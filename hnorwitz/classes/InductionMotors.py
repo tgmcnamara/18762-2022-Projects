@@ -53,10 +53,15 @@ class InductionMotors:
         self.vds_index = -1
         self.vqs_index = -1
         self.wr_index = -1
-       
+        ###initializing voltage and current sources
+        #self.vcvs_ds = -1
+        #self.vcvs_qs = -1
+        #self.cccs_ia = -1
+        #self.cccs_ib = -1
+        #self.cccs_ic = -1
         ### intialize something to hold the previous NR values
-        self.history = -1#don't think i need this
-        self.prevkh = -1#don't think i need this since i am initialing this outside
+        #self.history = -1#don't think i need this
+        #self.prevkh = -1#don't think i need this since i am initialing this outside
 
         # You are welcome to / may be required to add additional class variables   
 
@@ -80,12 +85,23 @@ class InductionMotors:
         Nodes.index_counter += 1
         self.wr_index = Nodes.index_counter
         Nodes.index_counter += 1
+        #####(not sure if need these one)(thes are for when i want to complete the full circuit and not just induction motor)
+        #self.vcvs_ds = Nodes.index_counter
+        #Nodes.index_counter += 1
+        #self.vcvs_qs = Nodes.index_counter
+        #Nodes.index_counter += 1
+        #self.cccs_ia = Nodes.index_counter
+        #Nodes.index_counter += 1
+        #self.cccs_ib = Nodes.index_counter
+        #Nodes.index_counter += 1
+        #self.cccs_ic = Nodes.index_counter
+        #Nodes.index_counter += 1
         pass
         
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self,Y_mtx, J_mtx, prev, prevkh,d_t, hist,time):#takes Y,J, previous V vector, current k vector, and time
+    def stamp_dense(self,Y_mtx, J_mtx, prev, prevkh,d_t):#, hist,time):#takes Y,J, previous V vector, current k vector, and time
         #prev = previous time step v vector
         #prevkh = previous values from kh iteration
         #hist = this holds previous dr values(not to sure about this one)
@@ -102,30 +118,37 @@ class InductionMotors:
         ########################################################################################
         ##converting from fabc to fdq (THIS IS INCROREST BUT THIS IS GENERALLY THE IDEA)#
         #Vds row in y (really not sure)
-        Y_mtx[self.vds_index,self.phase_a_index] = 1#n+1,k
-        Y_mtx[self.vds_index,self.phase_b_index] = -1#N+1, l  
-        Y_mtx[self.vds_index,self.phase_c_index] = -Av #N+1,p
-        Y_mtx[self.vds_index,self.phase_c_index] = Av#N+1,q
-        Y_mtx[self.phase_a_index,self.vds_index] = -1
-        Y_mtx[self.phase_a_index,self.vds_index] = 1#this should be the ground index
-        ###attempt 2 for VDs row in Y(based off voltage controled voltage source stamp)###
+        #Y_mtx[self.vds_index,self.phase_a_index] = 1#n+1,k
+        #Y_mtx[self.vds_index,self.phase_b_index] = -1#N+1, l  
+        #Y_mtx[self.vds_index,self.phase_c_index] = -Av #N+1,p
+        #Y_mtx[self.vds_index,self.phase_c_index] = Av#N+1,q
+        #Y_mtx[self.phase_a_index,self.vds_index] = -1
+        #Y_mtx[self.phase_a_index,self.vds_index] = 1#this should be the ground index
+
+        ###not stamping and just assuming that we are connected to va,vb and vc###(not sure about Vds and Vqs)
         Y_mtx[self.vds_index,self.phase_a_index] = (2/3)*np.cos(theta)*prev[self.phase_a_index] 
         Y_mtx[self.vds_index,self.phase_b_index] = (2/3)*np.cos(theta-lamb)*prev[self.phase_b_index] 
         Y_mtx[self.vds_index,self.phase_c_index] = (2/3)*np.cos(theta+lamb)*prev[self.phase_c_index]
-        Y_mtx[self.phase_a_index,self.vds_index] = -1
-        Y_mtx[self.phase_a_index,self.vds_index] = 1#this should be the ground index
+        J_mtx[self.vds_index, 0] = (2/3)*np.cos(theta)*prev[self.phase_a_index] + (2/3)*np.cos(theta-lamb)*prev[self.phase_b_index] +(2/3)*np.cos(theta+lamb)*prev[self.phase_c_index] #not sure about this
+        #Y_mtx[self.phase_a_index,self.vds_index] = -1
+        #Y_mtx[self.phase_a_index,self.vds_index] = 1#this should be the ground index
+        
         ############
         #Vqs row in y
         Y_mtx[self.vqs_index,self.phase_a_index] = (2/3)*np.sin(theta)*prev[self.phase_a_index] 
         Y_mtx[self.vqs_index,self.phase_b_index] = (2/3)*np.sin(theta-lamb)*prev[self.phase_b_index] 
         Y_mtx[self.vqs_index,self.phase_c_index] = (2/3)*np.sin(theta+lamb)*prev[self.phase_c_index]
-        Y_mtx[self.vqs_index,self.vqs_index] = -prev[self.iqs_index]
+        J_mtx[self.vqs_index, 0] = (2/3)*np.sin(theta)*prev[self.phase_a_index] + (2/3)*np.sin(theta-lamb)*prev[self.phase_b_index] +(2/3)*np.sin(theta+lamb)*prev[self.phase_c_index]
+        #Y_mtx[self.vqs_index,self.vqs_index] = -prev[self.iqs_index]
+        #Y_mtx[self.vqs_index,self.phase_a_index] = (2/3)*np.sin(theta)*prev[self.phase_a_index] 
+        #Y_mtx[self.vqs_index,self.phase_b_index] = (2/3)*np.sin(theta-lamb)*prev[self.phase_b_index] 
+        #Y_mtx[self.vqs_index,self.phase_c_index] = (2/3)*np.sin(theta+lamb)*prev[self.phase_c_index]
 
-        #############
-        vds = (2/3)*np.cos(theta)*prev[self.Vas] +(2/3)*np.cos(theta-lamb)*prev[self.vbs] +(2/3)*np.cos(theta+lamb)*prev[self.vcs]
-        vqs = (2/3)*np.sin(theta)*prev[self.Vas] +(2/3)*np.sin(theta-lamb)*prev[self.vbs] +(2/3)*np.sin(theta+lamb)*prev[self.vcs]
-        ids = (2/3)*np.cos(theta)*prev[self.Ias] +(2/3)*np.cos(theta-lamb)*prev[self.Ibs] +(2/3)*np.cos(theta+lamb)*prev[self.Ics]
-        iqs = (2/3)*np.sin(theta)*prev[self.Ias] +(2/3)*np.sin(theta-lamb)*prev[self.Ibs] +(2/3)*np.sin(theta+lamb)*prev[self.Ics]
+        #############think i was trying to right out all equations for dq 
+        #vds = (2/3)*np.cos(theta)*prev[self.Vas] +(2/3)*np.cos(theta-lamb)*prev[self.vbs] +(2/3)*np.cos(theta+lamb)*prev[self.vcs]
+        #vqs = (2/3)*np.sin(theta)*prev[self.Vas] +(2/3)*np.sin(theta-lamb)*prev[self.vbs] +(2/3)*np.sin(theta+lamb)*prev[self.vcs]
+        #ids = (2/3)*np.cos(theta)*prev[self.Ias] +(2/3)*np.cos(theta-lamb)*prev[self.Ibs] +(2/3)*np.cos(theta+lamb)*prev[self.Ics]
+        #iqs = (2/3)*np.sin(theta)*prev[self.Ias] +(2/3)*np.sin(theta-lamb)*prev[self.Ibs] +(2/3)*np.sin(theta+lamb)*prev[self.Ics]
         ##############################################################################################################
 
         ##ALL THIS BELOW MY BELONG IN NON LINEAR STAMP OR FOR THE NEWTON RAPHSON########

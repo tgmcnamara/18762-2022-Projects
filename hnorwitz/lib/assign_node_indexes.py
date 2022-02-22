@@ -15,11 +15,11 @@ def assign_node_indexes(devices):
     for inductors in devices['inductors']:
         inductors.assign_node_indexes()
 
-    for InductionMotors in devices['induction_motors']:
-        InductionMotors.assign_node_indexes()
-
     for voltage_sources in devices['voltage_sources']:
         voltage_sources.assign_node_indexes()
+
+    for InductionMotors in devices['induction_motors']:
+        InductionMotors.assign_node_indexes()
 
     size_Y = int(Nodes.index_counter)
     return size_Y

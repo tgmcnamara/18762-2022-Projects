@@ -21,11 +21,11 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     #THis constructs the overall y and J matrixes
     Y= np.zeros((size_Y,size_Y),dtype=float) #creates the Y matrix of 0s Matrix seems incorrect several rows and columbs of 0
     J = np.zeros((size_Y,1))
-    ##initialize linear an non linear y and j matrixs
-    Y_lin = Y
-    Y_non_lin = Y
-    J_lin = J
-    J_non_lin = J
+    ##initialize linear an non linear y and j matrixs (not sure if any of this is correct for)
+    Y_lin = np.zeros((size_Y,size_Y),dtype=float)
+    Y_non_lin =np.zeros((size_Y,size_Y),dtype=float)
+    J_lin = np.zeros((size_Y,1))
+    J_non_lin = np.zeros((size_Y,1))
     ########WAS ATTEMPTING TO SEE IF JUST HOW MY INDUCTORS WERE STAMPING
     #for inductors in devices['inductors']:
         #inductors.stamp_short(Y)#,J,d_t,V_init, t)
@@ -60,11 +60,11 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 #print(Y)
                 #print(J)
             ###NEWTON RAPHSON FOR T=0
-            prevkh = V_init
+            prevkh = V_init*0
             for k in range(len(NR)): #since induction motor is only non linear device  
             ######INDUCTION  Motor
                 for InductionMotors in devices['induction_motors']:
-                    InductionMotors.stamp_t0(Y_non_lin, J_non_lin, V_init, prevkh,d_t, hist,time)
+                    InductionMotors.stamp_dense(Y_non_lin, J_non_lin, V_init, prevkh,d_t)#, hist,time)#not sure what to do with the T0 stamp
                 #######
         
                 Y_nr = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
@@ -74,15 +74,17 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 Y_nr[Nodes.node_index_dict['gnd'],:] = 0
                 Y_nr[:,Nodes.node_index_dict['gnd']] = 0
                 Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+                hist = prevkh
                 prevkh = np.linalg.solve(Y_nr,J_nr)
-                if k == len(NR): #need to add an or condition about if it is below the tollerance
+                if k == len(NR) or (prevkh-hist)<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
                     Y = Y_nr
                     J = J_nr
+                    #HERE WE UPDATE COMPANION MODELS
                     #need a command to get out of for loop
                     break
                 else: 
-                    Y_nr = Y #resets Y_nr to zero matrix
-                    J_nr = J
+                    Y_nr = Y_nr*0 #resets Y_nr to zero matrix
+                    J_nr = J_nr*0
                 
             #print(Y)
             #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
@@ -153,6 +155,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 if k ==len(NR): #need to add an or condition about if it is below the tollerance
                     Y = Y_nr
                     J = J_nr
+                    break
                 else: 
                     Y_nr = Y #resets Y_nr to zero matrix
                     J_nr = J
