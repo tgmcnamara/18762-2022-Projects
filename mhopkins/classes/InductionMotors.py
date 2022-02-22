@@ -4,6 +4,13 @@ from itertools import count
 from classes.Nodes import Nodes
 # from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
 
+def F(x):
+    return f
+
+def J(x):
+    return j
+
+
 class InductionMotors:
     def __init__(
         self,
@@ -41,8 +48,17 @@ class InductionMotors:
         self.n_pole_pairs = n_pole_pairs
         self.lss = self.lls + self.lm
         self.lrr = self.llr + self.lm
-        # You are welcome to / may be required to add additional class variables   
+        # You are welcome to / may be required to add additional class variables
+        
+        # states of the induction motor
+        self.x = np.array([1,2])   
+        
+    def set_state(self, x):
+        self.x = x
 
+    def NR_iterate(self):
+        pass
+    
     # Some suggested functions to implement, 
     def assign_node_indexes(self,):
         pass
