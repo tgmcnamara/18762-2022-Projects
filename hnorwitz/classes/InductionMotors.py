@@ -53,9 +53,10 @@ class InductionMotors:
         self.vds_index = -1
         self.vqs_index = -1
         self.wr_index = -1
-        self.history = -1
+       
         ### intialize something to hold the previous NR values
-        self.prevkh = -1
+        self.history = -1#don't think i need this
+        self.prevkh = -1#don't think i need this since i am initialing this outside
 
         # You are welcome to / may be required to add additional class variables   
 
@@ -132,24 +133,25 @@ class InductionMotors:
         #fds Y
         Y_mtx[self.ids_index, self.vds_index] = 1#dfdr/dvds
         Y_mtx[self.ids_index, self.vqs_index] = 0
-        Y_mtx[self.ids_index, self.ids_index] = -self.rs -(2/d_t)*self.lss 
+        Y_mtx[self.ids_index, self.ids_index] = -self.rs -(2/d_t)*self.lss #dfdr/dids
         Y_mtx[self.ids_index, self.iqs_index] = 0
-        Y_mtx[self.ids_index, self.idr_index] = -(2/d_t) * self.lm
+        Y_mtx[self.ids_index, self.idr_index] = -(2/d_t) * self.lm #dfdr/didr
         Y_mtx[self.ids_index, self.iqr_index] = 0
         Y_mtx[self.ids_index, self.wr_index] = 0
         #fds J
-        J_mtx[self.ids_index,0] = -hist_ds + (1)*(vdsk_d_t) +(-self.rs -(2/d_t)*self.lss)*(idsk_d_t) + (-(2/d_t) * self.lm)*(idrk_d_t) #not sure what I am supposed to do here
-        
+        J_mtx[self.ids_index,0] = -hist_ds + (1)*(prevkh[self.vds_index]) +(-self.rs -(2/d_t)*self.lss)*(prevkh[self.ids_index]) + (-(2/d_t) * self.lm)*(prevkh[self.idr_index]) #I think idrk and the others should be from
+        ####I THINK VDSK_D_T AND IDSK_D_T, ETC SHOULD BE FROM PREVKH AND BE IN THE FORM prevkh[self.vds_index] and then the same for the rest
+
         #fqs Y
         Y_mtx[self.iqs_index, self.vds_index] = 0
         Y_mtx[self.iqs_index, self.vqs_index] = 1#dfqs/dvqs
         Y_mtx[self.iqs_index, self.ids_index] = 0 
-        Y_mtx[self.iqs_index, self.iqs_index] = -self.rs -(2/d_t)*self.lss
+        Y_mtx[self.iqs_index, self.iqs_index] = -self.rs -(2/d_t)*self.lss#dfqs/diqs
         Y_mtx[self.iqs_index, self.idr_index] = 0
-        Y_mtx[self.iqs_index, self.iqr_index] = -(2/d_t) * self.lm
+        Y_mtx[self.iqs_index, self.iqr_index] = -(2/d_t) * self.lm#dfqs/diqr
         Y_mtx[self.iqs_index, self.wr_index] = 0
         #fqs J
-        J_mtx[self.iqs_index,0] = -hist_qs + (1)*(vqsk_d_t) +(-self.rs -(2/d_t)*self.lss)*(iqsk_d_t) + (-(2/d_t) * self.lm)*(iqrk_d_t) #not sure what I am supposed to do here
+        J_mtx[self.iqs_index,0] = -hist_qs + (1)*(prevkh[self.vqs_index]) +(-self.rs -(2/d_t)*self.lss)*(prevkh[self.iqs_index]) + (-(2/d_t) * self.lm)*(prevkh[self.iqr_index]) #not sure what I am supposed to do here
 
         #fdr y (implementing parital derivatives from work sheet)
         Y_mtx[self.idr_index, self.vds_index] = 0
@@ -160,29 +162,29 @@ class InductionMotors:
         Y_mtx[self.idr_index, self.iqr_index] = self.lrr * prevkh[self.wr_index]#dfdr/diqr
         Y_mtx[self.idr_index, self.wr_index] = (self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index]#dfdr/dwr
         #fdr J
-        J_mtx[self.idr_index,0] = -hist_dr + (-(2/d_t) * self.lm)*(idsk_d_t) +(self.lm*prevkh[self.wr_index])*(iqsk_d_t) + (self.rr - (2/d_t)*self.lrr)*(idrk_d_t) + ((self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(wrk_d_t)#not sure what I am supposed to do here
+        J_mtx[self.idr_index,0] = -hist_dr + (-(2/d_t) * self.lm)*(prevkh[self.ids_index]) +(self.lm*prevkh[self.wr_index])*(prevkh[self.iqs_index]) + (self.rr - (2/d_t)*self.lrr)*(prevkh[self.idr_index]) + ((self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(prevkh[self.wr_index])#not sure what I am supposed to do here
         
         #fqr Y
         Y_mtx[self.iqr_index, self.vds_index] = 0
         Y_mtx[self.iqr_index, self.vqs_index] = 0
-        Y_mtx[self.iqr_index, self.ids_index] = self.lm*prevkh[self.wr_index]
-        Y_mtx[self.iqr_index, self.iqs_index] = (2/d_t) * self.lm
-        Y_mtx[self.iqr_index, self.idr_index] = -self.lrr * prevkh[self.wr_index]
-        Y_mtx[self.iqr_index, self.iqr_index] = self.rr + (2/d_t)*self.lrr
-        Y_mtx[self.iqr_index, self.wr_index] = -(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index]
+        Y_mtx[self.iqr_index, self.ids_index] = self.lm*prevkh[self.wr_index]#dfqr/dids
+        Y_mtx[self.iqr_index, self.iqs_index] = (2/d_t) * self.lm#dfiqr/diqs
+        Y_mtx[self.iqr_index, self.idr_index] = -self.lrr * prevkh[self.wr_index]#dfiqr/didr
+        Y_mtx[self.iqr_index, self.iqr_index] = self.rr + (2/d_t)*self.lrr#dfiqr/diqr
+        Y_mtx[self.iqr_index, self.wr_index] = -(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index]#diqr/dwr
         #fqr J
-        J_mtx[self.iqr_index,0] = -hist_qr + ((2/d_t) * self.lm)*(iqsk_d_t) +(self.lm*prevkh[self.wr_index])*(idsk_d_t) + (self.rr + (2/d_t)*self.lrr)*(iqrk_d_t) + (-(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(wrk_d_t)#not sure what I am supposed to do here
+        J_mtx[self.iqr_index,0] = -hist_qr + ((2/d_t) * self.lm)*(prevkh[self.iqs_index]) +(self.lm*prevkh[self.wr_index])*(prevkh[self.ids_index]) + (self.rr + (2/d_t)*self.lrr)*(prevkh[self.iqr_index]) + (-(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(prevkh[self.wr_index])#not sure what I am supposed to do here
 
-        #fwr Y(not sure if solved these out on paper correctly so not indcluding them yet)
+        #fwr Y
         Y_mtx[self.wr_index, self.vds_index] = 0
         Y_mtx[self.wr_index, self.vqs_index] = 0
-        Y_mtx[self.wr_index, self.ids_index] = -(3/2)*self.n_pole_pairs*self.lm*self.iqr_index
-        Y_mtx[self.wr_index, self.iqs_index] = (3/2)*self.n_pole_pairs*self.lm*self.idr_index
-        Y_mtx[self.wr_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm*self.iqs_index
-        Y_mtx[self.wr_index, self.iqr_index] = -(3/2)*self.n_pole_pairs*self.lm*self.ids_index
-        Y_mtx[self.wr_index, self.wr_index] = -self.d_fric - (2*self.j)/d_t
+        Y_mtx[self.wr_index, self.ids_index] = -(3/2)*self.n_pole_pairs*self.lm*self.iqr_index#dwr/dids
+        Y_mtx[self.wr_index, self.iqs_index] = (3/2)*self.n_pole_pairs*self.lm*self.idr_index#dwr/diqs
+        Y_mtx[self.wr_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm*self.iqs_index#dwr/didr
+        Y_mtx[self.wr_index, self.iqr_index] = -(3/2)*self.n_pole_pairs*self.lm*self.ids_index#dwr/diqr
+        Y_mtx[self.wr_index, self.wr_index] = -self.d_fric - (2*self.j)/d_t#dwr/dwr
         #fwr J
-        J_mtx[self.wr_index,0] = -hist_wr +(-(3/2)*self.n_pole_pairs*self.lm*self.iqr_index)*(idsk_d_t) + ((3/2)*self.n_pole_pairs*self.lm*self.idr_index)*(iqsk_d_t) + (-(3/2)*self.n_pole_pairs*self.lm*self.ids_index)*(iqrk_d_t) + (-self.d_fric - (2*self.j)/d_t)*(wrk_d_t)
+        J_mtx[self.wr_index,0] = -hist_wr +(-(3/2)*self.n_pole_pairs*self.lm*self.iqr_index)*(prevkh[self.ids_index]) + ((3/2)*self.n_pole_pairs*self.lm*self.idr_index)*(prevkh[self.iqs_index]) + (-(3/2)*self.n_pole_pairs*self.lm*self.ids_index)*(prevkh[self.iqr_index]) + (-self.d_fric - (2*self.j)/d_t)*(prevkh[self.wr_index])
 
         #########################
         #need to reset the historical values

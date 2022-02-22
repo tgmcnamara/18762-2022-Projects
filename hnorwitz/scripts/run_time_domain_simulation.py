@@ -66,24 +66,27 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 for InductionMotors in devices['induction_motors']:
                     InductionMotors.stamp_t0(Y_non_lin, J_non_lin, V_init, prevkh,d_t, hist,time)
                 #######
-                ######BECAUSE I INDEX GROUND NODES I NEED TO SET GND ROW AND COLM TO 0 BUT THE AT [GND,GND] NEED TO SET TO ONE TO AVOID LINSOLV ERROR
-                Y[Nodes.node_index_dict['gnd'],:] = 0
-                Y[:,Nodes.node_index_dict['gnd']] = 0
-                Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1 
         
                 Y_nr = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
                 J_nr = J_lin + J_non_lin
                 #J[Nodes.node_index_dict['gnd'],:] = 0 ###WAS NOT SURE IF I ALSO NEEDED TO SET GND INDX IN JMATRIX TO 0
+                ######BECAUSE I INDEX GROUND NODES I NEED TO SET GND ROW AND COLM TO 0 BUT THE AT [GND,GND] NEED TO SET TO ONE TO AVOID LINSOLV ERROR
+                Y_nr[Nodes.node_index_dict['gnd'],:] = 0
+                Y_nr[:,Nodes.node_index_dict['gnd']] = 0
+                Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
                 prevkh = np.linalg.solve(Y_nr,J_nr)
-                Y_nr = Y #resets Y_nr to zero matrix
-                J_nr = J
-                #NEED TO RESET THE Y AND J MATRIX
-                #####(NEED AN IF CONDITION HERE TO SEE IF IT CONVERVERES ENOUGH IF IT DOES WE MOVE ON TO NEXT TIME STEP)
+                if k == len(NR): #need to add an or condition about if it is below the tollerance
+                    Y = Y_nr
+                    J = J_nr
+                    #need a command to get out of for loop
+                    break
+                else: 
+                    Y_nr = Y #resets Y_nr to zero matrix
+                    J_nr = J
+                
             #print(Y)
             #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
             v = np.linalg.solve(Y,J)
-                
-            
             print(type(v))
             V_waveform[:,t_ind] = v.reshape(-1)#V_waveform[v,t_ind] 
             #print(V_waveform)
@@ -110,34 +113,51 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #################################################
         else:
             ##################Implement Newton Raphson (this may need to go before linsolve)##################################
-            for k in range(len(NR)):
-                Y= np.zeros((size_Y,size_Y),dtype=float) #####RESETS Y AND J TO BEING MATRIXES OF 0 AFTER EACH ITERATATION
-                J = np.zeros((size_Y,1))
-                for resistor in devices['resistors']:
-                    resistor.stamp_dense(Y)
+            
+            Y= np.zeros((size_Y,size_Y),dtype=float) #####RESETS Y AND J TO BEING MATRIXES OF 0 AFTER EACH ITERATATION
+            J = np.zeros((size_Y,1))
+            Y_lin = Y
+            Y_non_lin = Y
+            J_lin = J
+            J_non_lin = J
+            for resistor in devices['resistors']:
+                 resistor.stamp_dense(Y_lin)
                     #print(Y)
                     #print(J)
-                for capacitors in devices['capacitors']:
-                    capacitors.stamp_dense(Y, J, d_t, Prevs_v, t)
+            for capacitors in devices['capacitors']:
+                capacitors.stamp_dense(Y_lin, J_lin, d_t, Prevs_v, t)
                     #print(Y)
                     #print(J)
-                for inductors in devices['inductors']:
-                    inductors.stamp_dense(Y,J, d_t, Prevs_v, t)
+            for inductors in devices['inductors']:
+                inductors.stamp_dense(Y_lin,J_lin, d_t, Prevs_v, t)
                     #print(Y)
                     #print(J)
 
-                ######INDUCTION  Motor
-                for InductionMotors in devices['induction_motors']:
-                    InductionMotors.stamp_dense(Y)
             #######
-                for voltage_sources in devices['voltage_sources']:
-                    voltage_sources.stamp_dense(Y,J, t)
+            for voltage_sources in devices['voltage_sources']:
+                voltage_sources.stamp_dense(Y_lin,J_lin, t)
                     #print(Y)
                     #print(J)
-            #####(SAME AS COMMENT ON LINE 56)
-            Y[Nodes.node_index_dict['gnd'],:] = 0
-            Y[:,Nodes.node_index_dict['gnd']] = 0
-            Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+            for k in range(len(NR)):    
+                ######INDUCTION  Motor
+                for InductionMotors in devices['induction_motors']:
+                    InductionMotors.stamp_dense(Y_non_lin, J_non_lin, Prevs_v, prevkh,d_t, hist,time)
+               
+                Y_nr = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
+                J_nr = J_lin + J_non_lin
+                #####(SAME AS COMMENT ON LINE 73)
+                Y_nr[Nodes.node_index_dict['gnd'],:] = 0
+                Y_nr[:,Nodes.node_index_dict['gnd']] = 0
+                Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+                prevkh = np.linalg.solve(Y_nr,J_nr)
+                if k ==len(NR): #need to add an or condition about if it is below the tollerance
+                    Y = Y_nr
+                    J = J_nr
+                else: 
+                    Y_nr = Y #resets Y_nr to zero matrix
+                    J_nr = J
+                    Y_non_lin = Y
+                    J_non_lin = J
             #J[Nodes.node_index_dict['gnd'],:] = 0
             v = np.linalg.solve(Y,J)
             #####WAS ATTEMPTING TO MAKE ABSOLUTLY SURE THAT 0 VOLTAGE SOURCE FROM INDCUTOR STAMP WERE REALLY 0
@@ -149,10 +169,6 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #print(v[23]-v[12])
             #print("next")
 
-           
-
-
-            
             #############################################################
             #V_waveform.append(v)
             V_waveform[:,t_ind] = v.reshape(-1)
