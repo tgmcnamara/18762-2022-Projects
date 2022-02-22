@@ -12,7 +12,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     d_t = .0001# detlat t time step
     #time = np.linspace((0,SETTINGS['Simulation Time'],d_t)) ####ANNOTHER WAY i WAS TRYING TO INCREMENT MY TIME
     time = np.arange(0,SETTINGS['Simulation Time'],d_t)
-    NR = np.arrange(0,SETTINGS['Max Iters']) ####setting the maximume number of NR iterations
+    NR = np.arange(0,SETTINGS['Max Iters']) ####setting the maximume number of NR iterations
     size_t = len(time)
     V_waveform =np.zeros((size_Y, size_t)) #INITIALIZES THE WAVEFORM SO I CAN ADD V VECT EACH TIME STEP
     t_init = 0
@@ -21,7 +21,11 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     #THis constructs the overall y and J matrixes
     Y= np.zeros((size_Y,size_Y),dtype=float) #creates the Y matrix of 0s Matrix seems incorrect several rows and columbs of 0
     J = np.zeros((size_Y,1))
-
+    ##initialize linear an non linear y and j matrixs
+    Y_lin = Y
+    Y_non_lin = Y
+    J_lin = J
+    J_non_lin = J
     ########WAS ATTEMPTING TO SEE IF JUST HOW MY INDUCTORS WERE STAMPING
     #for inductors in devices['inductors']:
         #inductors.stamp_short(Y)#,J,d_t,V_init, t)
@@ -38,37 +42,47 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
         
         if t == 0:#####WAS AT TIMES TRYING DO DC ANALYSIS WHEN I T=0
             for resistor in devices['resistors']:
-                resistor.stamp_dense(Y)
+                resistor.stamp_dense(Y_lin)
                 #print(Y)
                 #print(J)
             for capacitors in devices['capacitors']:
                 #capacitors.stamp_open(Y)
-                capacitors.stamp_dense(Y,J,d_t,V_init,t)
+                capacitors.stamp_dense(Y_lin,J_lin,d_t,V_init,t)
                 #print(Y)
                 #print(J)
             for inductors in devices['inductors']:
                 #inductors.stamp_short(Y)#,J,d_t,V_init, t)
-                inductors.stamp_dense(Y,J,d_t,V_init,t)
+                inductors.stamp_dense(Y_lin,J_lin,d_t,V_init,t)
                 #print(Y)
                 #print(J)
-            ######INDUCTION  Motor
-            for InductionMotors in devices['induction_motors']:
-                InductionMotors.stamp_t0(Y)
-            #######
             for voltage_sources in devices['voltage_sources']:
-                voltage_sources.stamp_dense(Y,J, t)
+                voltage_sources.stamp_dense(Y_lin,J_lin, t)
                 #print(Y)
                 #print(J)
-
-            ######BECAUSE I INDEX GROUND NODES I NEED TO SET GND ROW AND COLM TO 0 BUT THE AT [GND,GND] NEED TO SET TO ONE TO AVOID LINSOLV ERROR
-            Y[Nodes.node_index_dict['gnd'],:] = 0
-            Y[:,Nodes.node_index_dict['gnd']] = 0
-            Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1 
-            #J[Nodes.node_index_dict['gnd'],:] = 0 ###WAS NOT SURE IF I ALSO NEEDED TO SET GND INDX IN JMATRIX TO 0
-            
+            ###NEWTON RAPHSON FOR T=0
+            prevkh = V_init
+            for k in range(len(NR)): #since induction motor is only non linear device  
+            ######INDUCTION  Motor
+                for InductionMotors in devices['induction_motors']:
+                    InductionMotors.stamp_t0(Y_non_lin, J_non_lin, V_init, prevkh,d_t, hist,time)
+                #######
+                ######BECAUSE I INDEX GROUND NODES I NEED TO SET GND ROW AND COLM TO 0 BUT THE AT [GND,GND] NEED TO SET TO ONE TO AVOID LINSOLV ERROR
+                Y[Nodes.node_index_dict['gnd'],:] = 0
+                Y[:,Nodes.node_index_dict['gnd']] = 0
+                Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1 
+        
+                Y_nr = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
+                J_nr = J_lin + J_non_lin
+                #J[Nodes.node_index_dict['gnd'],:] = 0 ###WAS NOT SURE IF I ALSO NEEDED TO SET GND INDX IN JMATRIX TO 0
+                prevkh = np.linalg.solve(Y_nr,J_nr)
+                Y_nr = Y #resets Y_nr to zero matrix
+                J_nr = J
+                #NEED TO RESET THE Y AND J MATRIX
+                #####(NEED AN IF CONDITION HERE TO SEE IF IT CONVERVERES ENOUGH IF IT DOES WE MOVE ON TO NEXT TIME STEP)
             #print(Y)
             #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
             v = np.linalg.solve(Y,J)
+                
             
             print(type(v))
             V_waveform[:,t_ind] = v.reshape(-1)#V_waveform[v,t_ind] 

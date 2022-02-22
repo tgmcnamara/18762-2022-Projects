@@ -54,6 +54,9 @@ class InductionMotors:
         self.vqs_index = -1
         self.wr_index = -1
         self.history = -1
+        ### intialize something to hold the previous NR values
+        self.prevkh = -1
+
         # You are welcome to / may be required to add additional class variables   
 
     # Some suggested functions to implement, 
@@ -85,14 +88,46 @@ class InductionMotors:
         #prev = previous time step v vector
         #prevkh = previous values from kh iteration
         #hist = this holds previous dr values(not to sure about this one)
+        theta = 0
+        lamb = (2*np.pi)/3
 
-        ##converting from fabc to fdq (THIS IS INCROREST BUT THIS IS GENERALLY THE IDEA)
+        ####HISTORY USES PREVIOUS V VALUES TO KEEP TRACK(these do not change between NR iterations)
+        hist_ds = prev[self.vds_index] - self.rs*prev[self.ids_index] + ((2/d_t)*((self.lss*prev[self.ids_index])+self.lm*prev[self.idr_index]))
+        hist_qs = prev[self.vqs_index] - self.rs*prev[self.iqs_index] + ((2/d_t)*((self.lss*prev[self.iqs_index])+self.lm*prev[self.iqr_index]))
+        hist_dr = (self.rr*prev[self.idr_index]) + ((self.lrr*prev[self.iqr_index]+self.lm*prev[self.ids_index])*prev[self.wr_index]) + ((2/d_t)*((self.lrr*(prev[self.idr_index]))+self.lm*prev[self.ids_index]))
+        hist_qr = (self.rr*prev[self.iqr_index]) + ((self.lrr*prev[self.idr_index]+self.lm*prev[self.ids_index])*prev[self.wr_index]) + ((2/d_t)*((self.lrr*(prev[self.iqr_index]))+self.lm*prev[self.iqs_index]))
+        hist_wr = (2/3)*self.n_pole_pairs*self.lm*((prev[self.idr_index]*prev[self.iqs_index]) - (prev[self.iqr_index]*prev[self.ids_index])) - prev[self.wr_index]*(self.d_fric-((2*self.j)/d_t)) - self.tm
+
+        ########################################################################################
+        ##converting from fabc to fdq (THIS IS INCROREST BUT THIS IS GENERALLY THE IDEA)#
+        #Vds row in y (really not sure)
+        Y_mtx[self.vds_index,self.phase_a_index] = 1#n+1,k
+        Y_mtx[self.vds_index,self.phase_b_index] = -1#N+1, l  
+        Y_mtx[self.vds_index,self.phase_c_index] = -Av #N+1,p
+        Y_mtx[self.vds_index,self.phase_c_index] = Av#N+1,q
+        Y_mtx[self.phase_a_index,self.vds_index] = -1
+        Y_mtx[self.phase_a_index,self.vds_index] = 1#this should be the ground index
+        ###attempt 2 for VDs row in Y(based off voltage controled voltage source stamp)###
+        Y_mtx[self.vds_index,self.phase_a_index] = (2/3)*np.cos(theta)*prev[self.phase_a_index] 
+        Y_mtx[self.vds_index,self.phase_b_index] = (2/3)*np.cos(theta-lamb)*prev[self.phase_b_index] 
+        Y_mtx[self.vds_index,self.phase_c_index] = (2/3)*np.cos(theta+lamb)*prev[self.phase_c_index]
+        Y_mtx[self.phase_a_index,self.vds_index] = -1
+        Y_mtx[self.phase_a_index,self.vds_index] = 1#this should be the ground index
+        ############
+        #Vqs row in y
+        Y_mtx[self.vqs_index,self.phase_a_index] = (2/3)*np.sin(theta)*prev[self.phase_a_index] 
+        Y_mtx[self.vqs_index,self.phase_b_index] = (2/3)*np.sin(theta-lamb)*prev[self.phase_b_index] 
+        Y_mtx[self.vqs_index,self.phase_c_index] = (2/3)*np.sin(theta+lamb)*prev[self.phase_c_index]
+        Y_mtx[self.vqs_index,self.vqs_index] = -prev[self.iqs_index]
+
+        #############
         vds = (2/3)*np.cos(theta)*prev[self.Vas] +(2/3)*np.cos(theta-lamb)*prev[self.vbs] +(2/3)*np.cos(theta+lamb)*prev[self.vcs]
         vqs = (2/3)*np.sin(theta)*prev[self.Vas] +(2/3)*np.sin(theta-lamb)*prev[self.vbs] +(2/3)*np.sin(theta+lamb)*prev[self.vcs]
         ids = (2/3)*np.cos(theta)*prev[self.Ias] +(2/3)*np.cos(theta-lamb)*prev[self.Ibs] +(2/3)*np.cos(theta+lamb)*prev[self.Ics]
         iqs = (2/3)*np.sin(theta)*prev[self.Ias] +(2/3)*np.sin(theta-lamb)*prev[self.Ibs] +(2/3)*np.sin(theta+lamb)*prev[self.Ics]
+        ##############################################################################################################
 
-        ##ALL THIS BELOW MY BELONG IN NON LINEAR STAMP OR FOR THE NEWTON RAPHSON
+        ##ALL THIS BELOW MY BELONG IN NON LINEAR STAMP OR FOR THE NEWTON RAPHSON########
         ####Ymtrix (stamp the Vd and Vq (current controlled voltage sources))
         #fds Y
         Y_mtx[self.ids_index, self.vds_index] = 1#dfdr/dvds
@@ -102,8 +137,8 @@ class InductionMotors:
         Y_mtx[self.ids_index, self.idr_index] = -(2/d_t) * self.lm
         Y_mtx[self.ids_index, self.iqr_index] = 0
         Y_mtx[self.ids_index, self.wr_index] = 0
-        #fqs J
-        J_mtx[self.ids_index,0] = -hist[self.ids_index] + (1)*(vdsk_d_t) +(-self.rs -(2/d_t)*self.lss)*(idsk_d_t) + (-(2/d_t) * self.lm)*(idrk_d_t) #not sure what I am supposed to do here
+        #fds J
+        J_mtx[self.ids_index,0] = -hist_ds + (1)*(vdsk_d_t) +(-self.rs -(2/d_t)*self.lss)*(idsk_d_t) + (-(2/d_t) * self.lm)*(idrk_d_t) #not sure what I am supposed to do here
         
         #fqs Y
         Y_mtx[self.iqs_index, self.vds_index] = 0
@@ -114,7 +149,7 @@ class InductionMotors:
         Y_mtx[self.iqs_index, self.iqr_index] = -(2/d_t) * self.lm
         Y_mtx[self.iqs_index, self.wr_index] = 0
         #fqs J
-        J_mtx[self.iqs_index,0] = -hist[self.iqs_index] + (1)*(vqsk_d_t) +(-self.rs -(2/d_t)*self.lss)*(iqsk_d_t) + (-(2/d_t) * self.lm)*(iqrk_d_t) #not sure what I am supposed to do here
+        J_mtx[self.iqs_index,0] = -hist_qs + (1)*(vqsk_d_t) +(-self.rs -(2/d_t)*self.lss)*(iqsk_d_t) + (-(2/d_t) * self.lm)*(iqrk_d_t) #not sure what I am supposed to do here
 
         #fdr y (implementing parital derivatives from work sheet)
         Y_mtx[self.idr_index, self.vds_index] = 0
@@ -125,7 +160,7 @@ class InductionMotors:
         Y_mtx[self.idr_index, self.iqr_index] = self.lrr * prevkh[self.wr_index]#dfdr/diqr
         Y_mtx[self.idr_index, self.wr_index] = (self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index]#dfdr/dwr
         #fdr J
-        J_mtx[self.idr_index,0] = -hist[self.idr_index] + (-(2/d_t) * self.lm)*(idsk_d_t) +(self.lm*prevkh[self.wr_index])*(iqsk_d_t) + (self.rr - (2/d_t)*self.lrr)*(idrk_d_t) + ((self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(wrk_d_t)#not sure what I am supposed to do here
+        J_mtx[self.idr_index,0] = -hist_dr + (-(2/d_t) * self.lm)*(idsk_d_t) +(self.lm*prevkh[self.wr_index])*(iqsk_d_t) + (self.rr - (2/d_t)*self.lrr)*(idrk_d_t) + ((self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(wrk_d_t)#not sure what I am supposed to do here
         
         #fqr Y
         Y_mtx[self.iqr_index, self.vds_index] = 0
@@ -136,20 +171,21 @@ class InductionMotors:
         Y_mtx[self.iqr_index, self.iqr_index] = self.rr + (2/d_t)*self.lrr
         Y_mtx[self.iqr_index, self.wr_index] = -(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index]
         #fqr J
-        J_mtx[self.iqr_index,0] = -hist[self.iqr_index] + ((2/d_t) * self.lm)*(iqsk_d_t) +(self.lm*prevkh[self.wr_index])*(idsk_d_t) + (self.rr + (2/d_t)*self.lrr)*(iqrk_d_t) + (-(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(wrk_d_t)#not sure what I am supposed to do here
+        J_mtx[self.iqr_index,0] = -hist_qr + ((2/d_t) * self.lm)*(iqsk_d_t) +(self.lm*prevkh[self.wr_index])*(idsk_d_t) + (self.rr + (2/d_t)*self.lrr)*(iqrk_d_t) + (-(self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])*(wrk_d_t)#not sure what I am supposed to do here
 
         #fwr Y(not sure if solved these out on paper correctly so not indcluding them yet)
         Y_mtx[self.wr_index, self.vds_index] = 0
         Y_mtx[self.wr_index, self.vqs_index] = 0
-        Y_mtx[self.wr_index, self.ids_index] = 0
-        Y_mtx[self.wr_index, self.iqs_index] = 0
-        Y_mtx[self.wr_index, self.idr_index] = 0
-        Y_mtx[self.wr_index, self.iqr_index] = 0
-        Y_mtx[self.wr_index, self.wr_index] = 0
-        #fqr J
-        J_mtx[self.wr_index,0] = 0
+        Y_mtx[self.wr_index, self.ids_index] = -(3/2)*self.n_pole_pairs*self.lm*self.iqr_index
+        Y_mtx[self.wr_index, self.iqs_index] = (3/2)*self.n_pole_pairs*self.lm*self.idr_index
+        Y_mtx[self.wr_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm*self.iqs_index
+        Y_mtx[self.wr_index, self.iqr_index] = -(3/2)*self.n_pole_pairs*self.lm*self.ids_index
+        Y_mtx[self.wr_index, self.wr_index] = -self.d_fric - (2*self.j)/d_t
+        #fwr J
+        J_mtx[self.wr_index,0] = -hist_wr +(-(3/2)*self.n_pole_pairs*self.lm*self.iqr_index)*(idsk_d_t) + ((3/2)*self.n_pole_pairs*self.lm*self.idr_index)*(iqsk_d_t) + (-(3/2)*self.n_pole_pairs*self.lm*self.ids_index)*(iqrk_d_t) + (-self.d_fric - (2*self.j)/d_t)*(wrk_d_t)
 
-        #####Jmatrix(stamp statevariable vds,vqs, vdr,vqr and swing)
+        #########################
+        #need to reset the historical values
         
         
 
