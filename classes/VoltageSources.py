@@ -17,7 +17,7 @@ class VoltageSources:
         self.phase_deg = phase_deg
         self.frequency_hz = frequency_hz
         
-        self.v_max = amp_ph_ph_rms * math.sqrt(2)
+        self.v_max = amp_ph_ph_rms * math.sqrt(2) / math.sqrt(3)
         self.frequency_rad_per_sec = frequency_hz * HERTZ_TO_RADIANS_PER_SECOND
         self.phase_rad = phase_deg * math.pi / 180
 
