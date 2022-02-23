@@ -1,8 +1,3 @@
-import sys
-import numpy as np
-from itertools import count
-from classes.Nodes import Nodes
-# from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
 
 class InductionMotors:
     def __init__(
@@ -51,10 +46,14 @@ class InductionMotors:
     def get_nodes_connections(self):
         return [self.phase_a_node, self.phase_b_node, self.phase_c_node]
 
-    def stamp_sparse(self,):
+    def stamp_dense(self, Y, J, v_t_previous, v_k_previous, runtime, timestep):
+        
         pass
 
-    def stamp_dense(self,):
+    def return_nr_variables(v_k):
+        pass
+
+    def stamp_sparse(self,):
         pass
 
     def stamp_t0(self,):

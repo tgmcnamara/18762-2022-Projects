@@ -28,4 +28,17 @@ class Devices:
             + self.voltage_sources \
             + self.induction_motors \
             + self.current_sources
+
+    def all_NR_invariant_devices(self):
+        return [] \
+            + self.resistors \
+            + self.capacitors \
+            + self.inductors \
+            + self.switches \
+            + self.voltage_sources \
+            + self.induction_motors \
+            + self.current_sources
+    
+    def all_NR_dependent_devices(self):
+        return self.induction_motors
         
