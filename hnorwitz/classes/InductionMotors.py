@@ -129,8 +129,10 @@ class InductionMotors:
         hist_qs = -prev[self.vqs_index] + self.rs*prev[self.iqs_index] - ((2/d_t)*((self.lss*prev[self.iqs_index])+self.lm*prev[self.iqr_index]))
         hist_dr = (self.rr*prev[self.idr_index]) + ((self.lrr*prev[self.iqr_index]+self.lm*prev[self.iqs_index])*prev[self.wr_index]) - ((2/d_t)*((self.lrr*(prev[self.idr_index]))+self.lm*prev[self.ids_index]))
         hist_qr = (self.rr*prev[self.iqr_index]) - ((self.lrr*prev[self.idr_index]+self.lm*prev[self.ids_index])*prev[self.wr_index]) - ((2/d_t)*((self.lrr*(prev[self.iqr_index]))+self.lm*prev[self.iqs_index]))
-        hist_wr = (3/2)*self.n_pole_pairs*self.lm*((prev[self.idr_index]*prev[self.iqs_index]) - (prev[self.iqr_index]*prev[self.ids_index])) + prev[self.wr_index]*(((2*self.j)/d_t)-self.d_fric) - 2*self.tm
-        print("hist_wr "+str(hist_wr))
+        #hist_wr = (3/2)*self.n_pole_pairs*self.lm*((prev[self.idr_index]*prev[self.iqs_index]) - (prev[self.iqr_index]*prev[self.ids_index])) + (((2*self.j)/d_t)-self.d_fric)*prev[self.wr_index] - 2*self.tm
+        hist_wr = ((((3/2)*self.n_pole_pairs*self.lm*prev[self.idr_index])*((3/2)*self.n_pole_pairs*self.lm*prev[self.iqs_index]))-(((3/2)*self.n_pole_pairs*self.lm*prev[self.iqr_index])*((3/2)*self.n_pole_pairs*self.lm*prev[self.ids_index])))+ (((2*self.j)/d_t)-self.d_fric)*prev[self.wr_index] - 2*self.tm
+        #wr_his_check = hist_wr - hist_wr_t
+        #print("hist_wr "+str(hist_wr))
         ########################################################################################
         ##converting from fabc to fdq (THIS IS INCROREST BUT THIS IS GENERALLY THE IDEA)#
         #Vds row in y (really not sure)
@@ -169,6 +171,9 @@ class InductionMotors:
         #iqs = (2/3)*np.sin(theta)*prev[self.Ias] +(2/3)*np.sin(theta-lamb)*prev[self.Ibs] +(2/3)*np.sin(theta+lamb)*prev[self.Ics]
         ##############################################################################################################
 
+        #MAYBE i SHOULD NOT BE MULTIPLYING THE JMATRIX BY THE PREVIOUS K VALUES BECAUSE WHE YOU SOLVE THAT IS WHAT WILL BE DONE
+
+        #######################################################
         ##ALL THIS BELOW MY BELONG IN NON LINEAR STAMP OR FOR THE NEWTON RAPHSON########
         ####Ymtrix (stamp the Vd and Vq (current controlled voltage sources))
         #fds Y (IN EQUATIONS I HAD SIGNS FLIPPED FOR DS QS AND WR SO CORRECT THEM IN THE CODE)
@@ -183,7 +188,7 @@ class InductionMotors:
         Y_mtx[self.ids_index, self.iqr_index] = 0
         Y_mtx[self.ids_index, self.wr_index] = 0
         #fds J
-        J_mtx[self.ids_index,0] = -hist_ds + (ds_dvds)*(prevkh[self.vds_index]) +(ds_dids)*(prevkh[self.ids_index]) + (ds_didr)*(prevkh[self.idr_index]) #I think idrk and the others should be from
+        J_mtx[self.ids_index,0] = -hist_ds #+ (ds_dvds)*(prevkh[self.vds_index]) +(ds_dids)*(prevkh[self.ids_index]) + (ds_didr)*(prevkh[self.idr_index]) #I think idrk and the others should be from
         ####I THINK VDSK_D_T AND IDSK_D_T, ETC SHOULD BE FROM PREVKH AND BE IN THE FORM prevkh[self.vds_index] and then the same for the rest
 
         #fqs Y
@@ -198,14 +203,14 @@ class InductionMotors:
         Y_mtx[self.iqs_index, self.iqr_index] = dqs_diqr
         Y_mtx[self.iqs_index, self.wr_index] = 0
         #fqs J
-        J_mtx[self.iqs_index,0] = -hist_qs + (dqs_dvqs)*(prevkh[self.vqs_index]) +(dqs_diqs)*(prevkh[self.iqs_index]) + (dqs_diqr)*(prevkh[self.iqr_index]) #not sure what I am supposed to do here
+        J_mtx[self.iqs_index,0] = -hist_qs #+ (dqs_dvqs)*(prevkh[self.vqs_index]) +(dqs_diqs)*(prevkh[self.iqs_index]) + (dqs_diqr)*(prevkh[self.iqr_index]) #not sure what I am supposed to do here
 
         #fdr y (implementing parital derivatives from work sheet)
         ddr_dids =(2/d_t) * self.lm #dfdr/dids
         ddr_diqs = self.lm*prevkh[self.wr_index]#dfdr/diqs
-        ddr_didr = self.rr - (2/d_t)*self.lrr#dfdr/didr(i origanlly had plus)
+        ddr_didr = self.rr + (2/d_t)*self.lrr#dfdr/didr(i origanlly had plus)
         ddr_diqr = self.lrr * prevkh[self.wr_index]#dfdr/diqr
-        ddr_dwr = (self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index]#dfdr/dwr
+        ddr_dwr = ((self.lrr*prevkh[self.iqr_index]) + self.lm*prevkh[self.iqs_index])#dfdr/dwr
         Y_mtx[self.idr_index, self.vds_index] = 0
         Y_mtx[self.idr_index, self.vqs_index] = 0
         Y_mtx[self.idr_index, self.ids_index] = ddr_dids
@@ -214,10 +219,10 @@ class InductionMotors:
         Y_mtx[self.idr_index, self.iqr_index] = ddr_diqr
         Y_mtx[self.idr_index, self.wr_index] = ddr_dwr
         #fdr J
-        J_mtx[self.idr_index,0] = -hist_dr + ( ddr_dids)*(prevkh[self.ids_index]) +(ddr_diqs)*(prevkh[self.iqs_index]) + ( ddr_didr)*(prevkh[self.idr_index]) + (ddr_diqr*prevkh[self.iqr_index])+ (ddr_dwr*prevkh[self.wr_index])#not sure what I am supposed to do here
+        J_mtx[self.idr_index,0] = -hist_dr #+ ( ddr_dids)*(prevkh[self.ids_index]) +(ddr_diqs)*(prevkh[self.iqs_index]) + ( ddr_didr)*(prevkh[self.idr_index]) + (ddr_diqr*prevkh[self.iqr_index])+ (ddr_dwr*prevkh[self.wr_index])#not sure what I am supposed to do here
         
         #fqr Y
-        dqr_dids = -self.lm*prevkh[self.wr_index]#dfqr/dids
+        dqr_dids = -(self.lm*prevkh[self.wr_index])#dfqr/dids
         dqr_diqs = (2/d_t) * self.lm#dfiqr/diqs
         dqr_didr = -self.lrr * prevkh[self.wr_index]#dfiqr/didr
         dqr_diqr = self.rr + (2/d_t)*self.lrr#dfiqr/diqr
@@ -230,7 +235,7 @@ class InductionMotors:
         Y_mtx[self.iqr_index, self.iqr_index] = dqr_diqr
         Y_mtx[self.iqr_index, self.wr_index] = dqr_dwr
         #fqr J
-        J_mtx[self.iqr_index,0] = -hist_qr + (dqr_diqs*prevkh[self.iqs_index]) +(dqr_dids)*(prevkh[self.ids_index]) + (dqr_diqr)*(prevkh[self.iqr_index]) + (dqr_dwr)*(prevkh[self.wr_index])#not sure what I am supposed to do here
+        J_mtx[self.iqr_index,0] = -hist_qr #+ (dqr_diqs*prevkh[self.iqs_index]) +(dqr_dids)*(prevkh[self.ids_index]) + (dqr_diqr)*(prevkh[self.iqr_index]) + (dqr_dwr)*(prevkh[self.wr_index])#not sure what I am supposed to do here
 
         #fwr Y(seems i inverted my partial derivatives)
         dwr_dids = -(3/2)*self.n_pole_pairs*self.lm*prevkh[self.iqr_index]#dwr/dids
@@ -245,9 +250,9 @@ class InductionMotors:
         Y_mtx[self.wr_index, self.idr_index] = dwr_didr
         Y_mtx[self.wr_index, self.iqr_index] = dwr_diqr
         Y_mtx[self.wr_index, self.wr_index] = dwr_dwr
-        #fwr J
-        J_mtx[self.wr_index,0] = -hist_wr +(dwr_dids)*(prevkh[self.ids_index]) + (dwr_diqs*prevkh[self.iqs_index]) + (dwr_diqr)*(prevkh[self.iqr_index]) + (dwr_dwr)*(prevkh[self.wr_index])
-        print("J_wr " + str(np.amax(J_mtx[self.wr_index,0])))
+        #fwr J FEEL LIKE SOMETHING IS WRONG HERE
+        J_mtx[self.wr_index,0] = -hist_wr #+(dwr_dids)*(prevkh[self.ids_index]) + (dwr_diqs*prevkh[self.iqs_index]) +(dwr_didr*prevkh[self.idr_index]) + (dwr_diqr)*(prevkh[self.iqr_index]) + (dwr_dwr)*(prevkh[self.wr_index])
+        #print("J_wr " + str(np.amax(J_mtx[self.wr_index,0])))
         #########################
         #need to reset the historical values
         

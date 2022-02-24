@@ -9,7 +9,7 @@ from classes.Nodes import Nodes
 from matplotlib import pyplot as plt
 
 def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
-    d_t = .001# detlat t time step
+    d_t = .00001# detlat t time step
     #time = np.linspace((0,SETTINGS['Simulation Time'],d_t)) ####ANNOTHER WAY i WAS TRYING TO INCREMENT MY TIME
     time = np.arange(0,SETTINGS['Simulation Time'],d_t)
     NR = np.arange(0,SETTINGS['Max Iters']) ####setting the maximume number of NR iterations
@@ -26,6 +26,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     Y_non_lin =np.copy(Y)
     J_lin = np.copy(J)
     J_non_lin = np.copy(J)
+
     ########WAS ATTEMPTING TO SEE IF JUST HOW MY INDUCTORS WERE STAMPING
     #for inductors in devices['inductors']:
         #inductors.stamp_short(Y)#,J,d_t,V_init, t)
@@ -77,11 +78,12 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 hist_nr =np.amax(prevkh)
                 prevkh = np.linalg.solve(Y_nr,J_nr)
                 print(np.amax(prevkh)-hist_nr)
-                if k == len(NR)-1 or (hist_nr-np.amax(prevkh))<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
+                if k == len(NR) or (np.amax(prevkh)-hist_nr)<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
                     Y = Y_nr
                     J = J_nr
                     Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
                     J_nr = np.zeros((size_Y,1))
+                    print("k " + str(k))
                     #HERE WE UPDATE COMPANION MODELS
                     #need a command to get out of for loop
                     break
@@ -156,17 +158,20 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 Y_nr[Nodes.node_index_dict['gnd'],:] = 0
                 Y_nr[:,Nodes.node_index_dict['gnd']] = 0
                 Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
-                hist_nr =np.amax(prevkh)
+                hist_nr =np.amax(np.abs(prevkh)) #initially np.amax(prevkh)
                 prevkh = np.linalg.solve(Y_nr,J_nr)
                 
-                print(np.amax(prevkh)-hist_nr)
-                if k == len(NR)-1 or (hist_nr-np.amax(prevkh))<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
+                #print("approach " + str(np.amax(np.abs(prevkh))-hist_nr))
+                #initially was np.abs(np.amax(prevkh)-hist_nr)
+                if k == len(NR) or np.abs(np.amax(np.abs(prevkh))-hist_nr)<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
+                    #print("k " +str(k))
                     Y = Y_nr
                     J = J_nr
-                    Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
-                    J_nr = np.zeros((size_Y,1))
+                    #Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
+                    #J_nr = np.zeros((size_Y,1))
                     break
-                else: 
+                else:
+                    #print("k " +str(k))
                     Y_non_lin =np.zeros((size_Y,size_Y),dtype=float)
                     J_non_lin = np.zeros((size_Y,1))
                     Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
@@ -193,17 +198,18 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     
     #################EVERYTHING BELOW THIS POINT IS MY PLOTTING AND PROCESSING
     V_waveform_T = np.transpose(V_waveform)########IF I DID NOT TAKE THE TRANSPOSE I WOULD GET AN ERROR 
-    plt.plot(time,V_waveform_T)
+    #plt.plot(time,V_waveform_T)
     #plt.plot(time,V_waveform_T[:,4])
-    plt.show()
+    #plt.show()
     
-    plt.plot(time,V_waveform_T[:,7])
-    plt.plot(time,V_waveform_T[:,8])
-    plt.plot(time,V_waveform_T[:,9])
-    plt.plot(time,V_waveform_T[:,10])
-    plt.plot(time,V_waveform_T[:,11])
-    plt.plot(time,V_waveform_T[:,12])
-    plt.plot(time,V_waveform_T[:,13])
+    plt.plot(time,V_waveform_T[:,7],label="Vds")
+    plt.plot(time,V_waveform_T[:,8],label = "vqs")
+    plt.plot(time,V_waveform_T[:,9],label = "ids")
+    plt.plot(time,V_waveform_T[:,10],label = "idr")
+    plt.plot(time,V_waveform_T[:,11],label = "iqs")
+    plt.plot(time,V_waveform_T[:,12],label = "iqr")
+    plt.plot(time,V_waveform_T[:,13],label = "wr")
+    plt.legend()
     plt.show()
 
     #USED FOR WHEN WANT TO FIND VOLTAGE ACCROSS SPECIFIC ELEMENT
