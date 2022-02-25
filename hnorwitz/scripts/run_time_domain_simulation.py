@@ -60,46 +60,58 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 voltage_sources.stamp_dense(Y_lin,J_lin, t)
                 #print(Y)
                 #print(J)
-            ###NEWTON RAPHSON FOR T=0
-            prevkh = V_init
-            for k in range(len(NR)): #since induction motor is only non linear device  
-            ######INDUCTION  Motor
-                for InductionMotors in devices['induction_motors']:
-                    InductionMotors.stamp_dense(Y_non_lin, J_non_lin, V_init, prevkh,d_t)#, hist,time)#not sure what to do with the T0 stamp
-                #######
+            ###INDUCTION MOTOR USING T0 STAMP AT FOR T=0
+            
+            for InductionMotors in devices['induction_motors']:
+                InductionMotors.stamp_t0(Y_non_lin)#, 
+            Y = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
+            J = J_lin + J_non_lin
+            Y[Nodes.node_index_dict['gnd'],:] = 0
+            Y[:,Nodes.node_index_dict['gnd']] = 0
+            Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+            #induction motor with out using T0 stamp AT T = 0
+
+            # for k in range(len(NR)): #since induction motor is only non linear device  
+            # ######INDUCTION  Motor
+            #prevkh = V_init
+            #     for InductionMotors in devices['induction_motors']:
+            #         InductionMotors.stamp_dense(Y_non_lin, J_non_lin, V_init, prevkh,d_t)#, hist,time)#not sure what to do with the T0 stamp
+            #     #######
         
-                Y_nr = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
-                J_nr = J_lin + J_non_lin
-                #J[Nodes.node_index_dict['gnd'],:] = 0 ###WAS NOT SURE IF I ALSO NEEDED TO SET GND INDX IN JMATRIX TO 0
-                ######BECAUSE I INDEX GROUND NODES I NEED TO SET GND ROW AND COLM TO 0 BUT THE AT [GND,GND] NEED TO SET TO ONE TO AVOID LINSOLV ERROR
-                Y_nr[Nodes.node_index_dict['gnd'],:] = 0
-                Y_nr[:,Nodes.node_index_dict['gnd']] = 0
-                Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
-                hist_nr =np.amax(prevkh)
-                prevkh = np.linalg.solve(Y_nr,J_nr)
-                print(np.amax(prevkh)-hist_nr)
-                if k == len(NR) or (np.amax(prevkh)-hist_nr)<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
-                    Y = Y_nr
-                    J = J_nr
-                    Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
-                    J_nr = np.zeros((size_Y,1))
-                    print("k " + str(k))
-                    #HERE WE UPDATE COMPANION MODELS
-                    #need a command to get out of for loop
-                    break
-                else: 
-                    Y_non_lin =np.zeros((size_Y,size_Y),dtype=float)
-                    J_non_lin = np.zeros((size_Y,1))
-                    Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
-                    J_nr = np.zeros((size_Y,1))
+            #     Y_nr = Y_lin + Y_non_lin #adds the linear matrix and non lear matrix together
+            #     J_nr = J_lin + J_non_lin
+            #     #J[Nodes.node_index_dict['gnd'],:] = 0 ###WAS NOT SURE IF I ALSO NEEDED TO SET GND INDX IN JMATRIX TO 0
+            #     ######BECAUSE I INDEX GROUND NODES I NEED TO SET GND ROW AND COLM TO 0 BUT THE AT [GND,GND] NEED TO SET TO ONE TO AVOID LINSOLV ERROR
+            #     Y_nr[Nodes.node_index_dict['gnd'],:] = 0
+            #     Y_nr[:,Nodes.node_index_dict['gnd']] = 0
+            #     Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+            #     hist_nr =np.amax(prevkh)
+            #     prevkh = np.linalg.solve(Y_nr,J_nr)
+            #     print(np.amax(prevkh)-hist_nr)
+            #     if k == len(NR) or (np.amax(prevkh)-hist_nr)<= SETTINGS["Tolerance"]: #need to add an or condition about if it is below the tollerance
+            #         Y = Y_nr
+            #         J = J_nr
+            #         Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
+            #         J_nr = np.zeros((size_Y,1))
+            #         print("k " + str(k))
+            #         #HERE WE UPDATE COMPANION MODELS
+            #         #need a command to get out of for loop
+            #         break
+            #     else: 
+            #         Y_non_lin =np.zeros((size_Y,size_Y),dtype=float)
+            #         J_non_lin = np.zeros((size_Y,1))
+            #         Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
+            #         J_nr = np.zeros((size_Y,1))
                 
             #print(Y)
             #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
+            
             v = np.linalg.solve(Y,J)
             print(type(v))
             V_waveform[:,t_ind] = v.reshape(-1)#V_waveform[v,t_ind] 
             #print(V_waveform)
             Prevs_v = v
+            prevkh = v
             print(v)
 
             ######MAY NEED NEWTON RAPHSON HERER#############################

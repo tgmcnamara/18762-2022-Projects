@@ -258,7 +258,7 @@ class InductionMotors:
         
         
 
-    def stamp_t0(self,Y_mtx, J_mtx,prev):#not sure how to set this up at the moment
+    def stamp_t0(self,Y_mtx):#not sure how to set this up at the moment
         theta = 0
         lamb = (2*np.pi)/3
 
