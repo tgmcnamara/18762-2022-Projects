@@ -85,9 +85,12 @@ class InductionMotors:
         Nodes.index_counter += 1
         self.wr_index = Nodes.index_counter
         Nodes.index_counter += 1
+        #self.Te_index = Nodes.index_counter
+        #Nodes.index_counter +=1
         print("vds " +str(self.vds_index) + " ,vqs " +str(self.vqs_index) )
         print("ids " +str(self.ids_index) +",iqs " +str(self.iqs_index) +" ,idr " +str(self.idr_index) +",iqr " +str(self.iqr_index))
         print("wr "+str(self.wr_index))
+        #print("Te " +str(self.Te_index))
         #####(not sure if need these one)(thes are for when i want to complete the full circuit and not just induction motor)
         #self.vcvs_ds = Nodes.index_counter
         #Nodes.index_counter += 1
@@ -133,6 +136,12 @@ class InductionMotors:
         hist_wr = ((((3/2)*self.n_pole_pairs*self.lm*prev[self.idr_index])*((3/2)*self.n_pole_pairs*self.lm*prev[self.iqs_index]))-(((3/2)*self.n_pole_pairs*self.lm*prev[self.iqr_index])*((3/2)*self.n_pole_pairs*self.lm*prev[self.ids_index])))+ (((2*self.j)/d_t)-self.d_fric)*prev[self.wr_index] - 2*self.tm
         #wr_his_check = hist_wr - hist_wr_t
         #print("hist_wr "+str(hist_wr))
+
+        ## getting electrical torque
+        # Y_mtx[self.Te_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm
+        # Y_mtx[self.Te_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm
+        # Y_mtx[self.Te_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm
+        # Y_mtx[self.Te_index, self.idr_index] = (3/2)*self.n_pole_pairs*self.lm
         ########################################################################################
         ##converting from fabc to fdq (THIS IS INCROREST BUT THIS IS GENERALLY THE IDEA)#
         #Vds row in y (really not sure)

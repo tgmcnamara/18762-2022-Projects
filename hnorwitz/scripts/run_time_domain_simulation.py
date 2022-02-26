@@ -15,6 +15,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     NR = np.arange(0,SETTINGS['Max Iters']) ####setting the maximume number of NR iterations
     size_t = len(time)
     V_waveform =np.zeros((size_Y, size_t)) #INITIALIZES THE WAVEFORM SO I CAN ADD V VECT EACH TIME STEP
+    Te_waveform = []#np.zeros((size_Y, 1))
     t_init = 0
 
     #FIRST CONSTRUCT INITIAL Y AND J matrix
@@ -110,6 +111,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             print(type(v))
             V_waveform[:,t_ind] = v.reshape(-1)#V_waveform[v,t_ind] 
             #print(V_waveform)
+            Te_waveform.append(((3/2)*2*0.0761)*(v[10]*v[11]-v[12]*v[9]))
             Prevs_v = v
             prevkh = v
             print(v)
@@ -190,6 +192,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                     J_nr = np.zeros((size_Y,1))
             #J[Nodes.node_index_dict['gnd'],:] = 0
             v = np.linalg.solve(Y,J)
+            #Tm_waveform.append(((((3/2)*InductionMotors[self.n_pole_pairs]*self.lm*prev[self.idr_index])*((3/2)*self.n_pole_pairs*self.lm*prev[self.iqs_index]))-(((3/2)*self.n_pole_pairs*self.lm*prev[self.iqr_index])*((3/2)*self.n_pole_pairs*self.lm*prev[self.ids_index]))))
             #####WAS ATTEMPTING TO MAKE ABSOLUTLY SURE THAT 0 VOLTAGE SOURCE FROM INDCUTOR STAMP WERE REALLY 0
             #print(v[13]-v[6])
             #print(v[15]-v[7])
@@ -202,6 +205,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #############################################################
             #V_waveform.append(v)
             V_waveform[:,t_ind] = v.reshape(-1)
+            Te_waveform.append(((3/2)*2*0.0761)*(v[10]*v[11]-v[12]*v[9]))
             #print(V_waveform)
             Prevs_v = v
             #print(v)
@@ -210,17 +214,46 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     
     #################EVERYTHING BELOW THIS POINT IS MY PLOTTING AND PROCESSING
     V_waveform_T = np.transpose(V_waveform)########IF I DID NOT TAKE THE TRANSPOSE I WOULD GET AN ERROR 
-    #plt.plot(time,V_waveform_T)
+    TE = np.array(Te_waveform)
+    ####Entire simulation
+    plt.plot(time,V_waveform_T)
     #plt.plot(time,V_waveform_T[:,4])
-    #plt.show()
+    plt.plot(time,TE)
+    plt.xlabel("time")
+    plt.ylabel("amplitude")
+    plt.title("Induction motor circuit with out L and R over 1 second")
+    plt.show()
     
-    plt.plot(time,V_waveform_T[:,7],label="Vds")
-    plt.plot(time,V_waveform_T[:,8],label = "vqs")
-    plt.plot(time,V_waveform_T[:,9],label = "ids")
-    plt.plot(time,V_waveform_T[:,10],label = "idr")
+    ##########
+    plt.plot(time,V_waveform_T[:,9],label="ids")
     plt.plot(time,V_waveform_T[:,11],label = "iqs")
+    #plt.plot(time,V_waveform_T[:,24],label = "I2c")
+    plt.xlabel("time")
+    plt.ylabel("Amps")
+    plt.title("Induction motor stator Current")
+    plt.legend()
+    plt.show()
+
+
+    plt.plot(time,V_waveform_T[:,10],label = "idr")
     plt.plot(time,V_waveform_T[:,12],label = "iqr")
+    plt.xlabel("time")
+    plt.ylabel("Amps")
+    plt.title("Induction motor rotor Current")
+    plt.legend()
+    plt.show()
+
+    plt.plot(time,TE,label = "Te")
+    plt.xlabel("time")
+    plt.ylabel("Nm")
+    plt.title("Induction motor electrical torque")
+    plt.legend()
+    plt.show()
+
     plt.plot(time,V_waveform_T[:,13],label = "wr")
+    plt.xlabel("time")
+    plt.ylabel("rpm")
+    plt.title("Induction motor rotor speed")
     plt.legend()
     plt.show()
 
