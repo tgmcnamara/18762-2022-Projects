@@ -4,7 +4,8 @@ from scripts.solve import solve
 #casename = 'testcases/RL_circuit.json'
 #casename = 'testcases/voltage_divider.json'
 #casename = 'testcases/single_phase_RL_circuit.json'
-casename = 'testcases/IM_circuit.json'
+#casename = 'testcases/IM_circuit.json'
+casename = 'testcases/IM_circuit_debug.json'
 
 # the settings for the solver
 settings = {
