@@ -37,7 +37,7 @@ class VoltageSources:
         pass
 
     def stamp_dense(self,Y_mtx, J_mtx, time): 
-        Y_mtx[self.vp_index,self.V_current_index] += 1 #(sines were fliped)
+        Y_mtx[self.vp_index,self.V_current_index] += 1 
         Y_mtx[self.np_index,self.V_current_index] += -1
         Y_mtx[self.V_current_index,self.vp_index] += 1
         Y_mtx[self.V_current_index,self.np_index] += -1

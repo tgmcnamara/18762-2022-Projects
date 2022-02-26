@@ -82,10 +82,7 @@ class Inductors:
         #####PREVENT 0 ROW OR COLUM WHEN RUN LINSOV
         Y_mtx[self.l_comp_index,self.l_comp_index] += 1
         Y_mtx[self.l_curr_index,self.l_curr_index] += 1
-        #Y_mtx[self.to_index,self.l_curr_index] +=-1
-        #Y_mtx[self.l_comp_index, self.l_curr_index] += 1
-        #Y_mtx[self.l_curr_index,self.l_comp_index] += 1
-        #Y_mtx[self.l_curr_index,self.to_index] += -1
+        
         
         
         
