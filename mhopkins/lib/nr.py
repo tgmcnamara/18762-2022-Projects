@@ -23,3 +23,5 @@ def newtonRaphson(x0,e,N):
         print('\nRequired root is:{}'.format(x1))
     else:
         print('\nNot Convergent.')
+        
+    return x1

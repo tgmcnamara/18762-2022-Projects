@@ -1,3 +1,6 @@
+
+def test(a):
+    a += 1
 #
 #  MULTIVARIABLE NEWTON RAPHSON
 #
@@ -61,3 +64,8 @@ N = int(N)
 
 # Starting Newton Raphson Method
 newtonRaphson(x0,e,N)
+
+a = 1
+test(a)
+
+print(a)

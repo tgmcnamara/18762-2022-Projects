@@ -74,5 +74,30 @@ def process_results(simulator, SETTINGS):
     plt.xlabel("Time (seconds)")
     plt.show()
             
+    # PLOT THE INDUCTION MOTOR RESULTS
     
+    for m in simulator.motor_list:
+        fig, ax = plt.subplots(3,1)
+        print("x_hist shape", m.x_hist.shape, m.x_hist.shape[0], m.x_hist[:].shape)
+        ax[0].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,0], label = "ids")
+        ax[0].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,1], label = "iqs")
+        ax[0].legend()
+        
+        ax[1].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,2], label = "idr")
+        ax[1].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,3], label = "iqr")
+        ax[1].legend()
+        
+        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,4], label = "wr")
+        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.calc_Te(), label = "Te")
+        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,5], label = "vds")
+        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,6], label = "vqs")
+        ax[2].legend()
+    
+        print("name", m.name)
+        ax[0].set_title("Induction Motor '{}' Results".format(str(m.name)))
+        ax[0].set_ylabel("Current [A]")
+        ax[1].set_ylabel("Current [A]")
+        ax[2].set_ylabel("Torque/Angular Speed")
+        ax[2].set_xlabel("Time (s)")
+        plt.show()
     

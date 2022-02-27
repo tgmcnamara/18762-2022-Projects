@@ -97,6 +97,7 @@ class Simulator():
         
         self.t = 0
         self.source_list = []
+        self.motor_list = []
         self.Y_hist = []
         self.v_hist = []
         self.J_hist = []
@@ -124,6 +125,13 @@ class Simulator():
             # create list of sources
             for source in devices['voltage_sources']:
                 self.source_list.append(source)
+            
+            # create list of inductio motors
+            for motor in devices['induction_motors']:
+                self.motor_list.append(motor)
+                motor.my_circuit = self
+                motor.tol = settings["Tolerance"]
+                motor.max_iters = settings["Max Iters"]
                 
             self.generate_companion_model(delta_t = self.delta_t)
             self.generate_Y_r()
@@ -300,7 +308,7 @@ class Simulator():
             
         # find ecm values
         
-        # CURRENT SOURCES
+        # STORING VOLTAGE DROP AND CURRENT ACROSS CURRENT SOURCES
         self.solving_dict["prev-ecm-vals"] = []
         for i in self.solving_dict["ecm-currents"]:
             prev_cur = i.amps
@@ -318,6 +326,17 @@ class Simulator():
                 
             prev_vdrop = float(vn - vp)
             self.solving_dict["prev-ecm-vals"].append(["I", i, prev_cur, prev_vdrop])
+        
+        # NR ITERATIONS OF THE INDUCTION MOTORS
+        for m in self.motor_list:
+            # updating voltage inputs
+            motor_voltage_inputs = len(m.voltage_inputs) * [0]
+            for i,node_name in enumerate([m.phase_a_node, m.phase_b_node, m.phase_c_node]):
+                m.voltage_inputs[i] = float(v[self.node_map[node_name]])
+            print("induction motor input voltages", m.voltage_inputs)
+            # performing newton raphson
+            x = m.NR_iterate(self.delta_t)
+            print("motor variables", x)
         
         print("ecm currents", self.solving_dict["prev-ecm-vals"])
         print("v", v)
