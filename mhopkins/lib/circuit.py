@@ -96,8 +96,11 @@ class Simulator():
                              }
         
         self.t = 0
+        # special device lists
         self.source_list = []
         self.motor_list = []
+        self.switch_list = []
+        
         self.Y_hist = []
         self.v_hist = []
         self.J_hist = []
@@ -126,13 +129,17 @@ class Simulator():
             for source in devices['voltage_sources']:
                 self.source_list.append(source)
             
-            # create list of inductio motors
+            # create list of induction motors
             for motor in devices['induction_motors']:
                 self.motor_list.append(motor)
                 motor.my_circuit = self
                 motor.tol = settings["Tolerance"]
                 motor.max_iters = settings["Max Iters"]
                 
+            # create list of switches
+            for s in devices['switches']:
+                self.switch_list.append(s)
+             
             self.generate_companion_model(delta_t = self.delta_t)
             self.generate_Y_r()
             self.perform_mna()
@@ -190,7 +197,8 @@ class Simulator():
                             # remove the inductor
                             self.circuit_ecm.obj_mat[i][j].remove(x)
                             # add equivalent circuit
-                            ecm_current = CurrentSources("ecm{}{}".format(i,j), i, j, 
+                            ecm_current = CurrentSources("ecm{}{}".format(i,j), self.node_map_reverse[i], 
+                                                         self.node_map_reverse[j], 
                                                          prev_current + (2*C) / delta_t + prev_voltage)
                             ecm_current.ecm_type = "c"
                             ecm_current.ecm_val = C
@@ -206,6 +214,10 @@ class Simulator():
     def create_obj_matrix(self, devices):
         # add rlc elements
         for i in (devices['resistors'] + devices['inductors'] + devices['capacitors']):
+            i_from = i.from_node
+            i_to = i.to_node
+            self.circuit.obj_mat[self.node_map[i_from]][self.node_map[i_to]].append(copy.deepcopy(i))
+        for i in (devices['switches']):
             i_from = i.from_node
             i_to = i.to_node
             self.circuit.obj_mat[self.node_map[i_from]][self.node_map[i_to]].append(copy.deepcopy(i))
@@ -265,7 +277,7 @@ class Simulator():
     def perform_mna(self):
         # preliminaries Y
         size_Y = self.orig_size #self.Y.shape[0]
-        new_size = size_Y + len(self.source_list)
+        new_size = size_Y + len(self.source_list) + len(self.switch_list)
         dummy_Y = np.zeros((new_size, new_size))
         dummy_Y[:size_Y,:size_Y] = self.Y
         # preliminaries J
@@ -287,11 +299,42 @@ class Simulator():
             # update J
             dummy_J[size_Y + s_counter] = source.get_current_voltage(self.t)
             s_counter += 1
-            # add currents
-            for cur in self.solving_dict["ecm-currents"]:
-                dummy_J[self.node_map[cur.ip_node]] = cur.amps
-                dummy_J[self.node_map[cur.in_node]] = -cur.amps
             
+         
+        for sw in self.switch_list:
+            # update Y
+            sw.update(self.t, self.t - self.delta_t)
+            if (sw.state == 0):
+                to_val = sw.to_node
+                from_val = sw.from_node
+                from_comp = np.eye(new_size)[self.node_map[from_val]]
+                to_comp = np.eye(new_size)[self.node_map[to_val]]
+                new_row = (to_comp - from_comp) * -1
+                new_col = new_row.T
+                dummy_Y[size_Y + s_counter,:] = np.array(new_row)
+                dummy_Y[:,size_Y + s_counter] = np.array(new_col)
+                # update J
+                dummy_J[size_Y + s_counter] = 0
+                s_counter += 1
+            elif (sw.state == 1):
+                to_val = sw.to_node
+                from_val = sw.from_node
+                from_comp = np.eye(new_size)[self.node_map[from_val]]
+                to_comp = np.eye(new_size)[self.node_map[to_val]]
+                new_row = (to_comp - from_comp) * -1
+                new_col = new_row.T
+                #dummy_Y[size_Y + s_counter,:] = np.array(new_row)
+                dummy_Y[:,size_Y + s_counter] = np.array(new_col)
+                dummy_Y[size_Y + s_counter, size_Y + s_counter] = 1
+                # update J
+                dummy_J[size_Y + s_counter] = 0
+                s_counter += 1
+                
+        
+        # add currents
+        for cur in self.solving_dict["ecm-currents"]:
+            dummy_J[self.node_map[cur.ip_node]] = cur.amps
+            dummy_J[self.node_map[cur.in_node]] = -cur.amps
             
         self.Y = dummy_Y
         self.J = dummy_J

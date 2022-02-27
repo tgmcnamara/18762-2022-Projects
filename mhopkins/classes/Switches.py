@@ -11,8 +11,16 @@ class Switches:
         self.to_node = to_node
         self.t_open = t_open
         self.t_close = t_close
+        self.state = 0 #[0 is closed, 1 is open]
+        
         # You are welcome to / may be required to add additional class variables   
 
+    def update(self,t,t_prev):
+        if (t > self.t_open and t_prev < self.t_open):
+            self.state = 1
+        elif ((t > self.t_close) and (t_prev < self.t_close)):
+            self.state = 0
+            
     # Some suggested functions to implement, 
     def assign_node_indexes(self,):
         pass
@@ -25,3 +33,9 @@ class Switches:
 
     def stamp_open(self,):
         pass
+    
+    def __str__(self):
+        return "Sw-{}-{}-{}".format(self.t_open, self.t_close, id(self))
+    
+    def __repr__(self):
+        return self.__str__()
