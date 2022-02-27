@@ -2,13 +2,15 @@ from platform import node
 from telnetlib import SE
 from typing import Set
 import numpy as np #think need to call np.linalg.solve(Y_mtx,J_mtx)
-import scipy as sp
+#import scipy as sp
 from classes.Capacitors import Capacitors #tried importning scipy but said it was already installed
 from classes.Inductors import Inductors
 from classes.Nodes import Nodes
 from matplotlib import pyplot as plt
 import time as TI
-start = TI.perf_counter()
+from scipy.sparse import csc_matrix
+from scipy.sparse.linalg import spsolve
+
 def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     d_t = .00001# detlat t time step
     #time = np.linspace((0,SETTINGS['Simulation Time'],d_t)) ####ANNOTHER WAY i WAS TRYING TO INCREMENT MY TIME
@@ -17,6 +19,8 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     size_t = len(time)
     V_waveform =np.zeros((size_Y, size_t)) #INITIALIZES THE WAVEFORM SO I CAN ADD V VECT EACH TIME STEP
     Te_waveform = []#MAKE AN EMPTY LIST WHICH I APPEND TE TO AFTER EACH ITERATION
+    Dence_eff = []
+    Sparse_eff = []
     t_init = 0
 
     #FIRST CONSTRUCT INITIAL Y AND J matrix
@@ -108,7 +112,11 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #print(Y)
             #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
             ############################################################################################################
+            start = TI.perf_counter_ns()
             v = np.linalg.solve(Y,J)
+            end_time = TI.perf_counter_ns()
+            eff = end_time -start
+            Dence_eff.append(eff)
             print(type(v))
             V_waveform[:,t_ind] = v.reshape(-1)#V_waveform[v,t_ind] 
             #print(V_waveform)
@@ -116,6 +124,17 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             Prevs_v = v
             prevkh = v
             print(v)
+
+            sY = csc_matrix(Y, dtype=float)
+            sJ = csc_matrix(J, dtype=float)
+            #sJ = sp.csr_matrix(J)
+
+            #COMPUTATIONAL EFFICENCY OF SPARCE MATRIX
+            start_s = TI.perf_counter_ns()
+            s_v = spsolve(sY,sJ)
+            end_time_s = TI.perf_counter_ns()
+            seff = end_time_s -start_s
+            Sparse_eff.append(seff)
 
         else:
             
@@ -155,6 +174,8 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                 Y_nr[:,Nodes.node_index_dict['gnd']] = 0
                 Y_nr[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
                 hist_nr =np.amax(np.abs(prevkh)) #initially np.amax(prevkh)
+                
+                
                 prevkh = np.linalg.solve(Y_nr,J_nr)
                 
                 #print("approach " + str(np.amax(np.abs(prevkh))-hist_nr))
@@ -171,7 +192,27 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
                     J_non_lin = np.zeros((size_Y,1))
                     Y_nr = np.zeros((size_Y,size_Y),dtype=float)#resets Y_nr to zero matrix
                     J_nr = np.zeros((size_Y,1))
+            
+            #BOTH SOLVE FOR NEXT TIME STEP AND PERFORM COMPULATION EFFICENCY CALCULATION FOR DENSE MATRIX
+            start = TI.perf_counter_ns()
             v = np.linalg.solve(Y,J)
+            end_time = TI.perf_counter_ns()
+            eff = end_time -start
+            Dence_eff.append(eff)
+            #print("dense "+ str(eff))
+
+            ##CONVERTS DENSE MATRIX TO SPACE MATRIX
+            sY = csc_matrix(Y, dtype=float)
+            sJ = csc_matrix(J, dtype=float)
+            #sJ = sp.csr_matrix(J)
+
+            #COMPUTATIONAL EFFICENCY OF SPARCE MATRIX
+            start_s = TI.perf_counter_ns()
+            s_v = spsolve(sY,sJ)
+            end_time_s = TI.perf_counter_ns()
+            seff = end_time_s -start_s
+            Sparse_eff.append(seff)
+            #print("sparse " + str(seff))
 
             #############################################################
             V_waveform[:,t_ind] = v.reshape(-1)
@@ -181,11 +222,24 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #print(v)
         
     #print(V_waveform)
-    end_time = TI.perf_counter()
-    eff = end_time -start
-
-    print(eff)
+    ###CALCULATING THE TOTAL EFFCIENCIES
+    D_tot = sum(Dence_eff)
+    D_avg = D_tot/len(time)
+    print("total_D=" + str(D_tot)+" average_D="+str(D_avg))
+    S_tot =sum(Sparse_eff)
+    S_avg = S_tot/len(time)
+    print("total_S=" + str(S_tot)+" average_S="+str(S_avg))
     #################EVERYTHING BELOW THIS POINT IS MY PLOTTING AND PROCESSING
+    #computational effencecy
+    plt.plot(time,Dence_eff,'o',label = "dense")
+    plt.plot(time,Sparse_eff,'o',label = "sparse")
+    plt.xlabel("corrosponding time step")
+    plt.ylabel("Comp time in nano seconds")
+    plt.title("IM dense vs IM sparse computational efficiency")
+    plt.legend()
+    plt.show()
+    
+    
     V_waveform_T = np.transpose(V_waveform)########IF I DID NOT TAKE THE TRANSPOSE I WOULD GET AN ERROR 
     TE = np.array(Te_waveform)
     ####Entire simulation
@@ -227,6 +281,8 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     plt.title("Induction motor rotor speed")
     plt.legend()
     plt.show()
+
+    
 
 ##################################################################################################################
 ###################################################################################################################
