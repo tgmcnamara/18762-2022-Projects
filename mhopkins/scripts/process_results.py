@@ -44,6 +44,11 @@ def process_results(simulator, SETTINGS):
     except:
         have_noi = False
         noi = []
+        
+    if (have_noi):
+        noi_N = len(noi)
+    else:
+        noi_N = N
     
     # voltages
     for i in range(n):

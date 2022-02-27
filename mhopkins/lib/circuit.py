@@ -203,7 +203,7 @@ class Simulator():
                             ecm_current.ecm_type = "c"
                             ecm_current.ecm_val = C
                             # remember the value in the ECM is conductance
-                            ecm_resistor = Resistors("ecm{}{}".format(i,j), i, j, (2*C) /delta_t)
+                            ecm_resistor = Resistors("ecm{}{}".format(i,j), i, j, delta_t / (2*C))
                             self.circuit_ecm.obj_mat[i][j].append(ecm_current)
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)
                             # log the current source in the solving dictionary so it can be updated
