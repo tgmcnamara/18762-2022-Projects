@@ -59,16 +59,9 @@ def execute_newtonraphson_iterations(devices: Devices, Y, J, v_previous, runtime
 
         v_k_plus = np.linalg.solve(Y, J)
 
-        tolerance_reached = True
+        error = np.amax(np.abs(v_k_plus - v_k_minus))
 
-        for nr_device in nr_devices:
-            #assume we only have one NR-dependent variable from any single element.
-            variable_plus = nr_device.return_nr_variable(v_k_plus)
-            variable_minus = nr_device.return_nr_variable(v_k_minus)
-            if math.abs(variable_plus - variable_minus) > settings.tolerance:
-                tolerance_reached = False
-
-        if tolerance_reached:
+        if error < settings.tolerance:
             return (Y_k, J_k)
 
         v_k_minus = v_k_plus
