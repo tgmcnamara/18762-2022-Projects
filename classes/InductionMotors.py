@@ -91,19 +91,16 @@ class InductionMotors:
         Y[self.index_vqs, self.index_vqs] = -1
     
     def stamp_ia(self, Y):
-        Y[self.index_node_a, self.index_ids] = 0.6667
-        #Y[self.index_ia, self.index_iqs] = 0
-        #skip ground since it'll zero anyway
+        Y[self.index_node_a, self.index_ids] = 1.5
+        Y[self.index_node_a, self.index_iqs] = -0.8660254
 
     def stamp_ib(self, Y):
-        Y[self.index_node_b, self.index_ids] = -0.3333
-        Y[self.index_node_b, self.index_iqs] = -0.57735
-        #skip ground since it'll zero anyway
+        Y[self.index_node_b, self.index_ids] = 0
+        Y[self.index_node_b, self.index_iqs] = -0.8660254
 
     def stamp_ic(self, Y):
-        Y[self.index_node_c, self.index_ids] = 0.3333
-        Y[self.index_node_c, self.index_iqs] = 0.57735
-        #skip ground since it'll zero anyway
+        Y[self.index_node_c, self.index_ids] = 0
+        Y[self.index_node_c, self.index_iqs] = 0.8660254
 
     def stamp_fds(self, Y, J, timestep, v_t_previous, v_k_previous):
         ids_t = v_t_previous[self.index_ids]
