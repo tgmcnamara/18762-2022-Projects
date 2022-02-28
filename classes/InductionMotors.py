@@ -42,9 +42,9 @@ class InductionMotors:
         # You are welcome to / may be required to add additional class variables   
 
     def assign_node_indexes(self, nodeLookup: dict):
-        self.index_va = nodeLookup[self.phase_a_node]
-        self.index_vb = nodeLookup[self.phase_b_node]
-        self.index_vc = nodeLookup[self.phase_c_node]
+        self.index_node_a = nodeLookup[self.phase_a_node]
+        self.index_node_b = nodeLookup[self.phase_b_node]
+        self.index_node_c = nodeLookup[self.phase_c_node]
 
         self.index_vds = self.claim_index(nodeLookup, "vds")
         self.index_vqs = self.claim_index(nodeLookup, "vqs")
@@ -54,11 +54,6 @@ class InductionMotors:
         self.index_idr = self.claim_index(nodeLookup, "idr")
         self.index_iqr = self.claim_index(nodeLookup, "iqr")
         self.index_wr = self.claim_index(nodeLookup, "wr")
-
-        #transform from ds and qs back to ia, ib, and ic
-        self.index_ia = self.claim_index(nodeLookup, "ia")
-        self.index_ib = self.claim_index(nodeLookup, "ib")
-        self.index_ic = self.claim_index(nodeLookup, "ic")
 
 
     def claim_index(self, nodeLookup, index_name):
@@ -87,26 +82,31 @@ class InductionMotors:
         self.stamp_ic(Y)
 
     def stamp_vds(self, Y):
-        Y[self.index_vds, self.index_va] = 0.66667
-        Y[self.index_vds, self.index_vb] = -0.33333
-        Y[self.index_vds, self.index_vc] = 0.33333
+        Y[self.index_vds, self.index_node_a] = 0.66667
+        Y[self.index_vds, self.index_node_b] = -0.33333
+        Y[self.index_vds, self.index_node_c] = 0.33333
+        Y[self.index_vds, self.index_vds] = -1
     
     def stamp_vqs(self, Y):
         #Y[self.index_vqs, self.index_va] = 0
-        Y[self.index_vqs, self.index_vb] = -0.57735
-        Y[self.index_vqs, self.index_vc] = 0.57735
+        Y[self.index_vqs, self.index_node_b] = -0.57735
+        Y[self.index_vqs, self.index_node_c] = 0.57735
+        Y[self.index_vqs, self.index_vqs] = -1
     
     def stamp_ia(self, Y):
-        Y[self.index_ia, self.index_ids] = 0.6667
+        Y[self.index_node_a, self.index_ids] = 0.6667
         #Y[self.index_ia, self.index_iqs] = 0
+        #skip ground since it'll zero anyway
 
     def stamp_ib(self, Y):
-        Y[self.index_ib, self.index_ids] = -0.3333
-        Y[self.index_ib, self.index_iqs] = -0.57735
+        Y[self.index_node_b, self.index_ids] = -0.3333
+        Y[self.index_node_b, self.index_iqs] = -0.57735
+        #skip ground since it'll zero anyway
 
     def stamp_ic(self, Y):
-        Y[self.index_ic, self.index_ids] = 0.3333
-        Y[self.index_ic, self.index_iqs] = 0.57735
+        Y[self.index_node_c, self.index_ids] = 0.3333
+        Y[self.index_node_c, self.index_iqs] = 0.57735
+        #skip ground since it'll zero anyway
 
     def stamp_fds(self, Y, J, timestep, v_t_previous, v_k_previous):
         ids_t = v_t_previous[self.index_ids]
