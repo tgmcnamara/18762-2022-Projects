@@ -2,6 +2,7 @@ import unittest
 from classes.Capacitors import Capacitors
 from classes.CurrentSources import CurrentSources
 from classes.Devices import Devices
+from classes.InductionMotors import InductionMotors
 from classes.Inductors import Inductors
 from classes.Nodes import Nodes
 from classes.Resistors import Resistors
@@ -72,6 +73,18 @@ class CircuitSimulatorTests(unittest.TestCase):
         self.assertAlmostEqual(145, max(v_waveform_b), delta=1)
         self.assertAlmostEqual(32, max(v_waveform_c), delta=1)
 
+    def test_IM(self):
+        devices = Devices([
+            VoltageSources("vs-gnd-a", "a1", "gnd", 120, 0, 15),
+            VoltageSources("vs-gnd-b", "b1", "gnd", 120, 120, 15),
+            VoltageSources("vs-gnd-c", "c1", "gnd", 120, -120, 15),
+            Resistors("r-1", "a1", "a2", 5),
+            Resistors("r-2", "b1", "b2", 5),
+            Resistors("r-3", "c1", "c2", 5),
+            InductionMotors("im", "a2", "b2", "c2", 10, 460, 60, 0.0761, 0.2761, 0.1645, 0.0022, 0.0022, 0.1, 10, 0.0177, 2)
+        ])
+
+        results = solve(devices, Settings(simulationTime=0.2))
 
 if __name__ == '__main__':
     unittest.main()

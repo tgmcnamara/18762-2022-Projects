@@ -41,19 +41,19 @@ def stamp_NR_invariant_devices(devices, Y, J, v_previous, J_previous, runtime, t
     for device in devices.all_NR_invariant_devices():
         device.stamp_dense(Y, J, v_previous, J_previous, runtime, timestep)
 
-def execute_newtonraphson_iterations(devices: Devices, Y, J, v_previous, runtime, settings: Settings, node_count):
+def execute_newtonraphson_iterations(devices: Devices, Y, J, v_t_previous, runtime, settings: Settings, node_count):
     nr_devices = devices.all_NR_dependent_devices()
     if len(nr_devices) == 0:
         return (Y, J)
 
-    v_k_minus = np.copy(v_previous)
+    v_k_minus = np.copy(v_t_previous)
 
     for _ in range(settings.maxNewtonIterations):
         Y_k = np.copy(Y)
         J_k = np.copy(J)
 
         for nr_device in nr_devices:
-            nr_device.stamp_dense(Y_k, J_k, v_previous, v_k_minus, runtime, settings.timestep)
+            nr_device.stamp_dense(Y_k, J_k, v_t_previous, v_k_minus, settings.timestep)
         
         clear_ground(Y, J, node_count)
 
@@ -70,7 +70,7 @@ def execute_newtonraphson_iterations(devices: Devices, Y, J, v_previous, runtime
     
 
 def clear_ground(Y, J, node_count):
-    J[0] = 1
+    J[0] = 0
     Y[0] = np.zeros(node_count)
     Y[:,0] = np.zeros(node_count)
     Y[0, 0] = 1

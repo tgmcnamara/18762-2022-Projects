@@ -36,7 +36,6 @@ class Devices:
             + self.inductors \
             + self.switches \
             + self.voltage_sources \
-            + self.induction_motors \
             + self.current_sources
     
     def all_NR_dependent_devices(self):

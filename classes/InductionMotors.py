@@ -68,9 +68,6 @@ class InductionMotors:
         self.stamp_vds(Y)
         self.stamp_vqs(Y)
 
-        self.stamp_fds(Y, J, timestep)
-        self.stamp_fqs(Y, J, timestep)
-
         self.stamp_fds(Y, J, timestep, v_t_previous, v_k_previous)
         self.stamp_fqs(Y, J, timestep, v_t_previous, v_k_previous)
         self.stamp_fdr(Y, J, timestep, v_t_previous, v_k_previous)
@@ -148,7 +145,7 @@ class InductionMotors:
 
         Y[self.index_iqs, self.index_vqs] = -1
         Y[self.index_iqs, self.index_iqs] = self.rs + 2 / timestep * self.lss
-        Y[self.index_ids, self.index_iqr] = 2 / timestep * self.lm
+        Y[self.index_iqs, self.index_iqr] = 2 / timestep * self.lm
 
         psi_q_minus = self.lss * iqs_t + self.lm * iqr_t
 
@@ -220,11 +217,11 @@ class InductionMotors:
         ids_k = v_k_previous[self.index_ids]
         wr_k = v_k_previous[self.index_wr]
 
-        Y[self.index_idr, self.index_ids] = -self.lm * wr_k
-        Y[self.index_idr, self.index_iqs] = 2 / timestep * self.lm
-        Y[self.index_idr, self.index_idr] = -self.lrr * wr_k
-        Y[self.index_idr, self.index_iqr] = self.rr + 2 / timestep * self.lrr
-        Y[self.index_idr, self.index_wr] = -(self.lrr * idr_k + self.lm * ids_k)
+        Y[self.index_iqr, self.index_ids] = -self.lm * wr_k
+        Y[self.index_iqr, self.index_iqs] = 2 / timestep * self.lm
+        Y[self.index_iqr, self.index_idr] = -self.lrr * wr_k
+        Y[self.index_iqr, self.index_iqr] = self.rr + 2 / timestep * self.lrr
+        Y[self.index_iqr, self.index_wr] = -(self.lrr * idr_k + self.lm * ids_k)
 
         psi_d_minus = self.lrr * idr_t + self.lm * ids_t
         psi_q_minus = self.lrr * iqr_t + self.lm * iqs_t
