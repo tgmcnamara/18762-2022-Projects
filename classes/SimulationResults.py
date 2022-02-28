@@ -53,7 +53,7 @@ class SimulationResults:
 
         return current_waveform
     
-    def get_rotor_speed(self, im_name):
+    def get_IM_waveforms(self, im_name):
         for device in self.devices.all_devices_but_nodes():
             if isinstance(device, InductionMotors) and device.name == im_name:
-                return device.get_rotor_speed(self.v_waveform)
+                return device.get_IM_waveforms(self.v_waveform)

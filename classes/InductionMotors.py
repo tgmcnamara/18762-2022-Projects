@@ -280,9 +280,18 @@ class InductionMotors:
 
         J[self.index_wr] = -fswing_k + delta_fswing_k
     
-    def get_rotor_speed(self, v_waveform):
-        rotor_waveform = []
+    def get_IM_waveforms(self, v_waveform):
+        wr = []
+        ids = []
+        iqs = []
+        idr = []
+        iqr = []
+
         for frame in v_waveform:
-            rotor_waveform.append(frame[self.index_wr])
+            wr.append(frame[self.index_wr])
+            ids.append(frame[self.index_ids])
+            iqs.append(frame[self.index_iqs])
+            idr.append(frame[self.index_idr])
+            iqr.append(frame[self.index_iqr])
         
-        return rotor_waveform
+        return { "wr": wr, "ids": ids, "iqs": iqs, "idr": idr, "iqr": iqr }
