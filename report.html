@@ -13247,7 +13247,7 @@ div#notebook {
 <pre>Running solver (sparse mode: False)...
 Circuit has 13 nodes
 Total Y matrix size for circuit will be 28
-Solver execution complete. Ran for 0.212391114 seconds.
+Solver execution complete. Ran for 0.317824213 seconds.
 </pre>
 </div>
 </div>
@@ -13362,6 +13362,14 @@ Solver execution complete. Ran for 0.212391114 seconds.
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="RL-Circuit-Analysis">RL Circuit Analysis<a class="anchor-link" href="#RL-Circuit-Analysis">&#182;</a></h4><p>Two factors stand out. The first is that the maximum amplitude of the current flow across the A phase is noticably greater than across the B and C phases. This is expected, since the l2_a inductor on the A phase is over an order of magnitude smaller inductance than the matching inductor on the B and C lines, since the change in current scales with the inverse of the inductance. Second, there is a noticable initial surge in the A phase current on the first cycle (with a similar response on the voltage). This is a classic example of the inrush current drawn by energy storage devices.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="RL-Sparse-Efficiency">RL Sparse Efficiency<a class="anchor-link" href="#RL-Sparse-Efficiency">&#182;</a></h4>
 </div>
 </div>
@@ -13392,11 +13400,11 @@ Solver execution complete. Ran for 0.212391114 seconds.
 <pre>Running solver (sparse mode: False)...
 Circuit has 13 nodes
 Total Y matrix size for circuit will be 28
-Solver execution complete. Ran for 0.219784664 seconds.
+Solver execution complete. Ran for 0.281691677 seconds.
 Running solver (sparse mode: True)...
 Circuit has 13 nodes
 Total Y matrix size for circuit will be 28
-Solver execution complete. Ran for 0.833691046 seconds.
+Solver execution complete. Ran for 0.885407057 seconds.
 </pre>
 </div>
 </div>
@@ -13409,6 +13417,15 @@ Solver execution complete. Ran for 0.833691046 seconds.
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Note that the non-sparse solver runs faster than the sparse solver. I haven't counted out that I might be using the sparse matrix sub-optimally, but given the (relatively) small matrix size, it could be that other factors can dominate allow the non-sparse matrix to execute faster. As a rule of thumb, sparse data structures tend to be slightly more computationally expensive than their non-sparse peers for small data sets. I would assume that below a certain matrix size, we would see the same here, but I don't know if we've crossed that threshold.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="RL-Simulator-Comparison">RL Simulator Comparison<a class="anchor-link" href="#RL-Simulator-Comparison">&#182;</a></h4><p>By comparison, here is a plot of the current from the simulator. While my simulator returned inverted results from mine, the waveform is a close match. It also displays the inrush current, along with the large discrepancy between the A phase versus phases B and C.</p>
+<p><img src="./media/RL_circuit_current.png" alt="image"></p>
 
 </div>
 </div>
@@ -13446,7 +13463,7 @@ Solver execution complete. Ran for 0.833691046 seconds.
 <pre>Running solver (sparse mode: False)...
 Circuit has 16 nodes
 Total Y matrix size for circuit will be 52
-Solver execution complete. Ran for 0.326840196 seconds.
+Solver execution complete. Ran for 0.377248097 seconds.
 </pre>
 </div>
 </div>
@@ -13539,7 +13556,7 @@ Solver execution complete. Ran for 0.326840196 seconds.
 <pre>Running solver (sparse mode: False)...
 Circuit has 10 nodes
 Total Y matrix size for circuit will be 26
-Solver execution complete. Ran for 0.691436154 seconds.
+Solver execution complete. Ran for 0.694836496 seconds.
 </pre>
 </div>
 </div>
@@ -13721,11 +13738,11 @@ Solver execution complete. Ran for 0.691436154 seconds.
 <pre>Running solver (sparse mode: False)...
 Circuit has 10 nodes
 Total Y matrix size for circuit will be 26
-Solver execution complete. Ran for 0.724596524 seconds.
+Solver execution complete. Ran for 0.694614491 seconds.
 Running solver (sparse mode: True)...
 Circuit has 10 nodes
 Total Y matrix size for circuit will be 26
-Solver execution complete. Ran for 2.427777637 seconds.
+Solver execution complete. Ran for 2.464192631 seconds.
 </pre>
 </div>
 </div>
@@ -13733,14 +13750,6 @@ Solver execution complete. Ran for 2.427777637 seconds.
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Once again, the sparse solver ends up being noticably slower than the non-sparse solver. Given that the total matrix size for this IM circuit is roughly comparable to the RL circuit, I would assume factors that affect the relative speed to be the same here as well: a) I'm misusing the sparse matrix library or b) the matrix is small enough that other factors allow the non-sparse computation to dominate.</p>
-
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
@@ -13775,7 +13784,7 @@ Solver execution complete. Ran for 2.427777637 seconds.
 <pre>Running solver (sparse mode: False)...
 Circuit has 11 nodes
 Total Y matrix size for circuit will be 34
-Solver execution complete. Ran for 0.808140912 seconds.
+Solver execution complete. Ran for 0.795142057 seconds.
 </pre>
 </div>
 </div>
