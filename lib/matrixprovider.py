@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.sparse import lil_array
+from scipy.sparse.linalg import spsolve
 
 class MatrixProvider:
     def __init__(self, use_sparse, y_size):
@@ -9,13 +11,25 @@ class MatrixProvider:
         return np.zeros(self.y_size)
     
     def generate_zero_matrix(self):
-        return np.zeros((self.y_size, self.y_size))
+        if self.use_sparse:
+            return lil_array((self.y_size, self.y_size))
+        else:
+            return np.zeros((self.y_size, self.y_size))
     
     def solve(self, A, B):
-        return np.linalg.solve(A, B)
+        if self.use_sparse:
+            return spsolve(A, B)
+        else:
+            return np.linalg.solve(A, B)
 
     def copy(self, x):
-        return np.copy(x)
+        if self.use_sparse:
+            return x.copy()
+        else:
+            return np.copy(x)
 
     def max_difference(self, x, y):
-        return np.amax(np.abs(x - y))
+        if self.use_sparse:
+            return np.amax(np.abs(x - y))
+        else:
+            return (abs(x - y)).max()
