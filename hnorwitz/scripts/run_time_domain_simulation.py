@@ -75,6 +75,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             Y[Nodes.node_index_dict['gnd'],:] = 0
             Y[:,Nodes.node_index_dict['gnd']] = 0
             Y[Nodes.node_index_dict['gnd'], Nodes.node_index_dict['gnd']] = 1
+            
             ##############################################################################################
             #INDUCTION MOTOR WITHOUT USING stamp_T0 AT T = 0
 
@@ -110,8 +111,9 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             #         J_nr = np.zeros((size_Y,1))
                 
             #print(Y)
-            #From what I can tell it seems my last to columbs are zersos if I use cap_open and ind_short commands(THIS IS AN OLD COMMENT)
+            
             ############################################################################################################
+            ####USING DENSE MATRIXES FOR V VECTOR
             start = TI.perf_counter_ns()
             v = np.linalg.solve(Y,J)
             end_time = TI.perf_counter_ns()
@@ -123,7 +125,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             Te_waveform.append(((3/2)*2*0.0761)*(v[10]*v[11]-v[12]*v[9]))#CALCULATE TE AND APPEND IT TO TE_WAVEFORM
             Prevs_v = v
             prevkh = v
-            print(v)
+            # print(v)
 
             sY = csc_matrix(Y, dtype=float)
             sJ = csc_matrix(J, dtype=float)
@@ -135,6 +137,11 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
             end_time_s = TI.perf_counter_ns()
             seff = end_time_s -start_s
             Sparse_eff.append(seff)
+            #V_waveform[:,t_ind] = s_v.reshape(-1)#V_waveform[v,t_ind] 
+             #print(V_waveform)
+            #Te_waveform.append(((3/2)*2*0.0761)*(s_v[10]*s_v[11]-s_v[12]*s_v[9]))#CALCULATE TE AND APPEND IT TO TE_WAVEFORM
+            #Prevs_v = s_v
+            #prevkh = s_v
 
         else:
             
@@ -229,6 +236,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     S_tot =sum(Sparse_eff)
     S_avg = S_tot/len(time)
     print("total_S=" + str(S_tot)+" average_S="+str(S_avg))
+
     #################EVERYTHING BELOW THIS POINT IS MY PLOTTING AND PROCESSING
     #computational effencecy
     plt.plot(time,Dence_eff,'o',label = "dense")
@@ -247,7 +255,7 @@ def run_time_domain_simulation(devices, V_init, size_Y, SETTINGS):
     plt.plot(time,TE)
     plt.xlabel("time")
     plt.ylabel("amplitude")
-    plt.title("Induction motor circuit with out L and R over 1 second")
+    plt.title("IM sparse construction")
     plt.show()
     
     ##########
