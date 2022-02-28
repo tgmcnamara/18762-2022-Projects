@@ -109,6 +109,6 @@ def process_results(simulator, SETTINGS):
         ax[2].set_ylabel("Ang. Speed [rad/s]")
         ax[3].set_ylabel("Torque [N*m]")
         ax[4].set_ylabel("Voltage [V]")
-        ax[3].set_xlabel("Time (s)")
+        ax[4].set_xlabel("Time (s)")
         plt.show()
     

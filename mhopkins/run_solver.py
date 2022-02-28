@@ -7,6 +7,8 @@ from scripts.solve import solve
 #casename = 'testcases/single_phase_RC_circuit.json'
 #casename = 'testcases/IM_circuit.json'
 #casename = 'testcases/RLC_circuit.json'
+#casename = 'testcases/IM_circuit_debug.json'
+#casename = 'testcases/RLC_circuit.json'
 casename = 'testcases/IM_circuit_debug.json'
 
 # the settings for the solver
@@ -15,7 +17,7 @@ settings = {
 	#"noi":[9,10,11], # nodes of interest for RLC circuit
 	"Tolerance": 1E-05, # Tolerance for Newton-Raphson
 	"Max Iters": 5, # Maximum number of newton iterations for non-linear loop at given time step
-    "Simulation Time": 0.2,# 0.2, # Total time to simulate: [0, tf]
+    "Simulation Time": 0.4,# 0.2, # Total time to simulate: [0, tf]
     "Sparse": False # Use sparse matrix formulation
 }
 

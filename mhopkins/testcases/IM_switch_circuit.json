@@ -40,6 +40,10 @@
             "name": "n4_a",
             "phase": "A"
         },
+		{
+			"name": "n4_b",
+			"phase": "B"
+		},
         {
             "name": "gnd",
             "phase": "N"

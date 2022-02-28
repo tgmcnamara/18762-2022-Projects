@@ -5,6 +5,7 @@ from scipy import sparse as sp
 import copy
 from classes.CurrentSources import CurrentSources
 from classes.Resistors import Resistors
+import math
 
 """
 COMPONENT LIST:
@@ -109,7 +110,7 @@ class Simulator():
         self.v = np.zeros((size_Y, 1))
         self.J = np.zeros((size_Y, 1))
         self.orig_size = size_Y
-        self.delta_t = 0.0001
+        self.delta_t = 0.001
         self.settings = settings
         
         if (node_indices != None):
@@ -373,19 +374,23 @@ class Simulator():
         
         # NR ITERATIONS OF THE INDUCTION MOTORS
         for m in self.motor_list:
-            if (self.t > self.delta_t):
+            if (self.t >= 0):
                 # updating voltage inputs
-                motor_voltage_inputs = len(m.voltage_inputs) * [0]
+                voltages = len(m.voltage_inputs) * [0]
                 for i,node_name in enumerate([m.phase_a_node, m.phase_b_node, m.phase_c_node]):
                     m.voltage_inputs[i] = float(v[self.node_map[node_name]])
+                    voltages[i] = m.voltage_inputs[i]
                 print("induction motor input voltages", m.voltage_inputs)
                 # performing newton raphson
                 x = m.NR_iterate(self.delta_t)
-                print("motor variables", x)
+                lambda_ = (2/3) * math.pi
+                m.prev_vds = (2/3) * (math.cos(0)*voltages[0] + math.cos(-lambda_)*voltages[1] + math.cos(lambda_)*voltages[2])
+                m.prev_vqs = (2/3) * (math.sin(0)*voltages[0] + math.sin(-lambda_)*voltages[1] + math.sin(lambda_)*voltages[2])
             else:
                 # add initialization
-                m.x = [3,1,0,0,0,10,5]
-        
+                pass
+
+                
         #print("ecm currents", self.solving_dict["prev-ecm-vals"])
         #print("v", v)
         return v  
