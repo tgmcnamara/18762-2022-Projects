@@ -4,7 +4,7 @@ from matplotlib import use
 
 
 class Settings:
-    def __init__(self, tolerance: float = 1E-05, maxNewtonIterations: int = 5, simulationTime: float = 0.2, useSparseMatrix: bool = False, timestep: float = 0.001):
+    def __init__(self, tolerance: float = 1E-05, maxNewtonIterations: int = 5, simulationTime: float = 0.2, useSparseMatrix: bool = False, timestep: float = 0.0001):
         # Tolerance for Newton-Raphson
         self.tolerance = tolerance
         # Maximum number of newton iterations for non-linear loop at given time step

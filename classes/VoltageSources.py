@@ -37,12 +37,6 @@ class VoltageSources:
 
         stamp_voltage_source(Y, J, self.vp_index, self.vn_index, self.current_index, v)
 
-    def stamp_sparse(self,):
-        pass
-
-    def stamp_open(self,):
-        pass
-
 class CurrentSensors(VoltageSources):
     def __init__(self, name, node_1, node_2):
         VoltageSources.__init__(self, name, node_1, node_2, 0, 0, 0)

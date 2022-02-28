@@ -45,9 +45,3 @@ class Capacitors:
         companion_v = previous_voltage + companion_r * previous_current
 
         stamp_voltage_source(Y, J, self.extension_index_3, self.to_index, self.extension_index_4, companion_v)
-
-    def stamp_sparse(self,):
-        pass
-
-    def stamp_open(self,):
-        pass

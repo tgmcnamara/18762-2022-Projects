@@ -24,9 +24,6 @@ class Resistors:
         self.from_index = from_index
         self.to_index = to_index
 
-    def stamp_sparse(self,):
-        pass
-
     def calculate_current(self, v, J, timestep):
         voltage = v[self.from_index] - v[self.to_index]
 

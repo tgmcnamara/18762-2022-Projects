@@ -52,10 +52,3 @@ class Inductors:
         previous_resistor_current = previous_voltage / companion_r
         previous_current_source_current = J[self.extension_index_1]
         return previous_current_source_current + previous_resistor_current
-
-
-    def stamp_sparse(self,):
-        pass
-
-    def stamp_short(self,):
-        pass

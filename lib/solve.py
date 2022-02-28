@@ -10,7 +10,7 @@ import math
 
 def solve(devices: Devices, settings: Settings = Settings()):
 
-    print("Running solver...")
+    print(f'Running solver (sparse mode: {settings.useSparseMatrix})...')
 
     start_time = time.perf_counter_ns()
 

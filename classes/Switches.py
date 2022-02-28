@@ -33,9 +33,3 @@ class Switches:
 
             J[self.switch_index] = 1
             Y[self.switch_index, self.switch_index] = 1
-
-    def stamp_sparse(self,):
-        pass
-
-    def stamp_open(self,):
-        pass
