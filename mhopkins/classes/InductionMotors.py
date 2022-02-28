@@ -44,7 +44,7 @@ class InductionMotors:
         self.n_pole_pairs = n_pole_pairs
         self.lss = self.lls + self.lm
         self.lrr = self.llr + self.lm
-        self.tol = 0.001
+        self.tol = 0.00001
         self.max_iters = 4
         # You are welcome to / may be required to add additional class variables
         
@@ -100,7 +100,7 @@ class InductionMotors:
         phiqr = (self.llr + self.lm) * x_prev[3] + self.lm * x_prev[1]
         Te_ = (3/2) * self.n_pole_pairs * self.lm * (x_prev[2]*x_prev[1] - x_prev[3]*x_prev[0])
         #lambda_ = 0
-        lambda_ = (1/3)*math.pi#2*math.pi*self.motor_freq
+        lambda_ = (2/3)*math.pi#2*math.pi*self.motor_freq
         
         # variables x: [0]ids,[1]iqs,[2]idr,[3]iqr,[4]wr,[5]vds,[6]vqs
         # x_prev: [0]ids,[1]iqs,[2]idr,[3]iqr,[4]wr,[5]vds,[6]vqs
@@ -170,7 +170,7 @@ class InductionMotors:
         x0 = x0 + np.linalg.inv(self.J(x0)) @ x0
         while condition:
             
-            if (self.timesteps > 1):
+            if (self.timesteps >= 0):
                 x1 = x0 - np.linalg.inv(self.J(x0)) @ self.F(x0,x_prev,self.voltage_inputs)
             else:
                 x1 = x0 - np.linalg.inv(self.init_J()) @ self.F(x0,x_prev,self.voltage_inputs)

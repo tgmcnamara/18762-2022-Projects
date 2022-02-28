@@ -109,7 +109,7 @@ class Simulator():
         self.v = np.zeros((size_Y, 1))
         self.J = np.zeros((size_Y, 1))
         self.orig_size = size_Y
-        self.delta_t = 0.001
+        self.delta_t = 0.0001
         self.settings = settings
         
         if (node_indices != None):
@@ -208,6 +208,7 @@ class Simulator():
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)
                             # log the current source in the solving dictionary so it can be updated
                             self.solving_dict["ecm-currents"].append(ecm_current)
+                            print("node to and from", self.node_map_reverse[i], self.node_map_reverse[j])
                     
             
             
@@ -372,17 +373,21 @@ class Simulator():
         
         # NR ITERATIONS OF THE INDUCTION MOTORS
         for m in self.motor_list:
-            # updating voltage inputs
-            motor_voltage_inputs = len(m.voltage_inputs) * [0]
-            for i,node_name in enumerate([m.phase_a_node, m.phase_b_node, m.phase_c_node]):
-                m.voltage_inputs[i] = float(v[self.node_map[node_name]])
-            print("induction motor input voltages", m.voltage_inputs)
-            # performing newton raphson
-            x = m.NR_iterate(self.delta_t)
-            print("motor variables", x)
+            if (self.t > self.delta_t):
+                # updating voltage inputs
+                motor_voltage_inputs = len(m.voltage_inputs) * [0]
+                for i,node_name in enumerate([m.phase_a_node, m.phase_b_node, m.phase_c_node]):
+                    m.voltage_inputs[i] = float(v[self.node_map[node_name]])
+                print("induction motor input voltages", m.voltage_inputs)
+                # performing newton raphson
+                x = m.NR_iterate(self.delta_t)
+                print("motor variables", x)
+            else:
+                # add initialization
+                m.x = [3,1,0,0,0,10,5]
         
-        print("ecm currents", self.solving_dict["prev-ecm-vals"])
-        print("v", v)
+        #print("ecm currents", self.solving_dict["prev-ecm-vals"])
+        #print("v", v)
         return v  
             
     

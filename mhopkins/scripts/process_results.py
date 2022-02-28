@@ -71,7 +71,7 @@ def process_results(simulator, SETTINGS):
         label = ""
         label = "i{}".format(i - n)
         plt.plot(np.array(list(range(L))) * simulator.delta_t, unknowns[:,i], 
-                 c = get_cmap(N*2)(i*2), label = label)
+                 c = get_cmap((N-n)*2)((i-n)*2), label = label)
         plt.legend()
     
     plt.title("Circuit Currents")
@@ -82,7 +82,7 @@ def process_results(simulator, SETTINGS):
     # PLOT THE INDUCTION MOTOR RESULTS
     
     for m in simulator.motor_list:
-        fig, ax = plt.subplots(3,1)
+        fig, ax = plt.subplots(5,1)
         print("x_hist shape", m.x_hist.shape, m.x_hist.shape[0], m.x_hist[:].shape)
         ax[0].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,0], label = "ids")
         ax[0].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,1], label = "iqs")
@@ -93,16 +93,22 @@ def process_results(simulator, SETTINGS):
         ax[1].legend()
         
         ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,4], label = "wr")
-        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.calc_Te(), label = "Te")
-        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,5], label = "vds")
-        ax[2].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,6], label = "vqs")
         ax[2].legend()
+        
+        ax[3].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.calc_Te(), label = "Te")
+        ax[3].legend()
+        
+        ax[4].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,5], label = "vds")
+        ax[4].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,6], label = "vqs")
+        ax[4].legend()
     
         print("name", m.name)
         ax[0].set_title("Induction Motor '{}' Results".format(str(m.name)))
         ax[0].set_ylabel("Current [A]")
         ax[1].set_ylabel("Current [A]")
-        ax[2].set_ylabel("Torque/Angular Speed")
-        ax[2].set_xlabel("Time (s)")
+        ax[2].set_ylabel("Ang. Speed [rad/s]")
+        ax[3].set_ylabel("Torque [N*m]")
+        ax[4].set_ylabel("Voltage [V]")
+        ax[3].set_xlabel("Time (s)")
         plt.show()
     
