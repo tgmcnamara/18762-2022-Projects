@@ -55,9 +55,9 @@ def execute_newtonraphson_iterations(devices: Devices, Y, J, v_t_previous, runti
         for nr_device in nr_devices:
             nr_device.stamp_dense(Y_k, J_k, v_t_previous, v_k_minus, settings.timestep)
         
-        clear_ground(Y, J, node_count)
+        clear_ground(Y_k, J_k, node_count)
 
-        v_k_plus = np.linalg.solve(Y, J)
+        v_k_plus = np.linalg.solve(Y_k, J_k)
 
         error = np.amax(np.abs(v_k_plus - v_k_minus))
 
