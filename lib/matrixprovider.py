@@ -18,7 +18,7 @@ class MatrixProvider:
     
     def solve(self, A, B):
         if self.use_sparse:
-            return spsolve(A, B)
+            return spsolve(A.asformat("csr"), B)
         else:
             return np.linalg.solve(A, B)
 
