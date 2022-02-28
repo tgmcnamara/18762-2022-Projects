@@ -286,6 +286,7 @@ class InductionMotors:
         iqs = []
         idr = []
         iqr = []
+        Te = []
 
         for frame in v_waveform:
             wr.append(frame[self.index_wr])
@@ -293,5 +294,7 @@ class InductionMotors:
             iqs.append(frame[self.index_iqs])
             idr.append(frame[self.index_idr])
             iqr.append(frame[self.index_iqr])
+
+            Te.append(3 / 2 * self.n_pole_pairs * self.lm * (frame[self.index_idr] * frame[self.index_iqs] - frame[self.index_iqr] * frame[self.index_ids]))
         
-        return { "wr": wr, "ids": ids, "iqs": iqs, "idr": idr, "iqr": iqr }
+        return { "wr": wr, "ids": ids, "iqs": iqs, "idr": idr, "iqr": iqr, "Te": Te }
