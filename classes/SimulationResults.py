@@ -1,6 +1,7 @@
 from typing import List
 import numpy as np
 from classes.Devices import Devices
+from classes.InductionMotors import InductionMotors
 from classes.Inductors import Inductors
 from classes.Resistors import Resistors
 from classes.Settings import Settings
@@ -51,3 +52,8 @@ class SimulationResults:
             current_waveform.append(current)
 
         return current_waveform
+    
+    def get_rotor_speed(self, im_name):
+        for device in self.devices.all_devices_but_nodes():
+            if isinstance(device, InductionMotors) and device.name == im_name:
+                return device.get_rotor_speed(self.v_waveform)

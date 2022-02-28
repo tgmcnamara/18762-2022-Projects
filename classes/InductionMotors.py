@@ -279,3 +279,10 @@ class InductionMotors:
             + -(self.d_fric + 2 * self.j / timestep) * wr_k
 
         J[self.index_wr] = -fswing_k + delta_fswing_k
+    
+    def get_rotor_speed(self, v_waveform):
+        rotor_waveform = []
+        for frame in v_waveform:
+            rotor_waveform.append(frame[self.index_wr])
+        
+        return rotor_waveform
