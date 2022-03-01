@@ -161,22 +161,27 @@ class InductionMotors:
         return np.vstack((j1,j2,j3,j4,j5))
 
     
-    def newtonRaphson(self, x0,e,N):
-        print('\n\n*** NEWTON RAPHSON METHOD IMPLEMENTATION ***')
+    def newtonRaphson(self, x0,e,N, show=True):
+        if (show):
+            print('\n\n*** NEWTON RAPHSON METHOD IMPLEMENTATION ***')
         step = 1
         flag = 1
         condition = True
         x_prev = x0
-        print("initial state", x0)
-        x0 = x0 #+ 0.00001 * self.J(x_prev) @ x0
+        if (show):
+            print("initial state", x0)
+        # initial guess
+        x0 = x0 + self.tol * self.J(x_prev) @ x0
         while condition:
             
+            # NR guess
             if (self.timesteps >= 0):
                 x1 = x0 - np.linalg.inv(self.J(x0)) @ self.F(x0,x_prev,self.voltage_inputs)
             else:
                 x1 = x0 - np.linalg.inv(self.init_J()) @ self.F(x0,x_prev,self.voltage_inputs)
-                
-            print('Iteration:{}, x1 = {} and f(x1) = {}'.format(step,x1,self.F(x1,x_prev,self.voltage_inputs)))
+            
+            if (show):    
+                print('Iteration:{}, x1 = {} and f(x1) = {}'.format(step,x1,self.F(x1,x_prev,self.voltage_inputs)))
             x0 = x1
             
             step = step + 1
@@ -188,9 +193,10 @@ class InductionMotors:
             condition = (abs(self.F(x1,x_prev,self.voltage_inputs)) > e).all()
         
         if flag==1:
-            print('\nRequired root is:{}'.format(x1))
-            print("did this function")
+            if (show):
+                print('\nRequired root is:{}'.format(x1))
         else:
-            print('\nNot Convergent.')
+            if (show):
+                print('\nNot Convergent.')
             
         return x1

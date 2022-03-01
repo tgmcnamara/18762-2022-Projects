@@ -22,6 +22,10 @@ def create_random_mapping(n):
         
 
 def process_results(simulator, SETTINGS):
+    
+    if (SETTINGS["Plotting"] == False):
+        return -1
+    
     unknowns = np.array(simulator.v_hist)
     # using the original size (excluding datum node) of the matrix to determine what the voltages are
     N = unknowns.shape[1]
@@ -83,7 +87,6 @@ def process_results(simulator, SETTINGS):
     
     for m in simulator.motor_list:
         fig, ax = plt.subplots(5,1)
-        print("x_hist shape", m.x_hist.shape, m.x_hist.shape[0], m.x_hist[:].shape)
         ax[0].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,0], label = "ids")
         ax[0].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,1], label = "iqs")
         ax[0].legend()
@@ -102,7 +105,6 @@ def process_results(simulator, SETTINGS):
         ax[4].plot(np.array(list(range(m.x_hist.shape[0])))*simulator.delta_t, m.x_hist[:,6], label = "vqs")
         ax[4].legend()
     
-        print("name", m.name)
         ax[0].set_title("Induction Motor '{}' Results".format(str(m.name)))
         ax[0].set_ylabel("Current [A]")
         ax[1].set_ylabel("Current [A]")

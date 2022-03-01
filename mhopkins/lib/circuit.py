@@ -93,7 +93,8 @@ class Simulator():
         integrations
         """
         self.solving_dict = {"ecm-currents": [],
-                             "ecm-voltages": []
+                             "ecm-voltages": [],
+                             "IM-currents": True,
                              }
         
         self.t = 0
@@ -141,6 +142,7 @@ class Simulator():
             for s in devices['switches']:
                 self.switch_list.append(s)
              
+            # initialization steps
             self.generate_companion_model(delta_t = self.delta_t)
             self.generate_Y_r()
             self.perform_mna()
@@ -150,6 +152,7 @@ class Simulator():
             
     
     def iterate(self, sparse = False):
+        # iteration loop
         while (self.t < self.settings['Simulation Time']):
             self.iteration(sparse = sparse)
         
@@ -160,6 +163,7 @@ class Simulator():
         self.perform_mna()
         self.delete_ground_node()
         v_result = self.solve_Yvj(sparse = sparse)
+        # update historical values
         self.Y_hist.append(self.Y)
         self.J_hist.append(self.J)
         self.v_hist.append(v_result)
@@ -209,7 +213,6 @@ class Simulator():
                             self.circuit_ecm.obj_mat[i][j].append(ecm_resistor)
                             # log the current source in the solving dictionary so it can be updated
                             self.solving_dict["ecm-currents"].append(ecm_current)
-                            print("node to and from", self.node_map_reverse[i], self.node_map_reverse[j])
                     
             
             
@@ -279,6 +282,7 @@ class Simulator():
     def perform_mna(self):
         # preliminaries Y
         size_Y = self.orig_size #self.Y.shape[0]
+        
         new_size = size_Y + len(self.source_list) + len(self.switch_list)
         dummy_Y = np.zeros((new_size, new_size))
         dummy_Y[:size_Y,:size_Y] = self.Y
@@ -325,7 +329,6 @@ class Simulator():
                 to_comp = np.eye(new_size)[self.node_map[to_val]]
                 new_row = (to_comp - from_comp) * -1
                 new_col = new_row.T
-                #dummy_Y[size_Y + s_counter,:] = np.array(new_row)
                 dummy_Y[:,size_Y + s_counter] = np.array(new_col)
                 dummy_Y[size_Y + s_counter, size_Y + s_counter] = 1
                 # update J
@@ -335,8 +338,32 @@ class Simulator():
         
         # add currents
         for cur in self.solving_dict["ecm-currents"]:
-            dummy_J[self.node_map[cur.ip_node]] = cur.amps
-            dummy_J[self.node_map[cur.in_node]] = -cur.amps
+            dummy_J[self.node_map[cur.ip_node]] += cur.amps
+            dummy_J[self.node_map[cur.in_node]] += -cur.amps
+            
+        # add motor currents
+        if (self.solving_dict["IM-currents"]):
+            # back calculate current if injecting induction motor currents
+            if (self.t >= 0):
+                for motor in self.motor_list:
+                    # inverse Parks Transformation
+                    ids = motor.x[0]
+                    iqs = motor.x[1]
+                    lambda_ = 2/3*math.pi
+                    ias = (math.cos(0)*ids + math.sin(0)*iqs)
+                    ibs = (math.cos(-lambda_)*ids + math.sin(-lambda_)*iqs)
+                    ics = (math.cos(lambda_)*ids + math.sin(lambda_)*iqs)
+                    
+                    # add current sources in based on induction motor outputs
+                    dummy_J[self.node_map[motor.phase_a_node]] += -ias
+                    dummy_J[self.node_map["gnd"]] += ias
+                    
+                    dummy_J[self.node_map[motor.phase_b_node]] += -ibs
+                    dummy_J[self.node_map["gnd"]] = ibs
+                    
+                    dummy_J[self.node_map[motor.phase_c_node]] += -ics
+                    dummy_J[self.node_map["gnd"]] += ics
+                
             
         self.Y = dummy_Y
         self.J = dummy_J
@@ -380,19 +407,14 @@ class Simulator():
                 for i,node_name in enumerate([m.phase_a_node, m.phase_b_node, m.phase_c_node]):
                     m.voltage_inputs[i] = float(v[self.node_map[node_name]])
                     voltages[i] = m.voltage_inputs[i]
-                print("induction motor input voltages", m.voltage_inputs)
                 # performing newton raphson
                 x = m.NR_iterate(self.delta_t)
                 lambda_ = (2/3) * math.pi
+                # setting the current vds/vqs to vds- and vqs-
                 m.prev_vds = (2/3) * (math.cos(0)*voltages[0] + math.cos(-lambda_)*voltages[1] + math.cos(lambda_)*voltages[2])
                 m.prev_vqs = (2/3) * (math.sin(0)*voltages[0] + math.sin(-lambda_)*voltages[1] + math.sin(lambda_)*voltages[2])
-            else:
-                # add initialization
-                pass
 
                 
-        #print("ecm currents", self.solving_dict["prev-ecm-vals"])
-        #print("v", v)
         return v  
             
     
