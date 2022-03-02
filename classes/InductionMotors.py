@@ -241,10 +241,6 @@ class InductionMotors:
         J[self.index_iqr] = -fqr_k + delta_fqr_k
     
     def stamp_fswing(self, Y, J, timestep, v_t_previous, v_k_previous):
-        iqr_t = v_t_previous[self.index_iqr]
-        iqs_t = v_t_previous[self.index_iqs]
-        idr_t = v_t_previous[self.index_idr]
-        ids_t = v_t_previous[self.index_ids]
         wr_t = v_t_previous[self.index_wr]
 
         iqr_k = v_k_previous[self.index_iqr]
@@ -253,45 +249,57 @@ class InductionMotors:
         ids_k = v_k_previous[self.index_ids]
         wr_k = v_k_previous[self.index_wr]
 
-        Y[self.index_wr, self.index_ids] = -3/2 * self.n_pole_pairs * self.lm * iqr_k
-        Y[self.index_wr, self.index_iqs] = 3/2 * self.n_pole_pairs * self.lm * idr_k
-        Y[self.index_wr, self.index_idr] = 3/2 * self.n_pole_pairs * self.lm * iqs_k
-        Y[self.index_wr, self.index_iqr] = -3/2 * self.n_pole_pairs * self.lm * ids_k
+        three_over_two_Npp_Lm = 3/2 * self.n_pole_pairs * self.lm
+
+        Y[self.index_wr, self.index_ids] = -three_over_two_Npp_Lm * iqr_k
+        Y[self.index_wr, self.index_iqs] = three_over_two_Npp_Lm * idr_k
+        Y[self.index_wr, self.index_idr] = three_over_two_Npp_Lm * iqs_k
+        Y[self.index_wr, self.index_iqr] = -three_over_two_Npp_Lm * ids_k
         Y[self.index_wr, self.index_wr] = -(self.d_fric + 2 * self.j / timestep)
 
-        Te_minus = 3 / 2 * self.n_pole_pairs * self.lm * (idr_t * iqs_t - iqr_t * ids_t)
+        Te_minus = self.get_Te(v_t_previous)
         
         fswing_minus = Te_minus + (2 * self.j / timestep - self.d_fric) * wr_t - 2 * self.tm
 
-        Te_plus =  3 / 2 * self.n_pole_pairs * self.lm * (idr_k * iqs_k - iqr_k * ids_k)
+        Te_plus =  self.get_Te(v_k_previous)
 
         fswing_plus = Te_plus - (self.d_fric + 2 * self.j / timestep) * wr_k
 
         fswing_k = fswing_minus + fswing_plus
 
-        delta_fswing_k = -3 / 2 * self.n_pole_pairs * self.lm * iqr_k * ids_k \
-            + 3 / 2 * self.n_pole_pairs * self.lm * idr_k * iqs_k \
-            + 3 / 2 * self.n_pole_pairs * self.lm * iqs_k * idr_k \
-            + -3 / 2 * self.n_pole_pairs * self.lm * ids_k * iqr_k \
+        delta_fswing_k = -three_over_two_Npp_Lm * iqr_k * ids_k \
+            + three_over_two_Npp_Lm * idr_k * iqs_k \
+            + three_over_two_Npp_Lm * iqs_k * idr_k \
+            + -three_over_two_Npp_Lm * ids_k * iqr_k \
             + -(self.d_fric + 2 * self.j / timestep) * wr_k
 
         J[self.index_wr] = -fswing_k + delta_fswing_k
     
+    def get_Te(self, v_vector):
+        iqr = v_vector[self.index_iqr]
+        iqs = v_vector[self.index_iqs]
+        idr = v_vector[self.index_idr]
+        ids = v_vector[self.index_ids]
+
+        return 3 / 2 * self.n_pole_pairs * self.lm * (idr * iqs - iqr * ids)
+
     def get_IM_waveforms(self, v_waveform):
         wr = []
+        rpm = []
         ids = []
         iqs = []
         idr = []
         iqr = []
         Te = []
 
-        for frame in v_waveform:
-            wr.append(frame[self.index_wr])
-            ids.append(frame[self.index_ids])
-            iqs.append(frame[self.index_iqs])
-            idr.append(frame[self.index_idr])
-            iqr.append(frame[self.index_iqr])
+        for v_frame in v_waveform:
+            wr.append(v_frame[self.index_wr])
+            rpm.append(v_frame[self.index_wr] * 30 / math.pi)
+            ids.append(v_frame[self.index_ids])
+            iqs.append(v_frame[self.index_iqs])
+            idr.append(v_frame[self.index_idr])
+            iqr.append(v_frame[self.index_iqr])
 
-            Te.append(3 / 2 * self.n_pole_pairs * self.lm * (frame[self.index_idr] * frame[self.index_iqs] - frame[self.index_iqr] * frame[self.index_ids]))
+            Te.append(self.get_Te(v_frame))
         
-        return { "wr": wr, "ids": ids, "iqs": iqs, "idr": idr, "iqr": iqr, "Te": Te }
+        return { "wr": wr, "ids": ids, "iqs": iqs, "idr": idr, "iqr": iqr, "Te": Te, "rpm": rpm }
