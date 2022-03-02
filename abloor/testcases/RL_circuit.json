@@ -122,13 +122,13 @@
             "name": "l2_b",
             "from_node": "n4_b",
             "to_node": "gnd",
-            "l": 0.100
+            "l": 0.010
         },
         {
             "name": "l2_c",
             "from_node": "n4_c",
             "to_node": "gnd",
-            "l": 0.150
+            "l": 0.015
         }
     ],
     "switches": [

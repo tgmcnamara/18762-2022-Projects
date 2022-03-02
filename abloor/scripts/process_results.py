@@ -22,28 +22,41 @@ def lookup_vs_index(name, devices):
 def process_results(V_waveform, devices, SETTINGS, step):
     t_final = SETTINGS['Simulation Time']
 
-    nodesvs = ["n3_a","n4_b","n4_c"]
+    nodesvs = ["n3_a","n3_b","n3_c"]
     curr = ["v_a","v_b","v_c"]
 
 
     x = np.linspace(0, t_final, V_waveform.shape[0])
-    y1 = np.transpose(V_waveform[:,lookup_node_index(nodesvs[0],devices)])
-    y2 = np.transpose(V_waveform[:,lookup_node_index(nodesvs[1],devices)])
-    y3 = np.transpose(V_waveform[:,lookup_node_index(nodesvs[2],devices)])
 
-    y1b = -np.transpose(V_waveform[:,lookup_vs_index(nodesvs[0],devices)])
-    y2b = -np.transpose(V_waveform[:,lookup_vs_index(nodesvs[1],devices)])
-    y3b = -np.transpose(V_waveform[:,lookup_vs_index(nodesvs[2],devices)])
+    if (SETTINGS['Plots'] == "RL"):
 
+        fig, (ax1,ax2) = plt.subplots(2,1)
 
-    print(x.shape)
-    print(y1.shape)
+        for wav in nodesvs:
+            y =  np.transpose(V_waveform[:,lookup_node_index(wav,devices)])
+            ax1.plot(x,y,label = wav)
 
-    fig, (ax1,ax2) = plt.subplots(2,1)
-    ax1.plot(x, y1, x, y2, x, y3)
+        for wav in curr:
+            y =  np.transpose(V_waveform[:,lookup_vs_index(wav,devices)])
+            ax2.plot(x,y,label = ("curr from " + wav))
 
-    ax2.plot(x, y1b, x, y2b, x, y3b)
+        ax1.legend(bbox_to_anchor=(0,1,1,.1),ncol=3,mode="expand", loc="lower left")
+        ax2.legend(bbox_to_anchor=(0,1,1,.1),ncol=3,mode="expand", loc="lower left")
 
-    fig.show()
-    fig.savefig("fig1.pdf")
-    print(np.pi)
+        fig.show()
+        fig.savefig("RL.pdf")
+
+    im_index = -1
+    for im in devices['induction_motors']:
+        im_index = im.index
+
+    if (SETTINGS['Plots'] == "IM") and (im_index != -1):
+        fig, (ax1, ax2) = plt.subplots(2,1)
+        for i in range(0,4):
+            y = np.transpose(V_waveform[:,(im_index + i)])
+            ax1.plot(x,y)
+
+        ax2.plot(x,np.transpose(V_waveform[:,(im_index + 4)]))
+        fig.show()
+        fig.savefig("IM.pdf")
+
