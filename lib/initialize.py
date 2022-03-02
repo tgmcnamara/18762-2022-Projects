@@ -7,7 +7,7 @@ def initialize(devices: Devices, Y_size):
 
     #Through extremely rigorous DC analysis, we set all the nodes to an initial 0.1v
     #Assume things like state of charge for capacitors is 0.
-    for i in range(Y_size):
+    for i in range(len(devices.nodes)):
         v_init[i] = 0.01
 
     return v_init
