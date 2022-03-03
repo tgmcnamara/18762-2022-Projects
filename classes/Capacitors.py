@@ -28,7 +28,7 @@ class Capacitors:
     def get_nodes_connections(self):
         return [self.from_node, self.to_node]
 
-    def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
+    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
         
         companion_r = timestep / (2 * self.c)
 
@@ -38,9 +38,7 @@ class Capacitors:
 
         previous_current = v_previous[self.extension_index_2]
 
-        previous_resistor_voltage = previous_current * companion_r
-        previous_voltage_source_voltage = J_previous[self.extension_index_4]
-        previous_voltage = previous_voltage_source_voltage + previous_resistor_voltage
+        previous_voltage = v_previous[self.from_index] - v_previous[self.to_index]
         
         companion_v = previous_voltage + companion_r * previous_current
 

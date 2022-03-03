@@ -20,7 +20,7 @@ class Simulator:
 
         while runtime <= self.settings.simulationTime:
             runtime += self.timestep
-            (v_next, J_next) = self.execute_time_step(v_previous, J_previous, runtime)
+            (v_next, J_next) = self.execute_time_step(v_previous, runtime)
             v_waveform.append(v_next)
             J_waveform.append(J_next)
             v_previous = v_next
@@ -28,11 +28,11 @@ class Simulator:
 
         return (v_waveform, J_waveform)
 
-    def execute_time_step(self, v_previous, J_previous, runtime: float):
+    def execute_time_step(self, v_previous, runtime: float):
         Y = self.matrixprovider.generate_zero_matrix()
         J = self.matrixprovider.generate_zero_vector()
 
-        self.stamp_NR_invariant_devices(Y, J, v_previous, J_previous, runtime)
+        self.stamp_NR_invariant_devices(Y, J, v_previous, runtime)
 
         self.clear_ground(Y, J)
 
@@ -42,9 +42,9 @@ class Simulator:
 
         return (v_next, J)
 
-    def stamp_NR_invariant_devices(self, Y, J, v_previous, J_previous, runtime):
+    def stamp_NR_invariant_devices(self, Y, J, v_previous, runtime):
         for device in self.devices.all_NR_invariant_devices():
-            device.stamp_dense(Y, J, v_previous, J_previous, runtime, self.timestep)
+            device.stamp_dense(Y, J, v_previous, runtime, self.timestep)
 
     def execute_newtonraphson_iterations(self, Y, J, v_t_previous, runtime):
         nr_devices = self.devices.all_NR_dependent_devices()

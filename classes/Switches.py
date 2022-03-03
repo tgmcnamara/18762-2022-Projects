@@ -23,7 +23,7 @@ class Switches:
     def get_nodes_connections(self):
         return [self.from_node, self.to_node]
 
-    def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
+    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
         if runtime <= self.t_open or runtime >= self.t_close:
             stamp_short(Y, J, self.from_index, self.to_index, self.switch_index)
         else:

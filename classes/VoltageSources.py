@@ -32,7 +32,7 @@ class VoltageSources:
     def get_nodes_connections(self):
         return [self.vp_node, self.vn_node]
 
-    def stamp_dense(self, Y, J, v_previous, J_previous, runtime, timestep):
+    def stamp_dense(self, Y, J, v_previous, runtime, timestep):
         v = self.v_max * math.sin(self.frequency_rad_per_sec * runtime + self.phase_rad)
 
         stamp_voltage_source(Y, J, self.vp_index, self.vn_index, self.current_index, v)
