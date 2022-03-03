@@ -33,11 +33,11 @@ class Inductors:
         #Current flowing across at tn is the current that was injected by the current source
         #plus the current flowing across the resistor.
         previous_resistor_current = previous_voltage / companion_r
-        previous_current_source_current = J_previous[self.extension_index_1]
+        previous_current_source_current = v_previous[self.extension_index_2]
         previous_current = previous_current_source_current + previous_resistor_current
 
         companion_i = previous_current + conductance * previous_voltage
-        
+    
         stamp_current_source(J, self.from_index, self.extension_index_1, companion_i)
 
         stamp_short(Y, J, self.to_index, self.extension_index_1, self.extension_index_2)
