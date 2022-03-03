@@ -7,6 +7,10 @@ def assign_node_indexes(devices):
     inductors = devices['inductors']
     imotors = devices['induction_motors']
 
+    #allocates appropriate number of indexes/new eqs/new variables for
+    #each component and adds to index counter which gives the first
+    #index to each component
+
     for node in nodes:
         node_index_counter += node.assign_node_indexes(node_index_counter)
 

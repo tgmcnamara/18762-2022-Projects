@@ -12,6 +12,7 @@ class Nodes:
 
     # Some suggested functions to implement,
     def assign_node_indexes(self,num):
+    #give single index to each node except ground
         if (self.name == "gnd"):
             return 0
         else:

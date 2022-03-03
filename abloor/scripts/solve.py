@@ -3,7 +3,7 @@ from lib.assign_node_indexes import assign_node_indexes
 from lib.initialize import initialize
 from scripts.run_time_domain_simulation import run_time_domain_simulation
 from scripts.process_results import process_results
-
+import time
 
 def solve(TESTCASE, SETTINGS):
     """Run the power flow solver.
@@ -42,6 +42,7 @@ def solve(TESTCASE, SETTINGS):
     # You can determine the size of the Y matrix by looking at the total
     # number of nodes in the system.
 
+    begin = time.perf_counter()
     size_Y = assign_node_indexes(devices)
 
     # # # Initialize solution vector # # #
@@ -52,6 +53,10 @@ def solve(TESTCASE, SETTINGS):
     #                time domain waveforms of all the state variables # # #
     V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS, step)
 
+    end = time.perf_counter()
+    tot = end - begin
+    print("Performance Time: ")
+    print(tot)
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
     # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink

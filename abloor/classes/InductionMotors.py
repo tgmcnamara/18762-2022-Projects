@@ -46,10 +46,12 @@ class InductionMotors:
 
     # Some suggested functions to implement,
     def assign_node_indexes(self, num):
+        #create space for 8 new equations for induction motor and connection
         self.index = num
         return 8
 
     def stamp_dq(self, devices, Y_matrix):
+        #stamp linear time invariant portions of IM eqs into the Y_matrix
         ids = self.index
         iqs = self.index + 1
         ias = self.index + 5
@@ -96,6 +98,7 @@ class InductionMotors:
 
 
     def stamp_dense(self, devices, Y_matrix, J_vector, V_prev, step):
+        #stamp iteration dependent values in the Y_matrix
         ids = self.index
         iqs = ids + 1
         idr = iqs + 1
@@ -131,6 +134,7 @@ class InductionMotors:
         #For J vector, I believe delta_matrix*v_prev - f should cancel out all prev it terms
 
     def stamp_time(self, devices, V_prev, J_vector, step):
+        #Stamp time dependent values into the J_vector
         dt = step
         ids = self.index
         iqs = self.index + 1
@@ -159,7 +163,6 @@ class InductionMotors:
         #should all be subtracted for -f
         #d/dt terms should have opposite sign convention from derivatives
         #since df/dt -> f(t+dt) - f(t)
-
         J_vector[ids] -= (self.rs - 2*(self.lss)/dt)*V_prev[ids]#lss term sign change
         J_vector[ids] -= -(2*self.lm/dt)*V_prev[idr]#sc
 

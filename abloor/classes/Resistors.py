@@ -21,6 +21,7 @@ class Resistors:
         pass
 
     def stamp_dense(self, devices, Y_matrix):
+    #put appropriate stamp into the Y_matrix
         nodes = devices['nodes']
         i = -1
         j = -1

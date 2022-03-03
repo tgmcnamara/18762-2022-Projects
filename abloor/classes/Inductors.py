@@ -16,6 +16,7 @@ class Inductors:
 
     # Some suggested functions to implement,
     def assign_node_indexes(self,num):
+    #create room for 2 eqs to account for VS current measuring
         self.index = num
         return 2
 
@@ -23,6 +24,7 @@ class Inductors:
         pass
 
     def stamp_dense(self, devices, Y_matrix, step):
+    #stamp invariant values into the Y_matrix
         c = self.index
         v = self.index + 1
         nodes = devices['nodes']
@@ -52,6 +54,7 @@ class Inductors:
 
 
     def stamp_time(self, devices, V_init, J_time, step):
+    #stamp time dependent values into the J vector
         c = self.index
         v = self.index + 1
         nodes = devices['nodes']
@@ -65,15 +68,15 @@ class Inductors:
                 j = node.index
 
         if (i != -1):
-            J_time[i][0] += -V_init[v] - g*V_init[i][0]
-            J_time[c][0] += V_init[v] + g*V_init[i][0]
+            J_time[i] += -V_init[v] - g*V_init[i]
+            J_time[c] += V_init[v] + g*V_init[i]
             #induc curr and measured v curr go in opp dir
 
         if (j != -1):
-            J_time[c][0] += -g*V_init[j][0]
+            J_time[c] += -g*V_init[j]
 
         if (i != -1) and (j != -1):
-            J_time[i][0] += g*V_init[j][0]
+            J_time[i] += g*V_init[j]
 
 
 

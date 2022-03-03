@@ -16,6 +16,7 @@ class VoltageSources:
 
     # Some suggested functions to implement,
     def assign_node_indexes(self, num):
+    #Allow space for equation to measure VS current
         self.index = num
         return 1
 
@@ -23,6 +24,7 @@ class VoltageSources:
         pass
 
     def stamp_dense(self, devices, Y_matrix):
+    #stamp invariatn values into Y_matrix
         v = self.index
         nodes = devices['nodes']
         i = -1
@@ -42,5 +44,6 @@ class VoltageSources:
 
 
     def stamp_J(self, J_time, time):
+    #stamp time dependent values into the J vector
         v = self.index
         J_time[v][0] += np.sqrt(3)*self.amp_ph_ph_rms*np.sin(2*np.pi*(self.frequency_hz*time + self.phase_deg/360))/np.sqrt(2)
