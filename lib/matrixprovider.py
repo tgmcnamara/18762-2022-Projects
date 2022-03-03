@@ -30,6 +30,6 @@ class MatrixProvider:
 
     def max_difference(self, x, y):
         if self.use_sparse:
-            return np.amax(np.abs(x - y))
-        else:
             return (abs(x - y)).max()
+        else:
+            return np.amax(np.abs(x - y))
