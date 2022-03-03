@@ -1,16 +1,36 @@
+from settings import settings
 from scripts.solve import solve
 
-# path to the grid network RAW file
-casename = 'testcases/RL_circuit.json'
+def file_grabber(file_name):
+    """ Input the filename of the dataset you wish to be handling. In these
+    cases it will a .json file. """
+    try:
+        # Testing if the file exists with the directory location
+        temp = open('testcases/' + file_name + ".json")
+        # If file exists, print indicative feedback
+        print("\nFile successfully located.")
+        # Close the file, it is not needed to be open here
+        temp.close
+        # Assign the value to casename
+        casename = 'testcases/' + file_name + ".json"
+        # End the while loop and provide the casename path
+        return False, casename
+    except:
+        # Inform the user the file could not be located
+        print("\nFile was not successfully found. Try making sure that the filename",
+        "was spelled correctly.")
+        # Allows the user to process the information from the above print statement
+        input("\nPress ENTER")
+        # Continue executing while loop while having no value for casename. Thus, "False"
+        return True, False
 
-# the settings for the solver
-settings = {
-	"Tolerance": 1E-05, # Tolerance for Newton-Raphson
-	"Max Iters": 5, # Maximum number of newton iterations for non-linear loop at given time step
-    "Simulation Time": 0.2, # Total time to simulate: [0, tf]
-    "Time Step": .001, # Time step to use
-    "Sparse": False # Use sparse matrix formulation
-}
+# Initial condition for the while loop
+attempt = True
+while attempt:
+    # Continue to prompt for the file until it is located
+    file = input("\nEnter the name of the file you wish to use.\n")
+    # Assign the values to continue or end the while loop while providing a path to case name
+    attempt, casename = file_grabber(file)
 
-# run the solver
+# Initiate the solver
 solve(casename, settings)

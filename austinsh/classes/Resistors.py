@@ -1,12 +1,8 @@
 import sys
 sys.path.append("..")
 import numpy as np
-from itertools import count
-from sklearn.metrics import r2_score
-from sympy import Ray3D
 from classes import Nodes
-from lib.assign_node_indexes import assign_node_indexes
-# from lib.stamping_functions import stamp_y_sparse, stamp_j_sparse
+
 Y_matrix = np.zeros((5,5))
 
 class Resistors:
@@ -16,9 +12,7 @@ class Resistors:
         self.to_node = to_node
         self.r = r
         self.g = 1/self.r
-        # You are welcome to / may be required to add additional class variables   
-
-    # Some suggested functions to implement, 
+ 
     def assign_node_indexes(self,):
         # Assigning the from node index value to the resistor
         self.from_node_index = Nodes.node_index_dict[self.from_node] 
@@ -28,7 +22,7 @@ class Resistors:
     
     def stamp_sparse(self,):
         pass
-
+    
     def stamp_dense(self, matrix):
         i,j = self.assign_node_indexes()
         if i == 0 or j == 0:

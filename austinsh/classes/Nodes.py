@@ -1,7 +1,6 @@
 import sys
 sys.path.append("..")
 import numpy as np
-from itertools import count
 
 node_index_counter = 1
 node_index_dict = dict()
@@ -29,5 +28,5 @@ class Nodes:
 # node_5 = Nodes("gnd", "c")
 
 # print()
-# print(node_index_dict["1a"])
+# print(node_index_dict["4a"])
 # print()
