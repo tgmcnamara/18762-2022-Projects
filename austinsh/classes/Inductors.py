@@ -35,7 +35,12 @@ class Inductors:
         i, j = self.assign_node_indexes()
         temp_column = np.zeros((len(y_matrix)))
         temp_row = np.zeros((len(y_matrix) + 1))
-        if i != 0:
+        if i != 0 and j != 0:
+            temp_column[i] = 1
+            temp_row[i] = self.g_equiv
+            temp_column[j] = -1
+            temp_row[j] = -self.g_equiv
+        elif i != 0:
             temp_column[i] = 1
             temp_row[i] = self.g_equiv
         elif j != 0:
@@ -44,25 +49,24 @@ class Inductors:
         temp_row[len(y_matrix)] = -1
         y_matrix = np.column_stack((y_matrix, np.vstack(temp_column)))
         y_matrix = np.vstack((y_matrix, temp_row))
+        # Creating the initial conditions
         if t == 0:
             j_matrix = np.append(j_matrix, 0)
-            y_matrix[len(y_matrix) - 1][i] = 1/.000000001
-            y_matrix[len(y_matrix) - 1][j] = -1/.000000001
+            if i != 0 and j != 0:
+                y_matrix[len(y_matrix) - 1][i] = 1/.000000001
+                y_matrix[len(y_matrix) - 1][j] = -1/.000000001
+            elif i != 0:
+                 y_matrix[len(y_matrix) - 1][i] = 1/.000000001
+            elif j != 0:
+                y_matrix[len(y_matrix) - 1][j] = -1/.000000001
         else:
             index = int(t/settings["Time Step"]) -1
-            j_v_stamp = self.g_equiv*(vectors[index][i]-vectors[index][j])
-            j_curr_stamp = vectors[index][len(y_matrix) - 1]
+            if j != 0 and i != 0:
+                j_v_stamp = self.g_equiv*(vectors[index][i-1]-vectors[index][j-1])
+            elif i != 0:
+                j_v_stamp = self.g_equiv*(vectors[index][i-1])
+            elif j != 0:
+                j_v_stamp = self.g_equiv*(-vectors[index][j-1])
+            j_curr_stamp = vectors[index][len(y_matrix) - 2]
             j_matrix = np.append(j_matrix, -(j_v_stamp + j_curr_stamp))
         return y_matrix, j_matrix
-
-
-
-    # def stamp_short(self,):
-    #     pass
-
-
-# I1 = Inductors("I1", "3a", "gnd", .1)
-# I2 = Inductors("I2", "2a", "4a", .1)
-# Y_y_matrix = I1.stamp_dense(r.Y_y_matrix)
-# Y_y_matrix = I2.stamp_dense(Y_y_matrix)
-# print(Y_y_matrix)
