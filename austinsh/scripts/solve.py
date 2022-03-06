@@ -62,13 +62,18 @@ def solve(TESTCASE, SETTINGS):
             vectors.append(solution)
             # Incriment the time to the next time step
         else:
+            # Add the solution values from the simple IM model to the vectors list
+            # to later be graphed
             vectors.append(reference)
+        # Incriment the time
         t += SETTINGS["Time Step"]
         return vectors, t
     
     while t <= t_final:
         # Initialize a solution list
         if t == 0:
+            # vectors is the solutions to later be graphed and volt is a temporary
+            # list for the induction motor
             vectors = []
             volt = []
         # Initialize the matrices Y and J to be stamped at the current timestep
@@ -77,8 +82,10 @@ def solve(TESTCASE, SETTINGS):
         # Produce the list of solution vectors
         vectors, t = solver(Y_matrix, J_matrix, vectors, t, tol, max_iters, time_step, volt)
     
+    # Convert the list of arrays into one array
     vectors = np.array(vectors)
     
+    # Get the values to be graphed based on the name of the value
     def get_by_name(name, legends, vectors):
         index = legends.index(name)
         vector_adj = vectors[:,index]

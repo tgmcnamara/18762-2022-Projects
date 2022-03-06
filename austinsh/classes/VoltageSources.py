@@ -29,9 +29,13 @@ class VoltageSources:
         pass
 
     def stamp_dense(self, y_matrix, j_matrix, t, prev_volt):
+        # Assigning indicies
         i,j = self.assign_node_indexes()
+        # Creating temporary rows and columns to later increase the size of the Y matrix
         temp_column_y = np.zeros((len(y_matrix)))
         temp_row_y = np.zeros((len(y_matrix) + 1))
+        # We do not need stamps for ground because it is a reference, so we just check
+        # if one of the nodes are connected to ground or not
         if i != 0 and j != 0:
             temp_column_y[i] = 1
             temp_row_y[i] = 1
@@ -43,9 +47,13 @@ class VoltageSources:
         elif j != 0:
             temp_column_y[j] = -1
             temp_row_y[j] = -1
+        # Increasing the size of the Y matrix with the new stamps
         y_matrix = np.column_stack((y_matrix, np.vstack(temp_column_y)))
         y_matrix = np.vstack((y_matrix, temp_row_y))
+        # pre_volt is used as a initial point for previous time step values of the induction motor. Otherwise,
+        # it has no use
         prev_volt = np.append(prev_volt, self.amp_voltage*math.sin((self.ang_frequency*(t - settings["Time Step"])) + self.phase_rad))
+        # Adding the voltage source value to the J matrix
         j_matrix = np.append(j_matrix, self.amp_voltage*math.sin((self.ang_frequency*t) + self.phase_rad))
         return y_matrix, j_matrix, prev_volt
 

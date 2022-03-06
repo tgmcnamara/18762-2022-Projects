@@ -11,8 +11,11 @@ class Nodes:
         self.phase = phase
         global node_index_counter
         if self.name == 'gnd':
+            # Ground will always been row/column zero
             node_index_dict[self.name] = 0
         else:
+            # Assigning nodes an index number based on the order of their appearance in
+            # the .json file
             node_index_dict[self.name] = node_index_counter
             node_index_counter += 1
     
