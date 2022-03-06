@@ -2,6 +2,7 @@ import numpy as np
 import math
 from classes import Nodes
 from classes import Resistors as r
+from settings import settings
 
 class VoltageSources:
     def __init__(self, name, vp_node, vn_node, amp_ph_ph_rms, phase_deg, frequency_hz):
@@ -27,7 +28,7 @@ class VoltageSources:
     def stamp_sparse(self,):
         pass
 
-    def stamp_dense(self, y_matrix, j_matrix, t):
+    def stamp_dense(self, y_matrix, j_matrix, t, prev_volt):
         i,j = self.assign_node_indexes()
         temp_column_y = np.zeros((len(y_matrix)))
         temp_row_y = np.zeros((len(y_matrix) + 1))
@@ -44,8 +45,9 @@ class VoltageSources:
             temp_row_y[j] = -1
         y_matrix = np.column_stack((y_matrix, np.vstack(temp_column_y)))
         y_matrix = np.vstack((y_matrix, temp_row_y))
+        prev_volt = np.append(prev_volt, self.amp_voltage*math.sin((self.ang_frequency*(t - settings["Time Step"])) + self.phase_rad))
         j_matrix = np.append(j_matrix, self.amp_voltage*math.sin((self.ang_frequency*t) + self.phase_rad))
-        return y_matrix, j_matrix
+        return y_matrix, j_matrix, prev_volt
 
     def stamp_open(self,):
         pass

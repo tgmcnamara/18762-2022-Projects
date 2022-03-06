@@ -48,17 +48,17 @@ def solve(TESTCASE, SETTINGS):
     # number of nodes in the system.
     size_Y = Nodes.node_index_counter
 
-    def solver(Y_matrix, J_matrix, vecotrs, t, tol, max_iters, time_step):
+    def solver(Y_matrix, J_matrix, vecotrs, t, tol, max_iters, time_step, volt):
         # Start stamping the models
         for elem in range(len(resistors)):
             Y_matrix = resistors[elem].stamp_dense(Y_matrix)
         for elem in range(len(inductors)):
             Y_matrix, J_matrix = inductors[elem].stamp_dense(Y_matrix, J_matrix, vectors, t)
         for elem in range(len(voltage_sources)):
-            Y_matrix, J_matrix = voltage_sources[elem].stamp_dense(Y_matrix, J_matrix, t)
+            Y_matrix, J_matrix, volt = voltage_sources[elem].stamp_dense(Y_matrix, J_matrix, t, volt)
         for elem in range(len(induction_motors)):
             reference = induction_motors[elem].stamp_dense(Y_matrix, J_matrix, vectors, t, tol, 
-                                                            max_iters, time_step)
+                                                            max_iters, time_step, volt)
         # Get rid of the ground row and column because otherwise it will create a singular
         # matrix and it is just the reference point anyways
         Y_matrix = np.delete(Y_matrix, 0, 1)
@@ -79,11 +79,12 @@ def solve(TESTCASE, SETTINGS):
         # Initialize a solution list
         if t == 0:
             vectors = []
+            volt = []
         # Initialize the matrices Y and J to be stamped at the current timestep
         Y_matrix = np.zeros((size_Y, size_Y))
         J_matrix = np.zeros(size_Y)
         # Produce the list of solution vectors
-        vectors, t = solver(Y_matrix, J_matrix, vectors, t, tol, max_iters, time_step)
+        vectors, t = solver(Y_matrix, J_matrix, vectors, t, tol, max_iters, time_step, volt)
     
     vectors = np.array(vectors)
 
@@ -99,6 +100,10 @@ def solve(TESTCASE, SETTINGS):
         return np.array(vector_adj)
 
     time = np.arange(t_initial, t_final, SETTINGS["Time Step"])
+
+    
+
+
     if TESTCASE == "testcases/RL_circuit.json":
         legends = ["V1_a", "V2_a", "V1_b", "V2_b", "V1_c", "V2_c", "V3_a", "V4_a", 
                 "V3_b", "V4_b", "V3_c", "V4_c", "IL_1a", "IL_1b", "IL_1c", "IL_2a",
