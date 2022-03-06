@@ -73,10 +73,6 @@ class InductionMotors:
                     x_guess = np.vstack(x_guess)
                     
                     y_history = np.zeros((7,1))
-                    # y_history[0] = (volt_prev[0]*2/3*math.cos(self.theta) + volt_prev[1]*2/3*math.cos(self.theta - 2*np.pi/3) + 
-                    #                 volt_prev[2]*2/3*math.cos(self.theta + 2*np.pi/3))
-                    # y_history[1] = (volt_prev[0]*2/3*math.sin(self.theta) + volt_prev[1]*2/3*math.sin(self.theta - 2*np.pi/3) + 
-                    #                 volt_prev[2]*2/3*math.sin(self.theta + 2*np.pi/3))
                     y_history[2] = -y_history[0]
                     y_history[3] = -y_history[1]
                     y_history[6] = -2*self.tm
@@ -163,6 +159,7 @@ class InductionMotors:
             computation = computation.astype(int)
             sum = int(np.sum(computation))
         vectors_history = x_new
+        vectors_history = np.vstack((vectors_history, [3/2*self.n_pole_pairs*self.lm*(x_new[4]*x_new[3] - x_new[5]*x_new[2])]))
         return vectors_history
 
 

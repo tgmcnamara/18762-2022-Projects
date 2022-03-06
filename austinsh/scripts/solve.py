@@ -4,10 +4,10 @@ import numpy as np
 from lib.parse_json import parse_json
 from classes import Nodes
 import matplotlib.pyplot as plt
+import time as duration
 
-# from scripts.run_time_domain_simulation import run_time_domain_simulation
-# from scripts.process_results import process_results
 def solve(TESTCASE, SETTINGS):
+    start_time = duration.time()
     """Run the power flow solver.
     Args:
         TESTCASE (str): A string with the path to the network json file.
@@ -17,8 +17,6 @@ def solve(TESTCASE, SETTINGS):
     """
 
     # # # Parse the test case data # # #
-    # TODO: STEP 0 - Initialize all the model classes in the models directory (models/) and familiarize
-    # yourself with the parameters of each model.
     case_name = TESTCASE
     devices = parse_json(case_name)
 
@@ -39,13 +37,6 @@ def solve(TESTCASE, SETTINGS):
     t_initial = 0
     t = t_initial
 
-    # # # Assign system nodes # # #
-    # We assign a node index for every node in our Y matrix and J vector.
-    # In addition to voltages, nodes track currents of voltage sources and
-    # other state variables needed for companion models or the model of the 
-    # induction motor.
-    # You can determine the size of the Y matrix by looking at the total
-    # number of nodes in the system.
     size_Y = Nodes.node_index_counter
 
     def solver(Y_matrix, J_matrix, vecotrs, t, tol, max_iters, time_step, volt):
@@ -87,11 +78,6 @@ def solve(TESTCASE, SETTINGS):
         vectors, t = solver(Y_matrix, J_matrix, vectors, t, tol, max_iters, time_step, volt)
     
     vectors = np.array(vectors)
-
-    # for i in range(vectors.shape[1]):
-    #     vector_adj = vectors[:,i]
-    #     vector_adj = vector_adj.flat
-    #     plt.plot(np.arange(t_initial, t_final, SETTINGS["Time Step"]), np.array(vector_adj))
     
     def get_by_name(name, legends, vectors):
         index = legends.index(name)
@@ -99,11 +85,11 @@ def solve(TESTCASE, SETTINGS):
         vector_adj = vector_adj.flat
         return np.array(vector_adj)
 
+    end = duration.time()
+    print("\nThe simulation took", (end - start_time) ,"seconds to finish.")
+    input("\npress ENTER")
+
     time = np.arange(t_initial, t_final, SETTINGS["Time Step"])
-
-    
-
-
     if TESTCASE == "testcases/RL_circuit.json":
         legends = ["V1_a", "V2_a", "V1_b", "V2_b", "V1_c", "V2_c", "V3_a", "V4_a", 
                 "V3_b", "V4_b", "V3_c", "V4_c", "IL_1a", "IL_1b", "IL_1c", "IL_2a",
@@ -115,6 +101,9 @@ def solve(TESTCASE, SETTINGS):
         v_graph = get_by_name("V3_c", legends, vectors)
         plt.plot(time, v_graph)
         plt.legend(["V3_a", "V3_b", "V3_c"])
+        plt.xlabel("Time (s)")
+        plt.ylabel("Current (V)")
+        plt.title("Voltage of RL Circuit Nodes 3", fontdict = {"family":"serif", "size":20})
         plt.show()
 
         i_graph = get_by_name("IL_2a", legends, vectors)
@@ -124,36 +113,39 @@ def solve(TESTCASE, SETTINGS):
         i_graph = get_by_name("IL_2c", legends, vectors)
         plt.plot(time, i_graph)
         plt.legend(["IL_2a", "IL_2b", "IL_2c"])
+        plt.xlabel("Time (s)")
+        plt.ylabel("Current (A)")
+        plt.title("Current Through the RL Circuit", {"family":"serif", "size":20})
         plt.show()
     
     if TESTCASE == "testcases/Simple_IM.json":
-        legends = ["Vds", "Vqs", "Ids", "Iqs", "Idr", "Iqr", "Wr"]
-        induction_graph = get_by_name("Vds", legends, vectors)
-        plt.plot(time, induction_graph)
-        induction_graph = get_by_name("Vqs", legends, vectors)
-        plt.plot(time, induction_graph)
+        legends = ["Vds", "Vqs", "Ids", "Iqs", "Idr", "Iqr", "Wr", "Te"]
         induction_graph = get_by_name("Ids", legends, vectors)
         plt.plot(time, induction_graph)
         induction_graph = get_by_name("Iqs", legends, vectors)
         plt.plot(time, induction_graph)
+        plt.xlabel("Time (s)")
+        plt.ylabel("Stator Current (A)")
+        plt.title("Stator Current of the Induction Motor", {"family":"serif", "size":20})
+        plt.legend(["Ids", "Iqs"])
+        plt.show()
+
         induction_graph = get_by_name("Idr", legends, vectors)
         plt.plot(time, induction_graph)
         induction_graph = get_by_name("Iqr", legends, vectors)
         plt.plot(time, induction_graph)
-        induction_graph = get_by_name("Wr", legends, vectors)
-        plt.plot(time, induction_graph)
-        plt.legend(legends)
+        plt.xlabel("Time (s)")
+        plt.ylabel("Rotor Current (A)")
+        plt.title("Rotor Current of the Induction Motor", {"family":"serif", "size":20})
+        plt.legend(["Idr", "Iqr"])
         plt.show()
 
-    # # # Initialize solution vector # # #
-    # TODO: STEP 1 - Complete the function to find your state vector at time t=0.
-    # V_init = initialize(devices, size_Y)
-
-    # TODO: STEP 2 - Run the time domain simulation and return an array that contains
-    #                time domain waveforms of all the state variables # # #
-    # V_waveform = run_time_domain_simulation(devices, V_init, size_Y, SETTINGS)
-
-    # # # Process Results # # #
-    # TODO: PART 1, STEP 3 - Write a process results function to compute the relevant results (voltage and current
-    # waveforms, steady state values, etc.), plot them, and compare your output to the waveforms produced by Simulink
-    # process_results(V_waveform, devices)
+        induction_graph = get_by_name("Wr", legends, vectors)
+        plt.plot(time, induction_graph)
+        induction_graph = get_by_name("Te", legends, vectors)
+        plt.plot(time, induction_graph)
+        plt.xlabel("Time (s)")
+        plt.ylabel("Rotor Angular Frequency (rads/sec) and Electrical Torque")
+        plt.title("Angular Rotor Frequency and Electrical Torque of the Induction Motor", {"family":"serif", "size":16})
+        plt.legend(["Wr", "Te"])
+        plt.show()
