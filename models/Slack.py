@@ -1,5 +1,5 @@
 from __future__ import division
-from models.Buses import Buses
+from models.Buses import Bus
 
 
 class Slack:
@@ -31,8 +31,8 @@ class Slack:
         Returns:
             None
         """
-        self.node_Vr_Slack = Buses._node_index.__next__()
-        self.node_Vi_Slack = Buses._node_index.__next__()
+        self.node_Vr_Slack = Bus._node_index.__next__()
+        self.node_Vi_Slack = Bus._node_index.__next__()
 
     # You should also add some other class functions you deem necessary for stamping,
     # initializing, and processing results.

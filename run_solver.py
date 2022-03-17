@@ -1,14 +1,12 @@
-from scripts.Solve import solve
+from lib.Solve import solve
+from lib.settings import Settings
+from parsers.parser import parse_raw
 
 # path to the grid network RAW file
 casename = 'testcases/PEGASE-13659_flat_start.RAW'
 
-# the settings for the solver
-settings = {
-    "Tolerance": 1E-05,
-    "Max Iters": 1000,
-    "Limiting":  False
-}
+raw_data = parse_raw(casename)
 
-# run the solver
-solve(casename, settings)
+settings = Settings()
+
+solve(raw_data, settings)

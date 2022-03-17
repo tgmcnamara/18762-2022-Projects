@@ -1,12 +1,15 @@
 from __future__ import division
 from itertools import count
 
+from lib.MatrixBuilder import MatrixBuilder
+from models.Buses import Bus
+
 
 class Loads:
     _ids = count(0)
 
     def __init__(self,
-                 Bus,
+                 bus: Bus,
                  P,
                  Q,
                  IP,
@@ -30,6 +33,37 @@ class Loads:
         """
         self.id = Loads._ids.__next__()
 
-        # You will need to implement the remainder of the __init__ function yourself.
-        # You should also add some other class functions you deem necessary for stamping,
-        # initializing, and processing results.
+        self.bus = bus
+        self.P = P
+        self.Q = Q
+    
+    def stamp(self, Y: MatrixBuilder, J, v_previous):
+        VR_k = v_previous[self.bus.node_Vr]
+        VI_k = v_previous[self.bus.node_Vi]
+
+        dI_denominator = (VR_k ** 2 + VI_k ** 2) ** 2
+
+        # Real current
+        dIR_dVR_k = (self.P * (VI_k ** 2 - VR_k ** 2) - 2 * self.Q * VR_k * VI_k) / dI_denominator
+        dIR_dVI_k = (self.Q * (VR_k ** 2 - VI_k ** 2) - 2 * self.P * VR_k * VI_k) / dI_denominator
+
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, dIR_dVR_k)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, dIR_dVI_k)
+
+        IR_k = (self.P * VR_k + self.Q * VI_k) / (VR_k ** 2 + VI_k ** 2)
+
+        J[self.bus.node_Vr] += -IR_k + dIR_dVR_k * VR_k + dIR_dVI_k * VI_k
+
+        #Imaginary current
+        dII_dVR_k = dIR_dVI_k
+        dII_dVI_k = (self.Q * (VR_k ** 2 - VI_k ** 2) + 2 * self.P * VR_k * VI_k) / dI_denominator
+
+        II_k = (self.P * VI_k - self.Q * VR_k) / (VR_k ** 2 + VI_k ** 2)
+
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dIR_dVR_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dIR_dVI_k)
+
+        J[self.bus.node_Vi] += -II_k + dII_dVR_k * VR_k + dII_dVI_k * VI_k
+
+
+

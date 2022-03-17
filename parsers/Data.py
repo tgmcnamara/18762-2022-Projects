@@ -19,11 +19,7 @@ import sys
 import math
 import traceback
 import re
-#from io import StringIO
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
     
     
 

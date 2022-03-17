@@ -3,7 +3,7 @@ from itertools import count
 import numpy as np
 
 
-class Buses:
+class Bus:
     _idsActiveBuses = count(1)
     _idsAllBuses = count(1)
 
@@ -37,7 +37,7 @@ class Buses:
 
         # initialize the bus key
         self.idAllBuses = self._idsAllBuses.__next__()
-        Buses.all_bus_key_[self.Bus] = self.idAllBuses - 1
+        Bus.all_bus_key_[self.Bus] = self.idAllBuses - 1
 
     def __str__(self):
         return_string = 'The bus number is : {} with Vr node as: {} and Vi node as {} '.format(self.Bus,

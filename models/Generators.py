@@ -1,6 +1,10 @@
 from __future__ import division
 from itertools import count
-from scripts.global_vars import global_vars
+
+from sympy import Q
+from lib.MatrixBuilder import MatrixBuilder
+from lib.global_vars import global_vars
+from models.Buses import Bus
 
 
 class Generators:
@@ -11,7 +15,7 @@ class Generators:
     total_P = 0
 
     def __init__(self,
-                 Bus,
+                 bus: Bus,
                  P,
                  Vset,
                  Qmax,
@@ -40,6 +44,47 @@ class Generators:
 
         self.id = self._ids.__next__()
 
-        # You will need to implement the remainder of the __init__ function yourself.
-        # You should also add some other class functions you deem necessary for stamping,
-        # initializing, and processing results.
+        self.bus = bus
+        self.P = P
+        self.Vset = Vset
+
+    def stamp(self, Y: MatrixBuilder, J, v_previous):
+        Q_k = v_previous[self.bus.node_Q]
+        VR_k = v_previous[self.bus.node_Vr]
+        VI_k = v_previous[self.bus.node_Vi]
+
+        IG_denominator = (VR_k ** 2 + VI_k ** 2)
+        dIG_denominator = IG_denominator ** 2
+
+        #Real current
+        dIR_dQ_k = -VI_k / IG_denominator
+        dIR_dVR_k = (self.P * (VR_k ** 2 - VI_k ** 2) + 2 * Q_k * VR_k * VI_k) / dIG_denominator
+        dIR_dVI_k = (Q_k * (VI_k ** 2 - VR_k ** 2) + 2 * self.P * VR_k * VI_k) / dIG_denominator
+
+        Y.stamp(self.bus.node_Vr, self.bus.node_Q, dIR_dQ_k)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, dIR_dVR_k)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, dIR_dVI_k)
+
+        IR_k = (-self.P * VR_k - Q_k * VI_k) / IG_denominator
+
+        J[self.bus.node_Vr] += -IR_k + dIR_dQ_k * Q_k + dIR_dVR_k * VR_k + dIR_dVI_k * VI_k
+
+        #Imaginary current
+        dII_dQ_k = VI_k / IG_denominator
+        dII_dVR_k = (self.P * (VR_k ** 2 - VI_k ** 2) - 2 * Q_k * VR_k * VI_k) / dIG_denominator
+        dII_dVI_k = (Q_k * (VR_k ** 2 - VI_k ** 2) - 2 * self.P * VR_k * VI_k) / dIG_denominator
+
+        Y.stamp(self.bus.node_Vi, self.bus.node_Q, dII_dQ_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dII_dVR_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dII_dVI_k)
+
+        II_k = (Q_k * VR_k - self.P * VI_k) / IG_denominator
+
+        J[self.bus.node_Vi] += -II_k + dII_dQ_k * Q_k + dII_dVR_k * VR_k + dII_dVI_k * VI_k
+
+        #Vset equation
+        Y.stamp(self.bus.node_Q, self.bus.node_Vr, 2 * VR_k)
+        Y.stamp(self.bus.node_Q, self.bus.node_Vi, 2 * VI_k)
+        J[self.bus.node_Q] += self.Vset ** 2
+
+

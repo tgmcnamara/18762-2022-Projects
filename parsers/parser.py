@@ -12,13 +12,13 @@
 
 import time
 
-from models.Buses import Buses
+from models.Buses import Bus
 
 import parsers.data_classes as data_classes
 
 import parsers.Data as Data  # pared down/modified version of data.py from
 # https://github.com/GOCompetition/Evaluation/blob/master/data.py
-from scripts.global_vars import global_vars
+from lib.global_vars import global_vars
 
 
 # also see this document for provided values for each type of entity:
@@ -458,7 +458,7 @@ def parse_raw(rawfile):
                 if int(x.stat) == 4:
                     area = search_case_data['buses'][x3.j].area
 
-                integrated_data['buses'].append(Buses(startNodeThreeWinding, busType,
+                integrated_data['buses'].append(Bus(startNodeThreeWinding, busType,
                                                       vmInit, vaInit, area))
                 for ele in new_xfmr3:
                     ele.to_bus = startNodeThreeWinding

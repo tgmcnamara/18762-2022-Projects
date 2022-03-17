@@ -14,13 +14,13 @@ import numpy as np
 import math
 
 from models.Branches import Branches
-from models.Buses import Buses
+from models.Buses import Bus
 from models.Generators import Generators
 from models.Loads import Loads
 from models.Slack import Slack
 from models.Shunts import Shunts
 
-from scripts.global_vars import global_vars
+from lib.global_vars import global_vars
 
 from parsers.parse_transformers import TwoWindingXfmrs, ThreeWindingXfmrs
 
@@ -68,7 +68,7 @@ class Bus_data:
         return (str(self.i) + ' ' + str(self.name))
 
     def integrate(self):
-        new_bus = Buses(self.i, self.ide, self.vm, self.va, self.area)
+        new_bus = Bus(self.i, self.ide, self.vm, self.va, self.area)
 
         return new_bus
 
