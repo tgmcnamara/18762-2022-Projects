@@ -1,13 +1,16 @@
 from __future__ import division
 from itertools import count
 
+from lib.MatrixBuilder import MatrixBuilder
+from models.Buses import Bus
+
 
 class Branches:
     _ids = count(0)
 
     def __init__(self,
-                 from_bus,
-                 to_bus,
+                 from_bus: Bus,
+                 to_bus: Bus,
                  r,
                  x,
                  b,
@@ -30,6 +33,57 @@ class Branches:
         """
         self.id = self._ids.__next__()
 
-        # You will need to implement the remainder of the __init__ function yourself.
-        # You should also add some other class functions you deem necessary for stamping,
-        # initializing, and processing results.
+        self.from_bus = from_bus
+        self.to_bus = to_bus
+
+        self.r = r
+        self.x = x
+        self.b = b
+
+        self.RX_factor = x / (x ** 2 + r ** 2)
+
+        self.b_half_shunt = b / 2
+
+    def stamp(self, Y: MatrixBuilder, J, v_previous):
+        
+        ###Series Current
+
+        #Real series current - from bus
+        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vr, -self.RX_factor)
+        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vr, self.RX_factor)
+
+        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vi, -self.RX_factor)
+        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vi, self.RX_factor)
+
+        #Real series current - to bus
+        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vr, self.RX_factor)
+        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vr, -self.RX_factor)
+
+        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vi, self.RX_factor)
+        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vi, -self.RX_factor)
+
+        #Imaginary series current - from bus
+        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vr, -self.RX_factor)
+        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vr, self.RX_factor)
+
+        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vi, self.RX_factor)
+        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vi, -self.RX_factor)
+
+        #Imaginary series current - to bus
+        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vr, self.RX_factor)
+        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vr, -self.RX_factor)
+
+        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vi, -self.RX_factor)
+        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vi, self.RX_factor)
+
+        ###Shunt Current
+
+        #Real/Imaginary shunt current - from bus
+        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vr, -self.b_half_shunt)
+        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vi, self.b_half_shunt)
+
+        #Real/Imaginary shunt current - to bus
+        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vr, -self.b_half_shunt)
+        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vi, self.b_half_shunt)
+
+
