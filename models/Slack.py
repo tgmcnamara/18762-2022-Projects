@@ -1,11 +1,12 @@
 from __future__ import division
+from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import Bus
-
+import math
 
 class Slack:
 
     def __init__(self,
-                 Bus,
+                 bus: Bus,
                  Vset,
                  ang,
                  Pinit,
@@ -19,20 +20,23 @@ class Slack:
             Pinit (float): the initial active power that the slack bus is supplying
             Qinit (float): the initial reactive power that the slack bus is supplying
         """
-        # You will need to implement the remainder of the __init__ function yourself.
 
-        # initialize nodes
-        self.node_Vr_Slack = None
-        self.node_Vi_Slack = None
+        self.bus = bus
+        self.Vset = Vset
+        self.ang = ang
 
     def assign_nodes(self):
-        """Assign the additional slack bus nodes for a slack bus.
-
-        Returns:
-            None
-        """
         self.node_Vr_Slack = Bus._node_index.__next__()
         self.node_Vi_Slack = Bus._node_index.__next__()
 
-    # You should also add some other class functions you deem necessary for stamping,
-    # initializing, and processing results.
+    def stamp(self, Y: MatrixBuilder, J, v_previous):
+        Vr_angle = self.Vset * math.cos(self.ang)
+
+        Y.stamp(self.node_Vr_Slack, self.bus.node_Vr, 1)
+        J[self.node_Vr_Slack] = Vr_angle
+
+        Vi_angle = self.Vset * math.sin(self.ang)
+
+        Y.stamp(self.node_Vi_Slack, self.bus.node_Vi, 1)
+        J[self.node_Vi_Slack] = Vi_angle
+
