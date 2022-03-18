@@ -1,7 +1,7 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import Bus
+from models.Buses import _all_bus_key
 
 class Generators:
     _ids = count(0)
@@ -11,7 +11,7 @@ class Generators:
     total_P = 0
 
     def __init__(self,
-                 bus: Bus,
+                 bus,
                  P,
                  Vset,
                  Qmax,
@@ -40,7 +40,7 @@ class Generators:
 
         self.id = self._ids.__next__()
 
-        self.bus = bus
+        self.bus = _all_bus_key[bus]
         self.P = P
         self.Vset = Vset
 

@@ -1,12 +1,12 @@
 from __future__ import division
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import Bus, _node_index
+from models.Buses import _all_bus_key, _node_index
 import math
 
 class Slack:
 
     def __init__(self,
-                 bus: Bus,
+                 bus,
                  Vset,
                  ang,
                  Pinit,
@@ -21,7 +21,7 @@ class Slack:
             Qinit (float): the initial reactive power that the slack bus is supplying
         """
 
-        self.bus = bus
+        self.bus = _all_bus_key[bus]
         self.Vset = Vset
         self.ang = ang
 

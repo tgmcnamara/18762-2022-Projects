@@ -1,13 +1,13 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import Bus
+from models.Buses import _all_bus_key
 
 class Loads:
     _ids = count(0)
 
     def __init__(self,
-                 bus: Bus,
+                 bus,
                  P,
                  Q,
                  IP,
@@ -31,7 +31,7 @@ class Loads:
         """
         self.id = Loads._ids.__next__()
 
-        self.bus = bus
+        self.bus = _all_bus_key[bus]
         self.P = P
         self.Q = Q
     

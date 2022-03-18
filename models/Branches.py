@@ -2,15 +2,15 @@ from __future__ import division
 from itertools import count
 
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import Bus
+from models.Buses import _all_bus_key
 
 
 class Branches:
     _ids = count(0)
 
     def __init__(self,
-                 from_bus: Bus,
-                 to_bus: Bus,
+                 from_bus,
+                 to_bus,
                  r,
                  x,
                  b,
@@ -33,8 +33,8 @@ class Branches:
         """
         self.id = self._ids.__next__()
 
-        self.from_bus = from_bus
-        self.to_bus = to_bus
+        self.from_bus = _all_bus_key[from_bus]
+        self.to_bus = _all_bus_key[to_bus]
 
         self.r = r
         self.x = x

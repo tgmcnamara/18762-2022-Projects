@@ -43,10 +43,10 @@ class PowerFlow:
 
         v_previous = np.copy(v_init)
 
-        Y = MatrixBuilder(len(v_init))
+        Y = MatrixBuilder()
         J_linear = [None] * len(v_init)
 
-        self.stamp_linear(Y, J, v_previous)
+        self.stamp_linear(Y, J_linear, v_previous)
 
         linear_index = Y.get_usage()
 

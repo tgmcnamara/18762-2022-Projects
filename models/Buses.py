@@ -40,7 +40,7 @@ class Bus:
 
         # initialize the bus key
         self.idAllBuses = _idsAllBuses.__next__()
-        _all_bus_key[self.Bus] = self.idAllBuses - 1
+        _all_bus_key[self.Bus] = self
 
     def __str__(self):
         return_string = 'The bus number is : {} with Vr node as: {} and Vi node as {} '.format(self.Bus,

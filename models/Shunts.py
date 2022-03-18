@@ -1,12 +1,13 @@
 from __future__ import division
 from itertools import count
-
+from lib.MatrixBuilder import MatrixBuilder
+from models.Buses import _all_bus_key
 
 class Shunts:
     _ids = count(0)
 
     def __init__(self,
-                 Bus,
+                 bus,
                  G_MW,
                  B_MVAR,
                  shunt_type,
@@ -37,7 +38,7 @@ class Shunts:
             Bstep (list): the admittance increase for each step in Nstep as MVar at unity voltage
         """
         self.id = self._ids.__next__()
+        self.bus = _all_bus_key[bus]
 
-        # You will need to implement the remainder of the __init__ function yourself.
-        # You should also add some other class functions you deem necessary for stamping,
-        # initializing, and processing results.
+    def stamp(self, Y: MatrixBuilder, J, v_previous):
+        pass

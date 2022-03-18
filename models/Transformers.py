@@ -1,5 +1,7 @@
 from __future__ import division
 from itertools import count
+from lib.MatrixBuilder import MatrixBuilder
+from models.Buses import _all_bus_key
 
 
 class Transformers:
@@ -32,6 +34,8 @@ class Transformers:
         """
         self.id = self._ids.__next__()
 
-        # You will need to implement the remainder of the __init__ function yourself.
-        # You should also add some other class functions you deem necessary for stamping,
-        # initializing, and processing results.
+        self.from_bus = _all_bus_key[from_bus]
+        self.to_bus = _all_bus_key[to_bus]
+
+    def stamp(self, Y: MatrixBuilder, J, v_previous):
+        pass

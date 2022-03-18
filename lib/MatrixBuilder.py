@@ -1,15 +1,22 @@
 from scipy.sparse import csc_matrix
 
 class MatrixBuilder:
-    def __init__(self, size) -> None:
-        self.size = size
-        self._max_index = size - 1
-        self._row = [None] * size
-        self._col = [None] * size
-        self._val = [None] * size
+    def __init__(self) -> None:
+        self._row = []
+        self._col = []
+        self._val = []
         self._index = 0
+        self._max_index = 0
 
     def stamp(self, row, column, value):
+        if self._index == self._max_index:
+            self._row.append(row)
+            self._col.append(column)
+            self._val.append(value)
+            self._index += 1
+            self._max_index += 1
+            return
+
         self._row[self._index] = row
         self._col[self._index] = column
         self._val[self._index] = value
