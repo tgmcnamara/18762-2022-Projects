@@ -6,8 +6,18 @@ from lib.settings import Settings
 
 class PowerFlow:
 
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings, raw_data):
         self.settings = settings
+
+        self.slack = raw_data['slack']
+        self.generator = raw_data['generators']
+        self.transformer = raw_data['xfmrs']
+        self.branch = raw_data['branches']
+        self.shunt = raw_data['shunts']
+        self.load = raw_data['loads']
+
+        self.linear_elments = self.slack + self.branch + self.shunt + self.transformer
+        self.nonlinear_elements = self.generator + self.load
 
     def solve(self):
         pass
@@ -21,28 +31,22 @@ class PowerFlow:
     def check_error(self):
         pass
 
-    def stamp_linear(self):
-        pass
+    def stamp_linear(self, Y, J, v_previous):
+        for element in self.linear_elments:
+            element.stamp(Y, J, v_previous)
 
-    def stamp_nonlinear(self):
-        pass
+    def stamp_nonlinear(self, Y, J, v_previous):
+        for element in self.nonlinear_elments:
+            element.stamp(Y, J, v_previous)
 
-    def run_powerflow(self,
-                      v_init,
-                      bus,
-                      slack,
-                      generator,
-                      transformer,
-                      branch,
-                      shunt,
-                      load):
+    def run_powerflow(self, v_init):
 
         v_previous = np.copy(v_init)
 
         Y = MatrixBuilder(len(v_init))
         J_linear = [None] * len(v_init)
 
-        self.stamp_linear()
+        self.stamp_linear(Y, J, v_previous)
 
         linear_index = Y.get_usage()
 

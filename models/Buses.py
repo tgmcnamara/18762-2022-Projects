@@ -2,14 +2,14 @@ from __future__ import division
 from itertools import count
 import numpy as np
 
+_idsAllBuses = count(1)
+_node_index = count(0)
+_all_bus_key = {}
 
 class Bus:
     _idsActiveBuses = count(1)
-    _idsAllBuses = count(1)
 
-    _node_index = count(0)
     bus_key_ = {}
-    all_bus_key_ = {}
 
     def __init__(self,
                  Bus,
@@ -35,15 +35,24 @@ class Bus:
         self.node_Vi = None  # imaginary voltage node at a bus
         self.node_Q = None  # reactive power or voltage contstraint node at a bus
 
+        self.Vr_init = 0
+        self.Vi_init = 0
+
         # initialize the bus key
-        self.idAllBuses = self._idsAllBuses.__next__()
-        Bus.all_bus_key_[self.Bus] = self.idAllBuses - 1
+        self.idAllBuses = _idsAllBuses.__next__()
+        _all_bus_key[self.Bus] = self.idAllBuses - 1
 
     def __str__(self):
         return_string = 'The bus number is : {} with Vr node as: {} and Vi node as {} '.format(self.Bus,
                                                                                                self.node_Vr,
                                                                                                self.node_Vi)
         return return_string
+
+    def get_Vr_init(self):
+        return (self.node_Vr, self.Vr_init)
+
+    def get_Vi_init(self):
+        return (self.node_Vi, self.Vi_init)
 
     def assign_nodes(self):
         """Assign nodes based on the bus type.
@@ -53,11 +62,11 @@ class Bus:
         """
         # If Slack or PQ Bus
         if self.Type == 1 or self.Type == 3:
-            self.node_Vr = self._node_index.__next__()
-            self.node_Vi = self._node_index.__next__()
+            self.node_Vr = _node_index.__next__()
+            self.node_Vi = _node_index.__next__()
 
         # If PV Bus
         elif self.Type == 2:
-            self.node_Vr = self._node_index.__next__()
-            self.node_Vi = self._node_index.__next__()
-            self.node_Q = self._node_index.__next__()
+            self.node_Vr = _node_index.__next__()
+            self.node_Vi = _node_index.__next__()
+            self.node_Q = _node_index.__next__()

@@ -3,7 +3,7 @@ from parsers.parser import parse_raw
 from lib.PowerFlow import PowerFlow
 from lib.process_results import process_results
 from lib.initialize import initialize
-from models.Buses import Bus
+from models.Buses import _node_index
 
 
 def solve(raw_data, settings: Settings):
@@ -13,17 +13,12 @@ def solve(raw_data, settings: Settings):
     # # # Parse the Test Case Data # # #
     # # # Assign Parsed Data to Variables # # #
 
-    bus = raw_data['buses']
+    buses = raw_data['buses']
     slack = raw_data['slack']
-    generator = raw_data['generators']
-    transformer = raw_data['xfmrs']
-    branch = raw_data['branches']
-    shunt = raw_data['shunts']
-    load = raw_data['loads']
 
     # # # Assign System Nodes Bus by Bus # # #
     # We can use these nodes to have predetermined node number for every node in our Y matrix and J vector.
-    for ele in bus:
+    for ele in buses:
         ele.assign_nodes()
 
     # Assign any slack nodes
@@ -33,18 +28,17 @@ def solve(raw_data, settings: Settings):
     # # # Initialize Solution Vector - V and Q values # # #
 
     # determine the size of the Y matrix by looking at the total number of nodes in the system
-    size_Y = Bus._node_index.__next__()
+    size_Y = _node_index.__next__()
 
-    # TODO: PART 1, STEP 1 - Complete the function to initialize your solution vector v_init.
-    v_init = initialize(size_Y)
+    v_init = initialize(size_Y, buses, settings)
 
     # # # Run Power Flow # # #
-    powerflow = PowerFlow(settings)
+    powerflow = PowerFlow(settings, raw_data)
 
     # TODO: PART 1, STEP 2 - Complete the PowerFlow class and build your run_powerflow function to solve Equivalent
     #  Circuit Formulation powerflow. The function will return a final solution vector v. Remove run_pf and the if
     #  condition once you've finished building your solver.
-    v_final = powerflow.run_powerflow(v_init, bus, slack, generator, transformer, branch, shunt, load)
+    v_final = powerflow.run_powerflow(v_init)
 
     # # # Process Results # # #
     # TODO: PART 1, STEP 3 - Write a process_results function to compute the relevant results (voltages, powers,

@@ -1,6 +1,6 @@
 from __future__ import division
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import Bus
+from models.Buses import Bus, _node_index
 import math
 
 class Slack:
@@ -26,8 +26,8 @@ class Slack:
         self.ang = ang
 
     def assign_nodes(self):
-        self.node_Vr_Slack = Bus._node_index.__next__()
-        self.node_Vi_Slack = Bus._node_index.__next__()
+        self.node_Vr_Slack = _node_index.__next__()
+        self.node_Vi_Slack = _node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Vr_angle = self.Vset * math.cos(self.ang)

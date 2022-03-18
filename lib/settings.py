@@ -1,5 +1,5 @@
 class Settings:
-    def __init__(self, tolerance = 1E-05, max_iters = 1000, limiting = False) -> None:
+    def __init__(self, tolerance = 1E-05, max_iters = 1000, limiting = False, v_init = None) -> None:
         """
         Args:
             tol (float): The chosen NR tolerance.
@@ -10,3 +10,4 @@ class Settings:
         self.tolerance = tolerance
         self.max_iters = max_iters
         self.limiting = limiting
+        self.v_init = v_init

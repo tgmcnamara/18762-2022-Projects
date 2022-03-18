@@ -3,7 +3,7 @@ from lib.settings import Settings
 from parsers.parser import parse_raw
 
 # path to the grid network RAW file
-casename = 'testcases/PEGASE-13659_flat_start.RAW'
+casename = 'testcases/GS-4_prior_solution.RAW'
 
 raw_data = parse_raw(casename)
 
