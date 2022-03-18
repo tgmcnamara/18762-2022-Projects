@@ -1,16 +1,12 @@
 from __future__ import division
 from itertools import count
-import numpy as np
+import math
 
 _idsAllBuses = count(1)
 _node_index = count(0)
 _all_bus_key = {}
 
 class Bus:
-    _idsActiveBuses = count(1)
-
-    bus_key_ = {}
-
     def __init__(self,
                  Bus,
                  Type,
@@ -35,8 +31,8 @@ class Bus:
         self.node_Vi = None  # imaginary voltage node at a bus
         self.node_Q = None  # reactive power or voltage contstraint node at a bus
 
-        self.Vr_init = 0
-        self.Vi_init = 0
+        self.Vr_init = Vm_init * math.cos(Va_init)
+        self.Vi_init = Vm_init * math.sin(Va_init)
 
         # initialize the bus key
         self.idAllBuses = _idsAllBuses.__next__()

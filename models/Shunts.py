@@ -41,4 +41,4 @@ class Shunts:
         self.bus = _all_bus_key[bus]
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
-        pass
+        raise Exception("Not implemented")

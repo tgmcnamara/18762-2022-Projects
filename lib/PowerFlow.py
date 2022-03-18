@@ -31,31 +31,39 @@ class PowerFlow:
     def check_error(self):
         pass
 
-    def stamp_linear(self, Y, J, v_previous):
+    def stamp_linear(self, Y: MatrixBuilder, J, v_previous):
         for element in self.linear_elments:
             element.stamp(Y, J, v_previous)
+            if self.settings.debug:
+                Y.assert_valid()
 
-    def stamp_nonlinear(self, Y, J, v_previous):
-        for element in self.nonlinear_elments:
+    def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
+        for element in self.nonlinear_elements:
             element.stamp(Y, J, v_previous)
+            if self.settings.debug:
+                Y.assert_valid()
 
     def run_powerflow(self, v_init):
 
         v_previous = np.copy(v_init)
 
         Y = MatrixBuilder()
-        J_linear = [None] * len(v_init)
+        J_linear = [0] * len(v_init)
 
         self.stamp_linear(Y, J_linear, v_previous)
 
         linear_index = Y.get_usage()
+        err_previous = 999999999999
 
         for _ in range(self.settings.max_iters):
             J = J_linear.copy()
 
-            self.stamp_nonlinear()
+            self.stamp_nonlinear(Y, J, v_previous)
 
-            v_next = spsolve(Y.to_matrix(), J)
+            if self.settings.debug:
+                Y.assert_valid(check_zeros=True)
+
+            v_next = np.linalg.solve(Y.to_matrix().todense(), J) #TODO: spsolve(Y.to_matrix(), J)
 
             err_max = (abs(v_next - v_previous)).max()
             
@@ -65,7 +73,11 @@ class PowerFlow:
             if err_max < self.settings.tolerance:
                 return v_next
 
+            if err_max > err_previous:
+                raise Exception("Failing to converge")
+
             v_previous = v_next
-            Y.clear(retain_index=linear_index)
+            Y.clear(retain_idx=linear_index)
+            err_previous = err_max
 
         raise Exception("Exceeded maximum NR iterations")
