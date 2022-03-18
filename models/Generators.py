@@ -1,11 +1,7 @@
 from __future__ import division
 from itertools import count
-
-from sympy import Q
 from lib.MatrixBuilder import MatrixBuilder
-from lib.global_vars import global_vars
 from models.Buses import Bus
-
 
 class Generators:
     _ids = count(0)

@@ -47,8 +47,6 @@ class PowerFlow:
         linear_index = Y.get_usage()
 
         for _ in range(self.settings.max_iters):
-
-            Y.clear(retain_index=linear_index)
             J = J_linear.copy()
 
             self.stamp_nonlinear()
@@ -64,5 +62,6 @@ class PowerFlow:
                 return v_next
 
             v_previous = v_next
+            Y.clear(retain_index=linear_index)
 
         raise Exception("Exceeded maximum NR iterations")

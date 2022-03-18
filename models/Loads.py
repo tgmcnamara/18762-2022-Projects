@@ -1,9 +1,7 @@
 from __future__ import division
 from itertools import count
-
 from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import Bus
-
 
 class Loads:
     _ids = count(0)
