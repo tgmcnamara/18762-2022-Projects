@@ -40,7 +40,8 @@ class Branches:
         self.x = x
         self.b = b
 
-        self.RX_factor = x / (x ** 2 + r ** 2)
+        self.R_factor = r / (x ** 2 + r ** 2)
+        self.X_factor = x / (x ** 2 + r ** 2)
 
         self.b_half_shunt = b / 2
 
@@ -49,32 +50,32 @@ class Branches:
         ###Series Current
 
         #Real series current - from bus
-        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vr, -self.RX_factor)
-        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vr, self.RX_factor)
+        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vr, -self.R_factor)
+        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vr, self.R_factor)
 
-        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vi, -self.RX_factor)
-        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vi, self.RX_factor)
+        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vi, -self.X_factor)
+        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vi, self.X_factor)
 
         #Real series current - to bus
-        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vr, self.RX_factor)
-        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vr, -self.RX_factor)
+        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vr, self.R_factor)
+        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vr, -self.R_factor)
 
-        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vi, self.RX_factor)
-        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vi, -self.RX_factor)
+        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vi, self.X_factor)
+        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vi, -self.X_factor)
 
         #Imaginary series current - from bus
-        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vr, -self.RX_factor)
-        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vr, self.RX_factor)
+        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vr, -self.X_factor)
+        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vr, self.X_factor)
 
-        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vi, self.RX_factor)
-        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vi, -self.RX_factor)
+        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vi, self.R_factor)
+        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vi, -self.R_factor)
 
         #Imaginary series current - to bus
-        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vr, self.RX_factor)
-        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vr, -self.RX_factor)
+        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vr, self.X_factor)
+        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vr, -self.X_factor)
 
-        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vi, -self.RX_factor)
-        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vi, self.RX_factor)
+        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vi, -self.R_factor)
+        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vi, self.R_factor)
 
         ###Shunt Current
 

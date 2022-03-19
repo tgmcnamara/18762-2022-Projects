@@ -9,6 +9,7 @@ class PowerFlow:
     def __init__(self, settings: Settings, raw_data):
         self.settings = settings
 
+        self.buses = raw_data['buses']
         self.slack = raw_data['slack']
         self.generator = raw_data['generators']
         self.transformer = raw_data['xfmrs']
@@ -53,7 +54,6 @@ class PowerFlow:
         self.stamp_linear(Y, J_linear, v_previous)
 
         linear_index = Y.get_usage()
-        err_previous = 999999999999
 
         for _ in range(self.settings.max_iters):
             J = J_linear.copy()
@@ -63,7 +63,10 @@ class PowerFlow:
             if self.settings.debug:
                 Y.assert_valid(check_zeros=True)
 
-            v_next = np.linalg.solve(Y.to_matrix().todense(), J) #TODO: spsolve(Y.to_matrix(), J)
+            v_next = spsolve(Y.to_matrix(), J)
+
+            if np.isnan(v_next).any():
+                raise Exception("Error solving linear system")
 
             err_max = (abs(v_next - v_previous)).max()
             
@@ -73,11 +76,22 @@ class PowerFlow:
             if err_max < self.settings.tolerance:
                 return v_next
 
-            if err_max > err_previous:
-                raise Exception("Failing to converge")
-
             v_previous = v_next
             Y.clear(retain_idx=linear_index)
-            err_previous = err_max
 
         raise Exception("Exceeded maximum NR iterations")
+    
+    def dump_index_map(self):
+        map = {}
+
+        for bus in self.buses:
+            map[f'bus-{bus.Bus}-Vr'] = bus.node_Vr
+            map[f'bus-{bus.Bus}-Vi'] = bus.node_Vi
+            if bus.node_Q != None:
+                map[f'bus-{bus.Bus}-Q'] = bus.node_Q
+        
+        for slack in self.slack:
+            map[f'slack-{slack.bus.Bus}-Vr'] = slack.node_Vr_Slack
+            map[f'slack-{slack.bus.Bus}-Vi'] = slack.node_Vi_Slack
+
+        return map

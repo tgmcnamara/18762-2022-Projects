@@ -66,9 +66,9 @@ class Generators:
         J[self.bus.node_Vr] += -IR_k + dIR_dQ_k * Q_k + dIR_dVR_k * VR_k + dIR_dVI_k * VI_k
 
         #Imaginary current
-        dII_dQ_k = VI_k / IG_denominator
-        dII_dVR_k = (self.P * (VR_k ** 2 - VI_k ** 2) - 2 * Q_k * VR_k * VI_k) / dIG_denominator
-        dII_dVI_k = (Q_k * (VR_k ** 2 - VI_k ** 2) - 2 * self.P * VR_k * VI_k) / dIG_denominator
+        dII_dQ_k = VR_k / IG_denominator
+        dII_dVR_k = (Q_k * (VI_k ** 2 - VR_k ** 2) + 2 * self.P * VR_k * VI_k) / dIG_denominator
+        dII_dVI_k = (self.P * (VI_k ** 2 - VR_k ** 2) - 2 * Q_k * VR_k * VI_k) / dIG_denominator
 
         Y.stamp(self.bus.node_Vi, self.bus.node_Q, dII_dQ_k)
         Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dII_dVR_k)

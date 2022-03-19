@@ -32,11 +32,13 @@ class Slack:
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Vr_angle = self.Vset * math.cos(self.ang)
 
+        Y.stamp(self.bus.node_Vr, self.node_Vr_Slack, 1)
         Y.stamp(self.node_Vr_Slack, self.bus.node_Vr, 1)
         J[self.node_Vr_Slack] = Vr_angle
 
         Vi_angle = self.Vset * math.sin(self.ang)
 
+        Y.stamp(self.bus.node_Vi, self.node_Vi_Slack, 1)
         Y.stamp(self.node_Vi_Slack, self.bus.node_Vi, 1)
         J[self.node_Vi_Slack] = Vi_angle
 

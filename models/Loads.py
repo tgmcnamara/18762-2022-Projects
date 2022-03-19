@@ -53,8 +53,8 @@ class Loads:
         J[self.bus.node_Vr] += -IR_k + dIR_dVR_k * VR_k + dIR_dVI_k * VI_k
 
         #Imaginary current
-        dII_dVR_k = dIR_dVI_k
-        dII_dVI_k = (self.Q * (VR_k ** 2 - VI_k ** 2) + 2 * self.P * VR_k * VI_k) / dI_denominator
+        dII_dVR_k = (self.P * (VI_k ** 2 - VR_k ** 2) + 2 * self.Q * VR_k * VI_k) / dI_denominator
+        dII_dVI_k = (self.Q * (VI_k ** 2 - VR_k ** 2) - 2 * self.P * VR_k * VI_k) / dI_denominator
 
         II_k = (self.P * VI_k - self.Q * VR_k) / (VR_k ** 2 + VI_k ** 2)
 
