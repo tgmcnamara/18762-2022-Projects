@@ -1,4 +1,4 @@
-function mpc = case4gs
+function mpc = GS_4_prior_solution
 %CASE4GS  Power flow data for 4 bus, 2 gen case from Grainger & Stevenson.
 %   Please see CASEFORMAT for details on the case file format.
 %
@@ -38,3 +38,10 @@ mpc.branch = [
 	2	4	0.00744	0.0372	0.0775	250	250	250	0	0	1	-360	360;
 	3	4	0.01272	0.0636	0.1275	250	250	250	0	0	1	-360	360;
 ];
+
+%% generator cost data
+mpc.gencost = [
+2	0	0	4	0	0	1	0
+2	0	0	4	0	0	1	0
+];
+
