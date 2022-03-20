@@ -1,7 +1,8 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import _all_bus_key
+from models.Buses import _all_bus_key, _node_index
+import math
 
 
 class Transformers:
@@ -37,5 +38,29 @@ class Transformers:
         self.from_bus = _all_bus_key[from_bus]
         self.to_bus = _all_bus_key[to_bus]
 
+        self.r = r
+        self.x = x
+
+        self.tr = tr
+        self.ang = ang
+
+    def assign_nodes(self):
+        self.node_Vr_primary_Xfmr = _node_index.__next__()
+        self.node_Vi_primary_Xfmr = _node_index.__next__()
+
     def stamp(self, Y: MatrixBuilder, J, v_previous):
-        raise Exception("Not implemented")
+        
+        #Primary winding - Real
+        Y.stamp(self.from_bus.node_Vr, self.node_Vr_primary_Xfmr, 1)
+        Y.stamp(self.node_Vr_primary_Xfmr, self.from_bus.node_Vr, 1)
+        Y.stamp(self.node_Vr_primary_Xfmr, self.to_bus.node_Vr, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_Vr_primary_Xfmr, self.to_bus.node_Vi, self.tr * math.sin(self.ang))
+
+        #Primary winding - Imaginary
+        Y.stamp(self.from_bus.node_Vi, self.node_Vi_primary_Xfmr, 1)
+        Y.stamp(self.node_Vi_primary_Xfmr, self.from_bus.node_Vr, 1)
+        Y.stamp(self.node_Vi_primary_Xfmr, self.to_bus.node_Vr, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_Vi_primary_Xfmr, self.to_bus.node_Vi, -self.tr * math.cos(self.ang))
+
+        #Secondary winding - Real
+

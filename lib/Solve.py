@@ -15,14 +15,11 @@ def solve(raw_data, settings: Settings):
 
     buses = raw_data['buses']
     slack = raw_data['slack']
+    transformers = raw_data['xfmrs']
 
     # # # Assign System Nodes Bus by Bus # # #
     # We can use these nodes to have predetermined node number for every node in our Y matrix and J vector.
-    for ele in buses:
-        ele.assign_nodes()
-
-    # Assign any slack nodes
-    for ele in slack:
+    for ele in buses + slack + transformers:
         ele.assign_nodes()
 
     # # # Initialize Solution Vector - V and Q values # # #
