@@ -80,11 +80,11 @@ class Branches:
         ###Shunt Current
 
         #Real/Imaginary shunt current - from bus
-        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vr, -self.b_half_shunt)
-        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vi, self.b_half_shunt)
+        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vi, -self.b_half_shunt)
+        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vr, self.b_half_shunt)
 
         #Real/Imaginary shunt current - to bus
-        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vr, -self.b_half_shunt)
-        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vi, self.b_half_shunt)
+        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vi, -self.b_half_shunt)
+        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vr, self.b_half_shunt)
 
 

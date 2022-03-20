@@ -44,6 +44,8 @@ class Generators:
         self.P = P
         self.Vset = Vset
 
+        self.Qinit = Qinit
+
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Q_k = v_previous[self.bus.node_Q]
         VR_k = v_previous[self.bus.node_Vr]

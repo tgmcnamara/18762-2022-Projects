@@ -25,20 +25,23 @@ class Slack:
         self.Vset = Vset
         self.ang = ang
 
+        self.Pinit = Pinit
+        self.Qinit = Qinit
+
     def assign_nodes(self):
-        self.node_Vr_Slack = _node_index.__next__()
-        self.node_Vi_Slack = _node_index.__next__()
+        self.slack_Ir = _node_index.__next__()
+        self.slack_Ii = _node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Vr_angle = self.Vset * math.cos(self.ang)
 
-        Y.stamp(self.bus.node_Vr, self.node_Vr_Slack, 1)
-        Y.stamp(self.node_Vr_Slack, self.bus.node_Vr, 1)
-        J[self.node_Vr_Slack] = Vr_angle
+        Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)
+        Y.stamp(self.slack_Ir, self.bus.node_Vr, 1)
+        J[self.slack_Ir] = Vr_angle
 
         Vi_angle = self.Vset * math.sin(self.ang)
 
-        Y.stamp(self.bus.node_Vi, self.node_Vi_Slack, 1)
-        Y.stamp(self.node_Vi_Slack, self.bus.node_Vi, 1)
-        J[self.node_Vi_Slack] = Vi_angle
+        Y.stamp(self.bus.node_Vi, self.slack_Ii, 1)
+        Y.stamp(self.slack_Ii, self.bus.node_Vi, 1)
+        J[self.slack_Ii] = Vi_angle
 

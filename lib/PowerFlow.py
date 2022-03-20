@@ -68,7 +68,9 @@ class PowerFlow:
             if np.isnan(v_next).any():
                 raise Exception("Error solving linear system")
 
-            err_max = (abs(v_next - v_previous)).max()
+            err = abs(v_next - v_previous)
+
+            err_max = err.max()
             
             if self.settings.limiting and err_max > self.settings.tolerance:
                 self.apply_limiting()
@@ -91,7 +93,7 @@ class PowerFlow:
                 map[f'bus-{bus.Bus}-Q'] = bus.node_Q
         
         for slack in self.slack:
-            map[f'slack-{slack.bus.Bus}-Vr'] = slack.node_Vr_Slack
-            map[f'slack-{slack.bus.Bus}-Vi'] = slack.node_Vi_Slack
+            map[f'slack-{slack.bus.Bus}-Ir'] = slack.slack_Ir
+            map[f'slack-{slack.bus.Bus}-Ii'] = slack.slack_Ii
 
         return map
