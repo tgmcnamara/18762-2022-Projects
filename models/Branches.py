@@ -40,51 +40,55 @@ class Branches:
         self.x = x
         self.b = b
 
-        self.R_factor = r / (x ** 2 + r ** 2)
-        self.X_factor = x / (x ** 2 + r ** 2)
+        self.G = r / (x ** 2 + r ** 2)
+        self.B = x / (x ** 2 + r ** 2)
 
-        self.b_half_shunt = b / 2
+        self.B_line = b / 2
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         
         ###Series Current
+        #I_r = G * (Vrn - Vrm) + B * (Vin - Vim)
+        #I_i = G * (Vin - Vim) - B * (Vrn - Vrm)
+        
+        Vrn = self.from_bus.node_Vr
+        Vin = self.from_bus.node_Vi
 
-        #Real series current - from bus
-        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vr, -self.R_factor)
-        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vr, self.R_factor)
+        Vrm = self.to_bus.node_Vr
+        Vim = self.to_bus.node_Vi
 
-        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vi, -self.X_factor)
-        Y.stamp(self.from_bus.node_Vr, self.to_bus.node_Vi, self.X_factor)
+        #From Bus - Real
+        Y.stamp(Vrn, Vrn, -self.G)
+        Y.stamp(Vrn, Vrm, self.G)
+        Y.stamp(Vrn, Vin, -self.B)
+        Y.stamp(Vrn, Vim, self.B)
 
-        #Real series current - to bus
-        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vr, self.R_factor)
-        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vr, -self.R_factor)
+        #From Bus - Imaginary
+        Y.stamp(Vin, Vin, -self.G)
+        Y.stamp(Vin, Vim, self.G)
+        Y.stamp(Vin, Vrn, self.B)
+        Y.stamp(Vin, Vrm, -self.B)
 
-        Y.stamp(self.to_bus.node_Vr, self.from_bus.node_Vi, self.X_factor)
-        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vi, -self.X_factor)
+        #To Bus - Real
+        Y.stamp(Vrm, Vrn, self.G)
+        Y.stamp(Vrm, Vrm, -self.G)
+        Y.stamp(Vrm, Vin, self.B)
+        Y.stamp(Vrm, Vim, -self.B)
 
-        #Imaginary series current - from bus
-        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vr, -self.X_factor)
-        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vr, self.X_factor)
-
-        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vi, self.R_factor)
-        Y.stamp(self.from_bus.node_Vi, self.to_bus.node_Vi, -self.R_factor)
-
-        #Imaginary series current - to bus
-        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vr, self.X_factor)
-        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vr, -self.X_factor)
-
-        Y.stamp(self.to_bus.node_Vi, self.from_bus.node_Vi, -self.R_factor)
-        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vi, self.R_factor)
+        #To Bus - Imaginary
+        Y.stamp(Vim, Vin, self.G)
+        Y.stamp(Vim, Vim, -self.G)
+        Y.stamp(Vim, Vrn, -self.B)
+        Y.stamp(Vim, Vrm, self.B)
 
         ###Shunt Current
 
         #Real/Imaginary shunt current - from bus
-        Y.stamp(self.from_bus.node_Vr, self.from_bus.node_Vi, -self.b_half_shunt)
-        Y.stamp(self.from_bus.node_Vi, self.from_bus.node_Vr, self.b_half_shunt)
+        Y.stamp(Vrn, Vin, -self.B_line)
+        Y.stamp(Vin, Vrn, self.B_line)
 
         #Real/Imaginary shunt current - to bus
-        Y.stamp(self.to_bus.node_Vr, self.to_bus.node_Vi, -self.b_half_shunt)
-        Y.stamp(self.to_bus.node_Vi, self.to_bus.node_Vr, self.b_half_shunt)
+        Y.stamp(Vrm, Vim, -self.B_line)
+        Y.stamp(Vim, Vrm, self.B_line)
 
 

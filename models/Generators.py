@@ -76,7 +76,7 @@ class Generators:
         Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dII_dVR_k)
         Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dII_dVI_k)
 
-        II_k = (Q_k * VR_k - self.P * VI_k) / IG_denominator
+        II_k = (- self.P * VI_k + Q_k * VR_k) / IG_denominator
 
         J[self.bus.node_Vi] += -II_k + dII_dQ_k * Q_k + dII_dVR_k * VR_k + dII_dVI_k * VI_k
 

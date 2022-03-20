@@ -1,8 +1,11 @@
 import math
 from scipy.sparse import csc_matrix
 
+from lib.settings import Settings
+
 class MatrixBuilder:
-    def __init__(self) -> None:
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
         self._row = []
         self._col = []
         self._val = []
@@ -30,7 +33,7 @@ class MatrixBuilder:
         self._index = retain_idx
 
     def to_matrix(self):
-        if self._max_index != self._index:
+        if self.settings.debug and self._max_index != self._index:
             raise Exception("Solver was not fully utilized. Garbage data remains")
 
         matrix = csc_matrix((self._val, (self._row, self._col)))
@@ -38,6 +41,9 @@ class MatrixBuilder:
         return matrix
 
     def assert_valid(self, check_zeros=False):
+        if not self.settings.debug:
+            return
+
         if max(self._row) != max(self._col):
             raise Exception("Matrix is not square")
         

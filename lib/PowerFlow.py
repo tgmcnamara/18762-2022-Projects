@@ -35,20 +35,18 @@ class PowerFlow:
     def stamp_linear(self, Y: MatrixBuilder, J, v_previous):
         for element in self.linear_elments:
             element.stamp(Y, J, v_previous)
-            if self.settings.debug:
-                Y.assert_valid()
+            Y.assert_valid()
 
     def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         for element in self.nonlinear_elements:
             element.stamp(Y, J, v_previous)
-            if self.settings.debug:
-                Y.assert_valid()
+            Y.assert_valid()
 
     def run_powerflow(self, v_init):
 
         v_previous = np.copy(v_init)
 
-        Y = MatrixBuilder()
+        Y = MatrixBuilder(self.settings)
         J_linear = [0] * len(v_init)
 
         self.stamp_linear(Y, J_linear, v_previous)
@@ -60,8 +58,7 @@ class PowerFlow:
 
             self.stamp_nonlinear(Y, J, v_previous)
 
-            if self.settings.debug:
-                Y.assert_valid(check_zeros=True)
+            Y.assert_valid(check_zeros=True)
 
             v_next = spsolve(Y.to_matrix(), J)
 
