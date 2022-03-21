@@ -32,8 +32,8 @@ class Loads:
         self.id = Loads._ids.__next__()
 
         self.bus = _all_bus_key[bus]
-        self.P = P
-        self.Q = Q
+        self.P = P / 100
+        self.Q = Q / 100
     
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         VR_k = v_previous[self.bus.node_Vr]

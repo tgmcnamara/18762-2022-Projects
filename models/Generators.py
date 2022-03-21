@@ -41,10 +41,10 @@ class Generators:
         self.id = self._ids.__next__()
 
         self.bus = _all_bus_key[bus]
-        self.P = P
+        self.P = P / 100
         self.Vset = Vset
 
-        self.Qinit = Qinit
+        self.Qinit = Qinit / 100
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Q_k = v_previous[self.bus.node_Q]
@@ -83,6 +83,9 @@ class Generators:
         #Vset equation
         Y.stamp(self.bus.node_Q, self.bus.node_Vr, 2 * VR_k)
         Y.stamp(self.bus.node_Q, self.bus.node_Vi, 2 * VI_k)
-        J[self.bus.node_Q] += self.Vset ** 2
+        # Vhist = Vr**2 + Vi**2 - Vset**2
+        # J = -Vhist + Vr*2.Vr + Vi*2.Vi
+        # J = Vset**2 + Vr**2 + Vi**2
+        J[self.bus.node_Q] += VR_k ** 2 + VI_k ** 2 + self.Vset ** 2
 
 
