@@ -16,6 +16,7 @@ def solve(raw_data, settings: Settings):
     buses = raw_data['buses']
     slack = raw_data['slack']
     transformers = raw_data['xfmrs']
+    generators = raw_data['generators']
 
     # # # Assign System Nodes Bus by Bus # # #
     # We can use these nodes to have predetermined node number for every node in our Y matrix and J vector.
@@ -27,7 +28,7 @@ def solve(raw_data, settings: Settings):
     # determine the size of the Y matrix by looking at the total number of nodes in the system
     size_Y = _node_index.__next__()
 
-    v_init = initialize(size_Y, buses, settings)
+    v_init = initialize(size_Y, buses, generators, settings)
 
     # # # Run Power Flow # # #
     powerflow = PowerFlow(settings, raw_data)
