@@ -17,10 +17,10 @@ class BusResult:
         self.V_r = V_r
         self.V_i = V_i
         self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
-        self.V_ang = math.tanh(V_i / V_r)
+        self.V_ang = math.tanh(V_i / V_r)  * 57.3
     
     def __str__(self) -> str:
-        return f'Bus {self.bus.Bus} V_mag (pu): {round(self.V_mag, 4)}, V_ang (deg): {round(self.V_ang, 4) * 57.3}'
+        return f'Bus {self.bus.Bus} V_mag (pu): {"{:10.3f}".format(self.V_mag)}, V_ang (deg): {"{:10.3f}".format(self.V_ang)}'
 
 def process_results(raw_data, v_final):
     bus_results = []
