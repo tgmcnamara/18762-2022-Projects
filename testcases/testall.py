@@ -58,3 +58,24 @@ class PowerFlowTests(unittest.TestCase):
 
         print(matrix)
         print(J)
+
+    def test_branch(self):
+        b1 = Bus(1, 1, 1, 0, None)
+        b1.assign_nodes()
+        b2 = Bus(2, 1, 1, 0, None)
+        b2.assign_nodes()
+
+        branch = Branches(1, 2, 1.00800E-2, 5.04000E-2, 1.02500E-1, None, None, None, None)
+
+        settings = Settings(debug=True, max_iters=30)
+
+        Y = MatrixBuilder(settings)
+        J = [0, 0]
+        v_prev = None
+
+        branch.stamp(Y, J, v_prev)
+
+        matrix = Y.to_matrix().todense()
+
+        print(matrix)
+        print(J)
