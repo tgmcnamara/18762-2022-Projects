@@ -1,7 +1,4 @@
 import math
-from typing import List
-
-from models.Buses import Bus
 
 class PowerFlowResults:
     def __init__(self, bus_results):
@@ -19,7 +16,6 @@ class BusResult:
         self.bus = bus
         self.V_r = V_r
         self.V_i = V_i
-        self.Q = Q
         self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
         self.V_ang = math.tanh(V_i / V_r)
     

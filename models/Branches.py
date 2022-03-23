@@ -58,28 +58,28 @@ class Branches:
         Vim = self.to_bus.node_Vi
 
         #From Bus - Real
-        Y.stamp(Vrn, Vrn, -self.G)
-        Y.stamp(Vrn, Vrm, self.G)
-        Y.stamp(Vrn, Vin, -self.B)
-        Y.stamp(Vrn, Vim, self.B)
+        Y.stamp(Vrn, Vrn, self.G)
+        Y.stamp(Vrn, Vrm, -self.G)
+        Y.stamp(Vrn, Vin, self.B)
+        Y.stamp(Vrn, Vim, -self.B)
 
         #From Bus - Imaginary
-        Y.stamp(Vin, Vin, -self.G)
-        Y.stamp(Vin, Vim, self.G)
-        Y.stamp(Vin, Vrn, self.B)
-        Y.stamp(Vin, Vrm, -self.B)
+        Y.stamp(Vin, Vin, self.G)
+        Y.stamp(Vin, Vim, -self.G)
+        Y.stamp(Vin, Vrn, -self.B)
+        Y.stamp(Vin, Vrm, self.B)
 
         #To Bus - Real
-        Y.stamp(Vrm, Vrn, self.G)
-        Y.stamp(Vrm, Vrm, -self.G)
-        Y.stamp(Vrm, Vin, self.B)
-        Y.stamp(Vrm, Vim, -self.B)
+        Y.stamp(Vrm, Vrn, -self.G)
+        Y.stamp(Vrm, Vrm, self.G)
+        Y.stamp(Vrm, Vin, -self.B)
+        Y.stamp(Vrm, Vim, self.B)
 
         #To Bus - Imaginary
-        Y.stamp(Vim, Vin, self.G)
-        Y.stamp(Vim, Vim, -self.G)
-        Y.stamp(Vim, Vrn, -self.B)
-        Y.stamp(Vim, Vrm, self.B)
+        Y.stamp(Vim, Vin, -self.G)
+        Y.stamp(Vim, Vim, self.G)
+        Y.stamp(Vim, Vrn, self.B)
+        Y.stamp(Vim, Vrm, -self.B)
 
         ###Shunt Current
 
