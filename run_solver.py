@@ -13,4 +13,7 @@ raw_data = parse_raw(casename)
 
 settings = Settings(debug=True, max_iters=30)
 
-solve(raw_data, settings)
+results = solve(raw_data, settings)
+
+for result in results:
+    print(result)
