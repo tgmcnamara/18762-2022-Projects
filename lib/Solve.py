@@ -28,6 +28,6 @@ def solve(raw_data, settings: Settings):
 
     v_final = powerflow.run_powerflow(v_init)
 
-    results = process_results(buses, v_final)
+    results = process_results(raw_data, v_final)
 
     return results
