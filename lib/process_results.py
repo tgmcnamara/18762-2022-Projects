@@ -1,8 +1,9 @@
 import math
 
 class PowerFlowResults:
-    def __init__(self, bus_results):
+    def __init__(self, bus_results, duration_seconds):
         self.bus_results = bus_results
+        self.duration_seconds = duration_seconds
 
 class GeneratorResult:
     def __init__(self, generator, P, Q, is_slack):
@@ -22,7 +23,7 @@ class BusResult:
     def __str__(self) -> str:
         return f'Bus {self.bus.Bus} V_mag (pu): {"{:10.3f}".format(self.V_mag)}, V_ang (deg): {"{:10.3f}".format(self.V_ang)}'
 
-def process_results(raw_data, v_final):
+def process_results(raw_data, v_final, duration_seconds):
     bus_results = []
     
     for bus in raw_data['buses']:
@@ -34,5 +35,5 @@ def process_results(raw_data, v_final):
         
         bus_results.append(BusResult(bus, V_r, V_i, Q))
 
-    return PowerFlowResults(bus_results)
+    return PowerFlowResults(bus_results, duration_seconds)
 

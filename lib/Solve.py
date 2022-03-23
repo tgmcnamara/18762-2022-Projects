@@ -1,3 +1,5 @@
+import math
+import time
 from lib.settings import Settings
 from parsers.parser import parse_raw
 from lib.PowerFlow import PowerFlow
@@ -7,6 +9,10 @@ from models.Buses import _node_index
 
 
 def solve(raw_data, settings: Settings):
+    print("Running power flow solver...")
+
+    start_time = time.perf_counter_ns()
+
     buses = raw_data['buses']
     slack = raw_data['slack']
     transformers = raw_data['xfmrs']
@@ -28,6 +34,14 @@ def solve(raw_data, settings: Settings):
 
     v_final = powerflow.run_powerflow(v_init)
 
-    results = process_results(raw_data, v_final)
+    print("Power flow solver converged")
+
+    end_time = time.perf_counter_ns()
+
+    duration_seconds = (end_time * 1.0 - start_time * 1.0) / math.pow(10, 9)
+
+    print(f'Ran for {"{:10.3f}".format(duration_seconds)} seconds')
+
+    results = process_results(raw_data, v_final, duration_seconds)
 
     return results

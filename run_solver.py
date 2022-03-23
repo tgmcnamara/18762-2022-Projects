@@ -15,5 +15,7 @@ settings = Settings(debug=True, max_iters=30)
 
 result = solve(raw_data, settings)
 
+print("Results:")
+
 for result in result.bus_results:
     print(result)
