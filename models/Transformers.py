@@ -44,23 +44,69 @@ class Transformers:
         self.tr = tr
         self.ang = ang
 
+        self.G_loss = r / (r ** 2 + x ** 2)
+        self.B_loss = x / (r ** 2 + x ** 2)
+
     def assign_nodes(self):
-        self.node_Vr_primary_Xfmr = _node_index.__next__()
-        self.node_Vi_primary_Xfmr = _node_index.__next__()
+        self.node_primary_Ir = _node_index.__next__()
+        self.node_primary_Ii = _node_index.__next__()
+        self.node_secondary_Vr = _node_index.__next__()
+        self.node_secondary_Vi = _node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         
-        #Primary winding - Real
-        Y.stamp(self.from_bus.node_Vr, self.node_Vr_primary_Xfmr, 1)
-        Y.stamp(self.node_Vr_primary_Xfmr, self.from_bus.node_Vr, 1)
-        Y.stamp(self.node_Vr_primary_Xfmr, self.to_bus.node_Vr, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_Vr_primary_Xfmr, self.to_bus.node_Vi, self.tr * math.sin(self.ang))
+        ###Primary winding
 
-        #Primary winding - Imaginary
-        Y.stamp(self.from_bus.node_Vi, self.node_Vi_primary_Xfmr, 1)
-        Y.stamp(self.node_Vi_primary_Xfmr, self.from_bus.node_Vr, 1)
-        Y.stamp(self.node_Vi_primary_Xfmr, self.to_bus.node_Vr, -self.tr * math.sin(self.ang))
-        Y.stamp(self.node_Vi_primary_Xfmr, self.to_bus.node_Vi, -self.tr * math.cos(self.ang))
+        #Real
+        Y.stamp(self.from_bus.node_Vr, self.node_primary_Ir, 1)
+        Y.stamp(self.node_primary_Ir, self.from_bus.node_Vr, 1)
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, self.tr * math.sin(self.ang))
 
-        #Secondary winding - Real
+        #Imaginary
+        Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, 1)
+        Y.stamp(self.node_primary_Ii, self.from_bus.node_Vr, 1)
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, -self.tr * math.cos(self.ang))
+
+        ###Secondary winding
+
+        #Real
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, -self.tr * math.sin(self.ang))
+
+        #Imaginary
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -self.tr * math.cos(self.ang))
+
+        ###Secondary losses
+
+        Vrn = self.node_secondary_Vr
+        Vin = self.node_secondary_Vi
+        Vrm = self.to_bus.node_Vr
+        Vim = self.to_bus.node_Vi
+
+        #From Bus - Real
+        Y.stamp(Vrn, Vrn, self.G_loss)
+        Y.stamp(Vrn, Vrm, -self.G_loss)
+        Y.stamp(Vrn, Vin, self.B_loss)
+        Y.stamp(Vrn, Vim, -self.B_loss)
+
+        #From Bus - Imaginary
+        Y.stamp(Vin, Vin, self.G_loss)
+        Y.stamp(Vin, Vim, -self.G_loss)
+        Y.stamp(Vin, Vrn, -self.B_loss)
+        Y.stamp(Vin, Vrm, self.B_loss)
+
+        #To Bus - Real
+        Y.stamp(Vrm, Vrn, -self.G_loss)
+        Y.stamp(Vrm, Vrm, self.G_loss)
+        Y.stamp(Vrm, Vin, -self.B_loss)
+        Y.stamp(Vrm, Vim, self.B_loss)
+
+        #To Bus - Imaginary
+        Y.stamp(Vim, Vin, -self.G_loss)
+        Y.stamp(Vim, Vim, self.G_loss)
+        Y.stamp(Vim, Vrn, self.B_loss)
+        Y.stamp(Vim, Vrm, -self.B_loss)
 
