@@ -40,5 +40,14 @@ class Shunts:
         self.id = self._ids.__next__()
         self.bus = _all_bus_key[bus]
 
+        self.G_MW = G_MW
+        self.B_MVAR = B_MVAR
+
     def stamp(self, Y: MatrixBuilder, J, v_previous):
-        raise Exception("Not implemented")
+        #Real
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, self.G_MW)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, -self.B_MVAR)
+
+        #Imaginary
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, self.B_MVAR)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, self.G_MW)
