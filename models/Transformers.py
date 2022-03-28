@@ -72,12 +72,12 @@ class Transformers:
         ###Secondary winding
 
         #Real
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, self.tr * math.sin(self.ang))
 
         #Imaginary
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, self.tr * math.sin(self.ang))
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, self.tr * math.cos(self.ang))
 
         ###Secondary losses
 
