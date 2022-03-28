@@ -106,4 +106,3 @@ class PowerFlowTests(unittest.TestCase):
         matrix = Y.to_matrix().todense()
 
         print(matrix)
-        print(J)
