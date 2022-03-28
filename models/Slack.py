@@ -25,8 +25,8 @@ class Slack:
         self.Vset = Vset
         self.ang = ang
 
-        self.Pinit = Pinit
-        self.Qinit = Qinit
+        self.Pinit = Pinit / 100
+        self.Qinit = Qinit / 100
 
     def assign_nodes(self):
         self.slack_Ir = _node_index.__next__()
