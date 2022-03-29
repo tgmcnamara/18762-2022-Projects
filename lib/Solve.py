@@ -27,7 +27,7 @@ def solve(raw_data, settings: Settings):
     # determine the size of the Y matrix by looking at the total number of nodes in the system
     size_Y = _node_index.__next__()
 
-    v_init = initialize(size_Y, buses, generators, settings)
+    v_init = initialize(size_Y, buses, generators, slack, settings)
 
     # # # Run Power Flow # # #
     powerflow = PowerFlow(settings, raw_data)

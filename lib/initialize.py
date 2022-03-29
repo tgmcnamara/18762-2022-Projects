@@ -3,9 +3,10 @@ import numpy as np
 from lib.settings import Settings
 from models.Buses import Bus
 from models.Generators import Generators
+from models.Slack import Slack
 
 
-def initialize(Y_size, buses: List[Bus], generators: List[Generators], settings: Settings):
+def initialize(Y_size, buses: List[Bus], generators: List[Generators], slacks: List[Slack], settings: Settings):
     Y = np.zeros(Y_size)
 
     if settings.v_init == None:
@@ -21,6 +22,10 @@ def initialize(Y_size, buses: List[Bus], generators: List[Generators], settings:
 
     for generator in generators:
         Y[generator.bus.node_Q] = generator.Qinit
+
+    for slack in slacks:
+        Y[slack.slack_Ir] = slack.Pinit
+        Y[slack.slack_Ii] = slack.Qinit
 
     return Y
 
