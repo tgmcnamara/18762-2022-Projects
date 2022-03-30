@@ -40,8 +40,8 @@ class Shunts:
         self.id = self._ids.__next__()
         self.bus = _all_bus_key[bus]
 
-        self.G_MW = G_MW
-        self.B_MVAR = B_MVAR
+        self.G_MW = G_MW / 100
+        self.B_MVAR = B_MVAR / 100
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         #Real

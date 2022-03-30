@@ -83,11 +83,11 @@ class Branches:
 
         ###Shunt Current
 
-        #Real/Imaginary shunt current - from bus
+        #From Bus - Real/Imaginary
         Y.stamp(Vrn, Vin, -self.B_line)
         Y.stamp(Vin, Vrn, self.B_line)
 
-        #Real/Imaginary shunt current - to bus
+        #To Bus - Real/Imaginary
         Y.stamp(Vrm, Vim, -self.B_line)
         Y.stamp(Vim, Vrm, self.B_line)
 
