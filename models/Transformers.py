@@ -42,7 +42,7 @@ class Transformers:
         self.x = x
 
         self.tr = tr
-        self.ang = ang
+        self.ang = ang * math.pi / 180.
 
         self.G_loss = r / (r ** 2 + x ** 2)
         self.B_loss = x / (r ** 2 + x ** 2)
