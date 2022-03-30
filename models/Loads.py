@@ -58,8 +58,8 @@ class Loads:
 
         II_k = (self.P * VI_k - self.Q * VR_k) / (VR_k ** 2 + VI_k ** 2)
 
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dIR_dVR_k)
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dIR_dVI_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dII_dVR_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dII_dVI_k)
 
         J[self.bus.node_Vi] += -II_k + dII_dVR_k * VR_k + dII_dVI_k * VI_k
 
