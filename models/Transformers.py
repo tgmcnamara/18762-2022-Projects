@@ -58,26 +58,26 @@ class Transformers:
         ###Primary winding
 
         #Real
-        Y.stamp(self.from_bus.node_Vr, self.node_primary_Ir, -1)
-        Y.stamp(self.node_primary_Ir, self.from_bus.node_Vr, -1)
-        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, self.tr * math.sin(self.ang))
+        Y.stamp(self.from_bus.node_Vr, self.node_primary_Ir, 1)
+        Y.stamp(self.node_primary_Ir, self.from_bus.node_Vr, 1)
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, self.tr * math.cos(self.ang))
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, -self.tr * math.sin(self.ang))
 
         #Imaginary
-        Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, -1)
-        Y.stamp(self.node_primary_Ii, self.from_bus.node_Vi, -1)
-        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, -self.tr * math.sin(self.ang))
-        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, -self.tr * math.cos(self.ang))
+        Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, 1)
+        Y.stamp(self.node_primary_Ii, self.from_bus.node_Vi, 1)
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, self.tr * math.sin(self.ang))
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, self.tr * math.cos(self.ang))
 
         ###Secondary winding
 
         #Real
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, self.tr * math.sin(self.ang))
 
         #Imaginary
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, self.tr * math.sin(self.ang))
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, -self.tr * math.sin(self.ang))
 
         ###Secondary losses
 

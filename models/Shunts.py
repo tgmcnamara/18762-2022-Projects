@@ -45,9 +45,9 @@ class Shunts:
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         #Real
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, -self.G)
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, self.B)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, self.G)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, -self.B)
 
         #Imaginary
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, -self.B)
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, -self.G)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, self.B)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, self.G)
