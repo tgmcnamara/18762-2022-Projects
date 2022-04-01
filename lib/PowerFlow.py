@@ -60,7 +60,7 @@ class PowerFlow:
 
         linear_index = Y.get_usage()
 
-        for _ in range(self.settings.max_iters):
+        for iteration_num in range(self.settings.max_iters):
             J = J_linear.copy()
 
             self.stamp_nonlinear(Y, J, v_previous)
@@ -79,7 +79,7 @@ class PowerFlow:
             err_max = err.max()
             
             if err_max < self.settings.tolerance:
-                return v_next
+                return (v_next, iteration_num)
             elif self.settings.limiting and err_max > self.settings.tolerance:
                 v_next = self.apply_limiting(v_next, v_previous, diff)
 

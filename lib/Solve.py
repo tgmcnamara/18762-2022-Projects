@@ -32,15 +32,15 @@ def solve(raw_data, settings: Settings):
     # # # Run Power Flow # # #
     powerflow = PowerFlow(settings, raw_data, size_Y)
 
-    v_final = powerflow.run_powerflow(v_init)
+    (v_final, iteration_num) = powerflow.run_powerflow(v_init)
 
-    print("Power flow solver converged")
+    print(f'Power flow solver converged after {iteration_num} iterations.')
 
     end_time = time.perf_counter_ns()
 
     duration_seconds = (end_time * 1.0 - start_time * 1.0) / math.pow(10, 9)
 
-    print(f'Ran for {"{:10.3f}".format(duration_seconds)} seconds')
+    print(f'Ran for {"{:.3f}".format(duration_seconds)} seconds')
 
     results = process_results(raw_data, v_final, duration_seconds)
 
