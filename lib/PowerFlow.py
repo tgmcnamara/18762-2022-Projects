@@ -10,8 +10,9 @@ V_MIN = -5
 
 class PowerFlow:
 
-    def __init__(self, settings: Settings, raw_data):
+    def __init__(self, settings: Settings, raw_data, size_Y):
         self.settings = settings
+        self.size_Y = size_Y
 
         self.buses = raw_data['buses']
         self.slack = raw_data['slack']
@@ -23,6 +24,12 @@ class PowerFlow:
 
         self.linear_elments = self.slack + self.branch + self.shunt + self.transformer
         self.nonlinear_elements = self.generator + self.load
+
+    def solve(self, Y, J):
+        if self.settings.use_sparse:
+            return spsolve(Y, J)
+        else:
+            return np.linalg.solve(Y, J)
 
     def apply_limiting(self, v_next, v_previous, diff):
         #voltage limiting
@@ -46,7 +53,7 @@ class PowerFlow:
 
         v_previous = np.copy(v_init)
 
-        Y = MatrixBuilder(self.settings)
+        Y = MatrixBuilder(self.settings, self.size_Y)
         J_linear = [0] * len(v_init)
 
         self.stamp_linear(Y, J_linear, v_previous)
@@ -60,7 +67,7 @@ class PowerFlow:
 
             Y.assert_valid(check_zeros=True)
 
-            v_next = spsolve(Y.to_matrix(), J)
+            v_next = self.solve(Y.to_matrix(), J)
 
             if np.isnan(v_next).any():
                 raise Exception("Error solving linear system")

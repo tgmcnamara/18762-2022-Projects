@@ -30,7 +30,7 @@ def solve(raw_data, settings: Settings):
     v_init = initialize(size_Y, buses, generators, slack, settings)
 
     # # # Run Power Flow # # #
-    powerflow = PowerFlow(settings, raw_data)
+    powerflow = PowerFlow(settings, raw_data, size_Y)
 
     v_final = powerflow.run_powerflow(v_init)
 

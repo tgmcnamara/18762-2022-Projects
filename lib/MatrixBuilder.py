@@ -1,16 +1,17 @@
 import math
 from scipy.sparse import csc_matrix
-
+import numpy as np
 from lib.settings import Settings
 
 class MatrixBuilder:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, size_Y) -> None:
         self.settings = settings
         self._row = []
         self._col = []
         self._val = []
         self._index = 0
         self._max_index = 0
+        self.size_Y = size_Y
 
     def stamp(self, row, column, value):
         if math.isnan(value) or value == None:
@@ -36,7 +37,13 @@ class MatrixBuilder:
         if self.settings.debug and self._max_index != self._index:
             raise Exception("Solver was not fully utilized. Garbage data remains")
 
-        matrix = csc_matrix((self._val, (self._row, self._col)))
+        if self.settings.use_sparse:
+            matrix = csc_matrix((self._val, (self._row, self._col)))
+        else:
+            matrix = np.zeros((self.size_Y, self.size_Y))
+
+            for idx in range(self._max_index):
+                matrix[self._row[idx], self._col[idx]] += self._val[idx]
 
         return matrix
 
