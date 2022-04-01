@@ -45,7 +45,7 @@ class Transformers:
         self.ang = ang * math.pi / 180.
 
         self.G_loss = r / (r ** 2 + x ** 2)
-        self.B_loss = x / (r ** 2 + x ** 2)
+        self.B_loss = x / (r ** 2 + x ** 2) #source of error
 
     def assign_nodes(self):
         self.node_primary_Ir = _node_index.__next__()
@@ -55,29 +55,31 @@ class Transformers:
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         
+        # I_O + I_T
+
         ###Primary winding
 
         #Real
         Y.stamp(self.from_bus.node_Vr, self.node_primary_Ir, 1)
         Y.stamp(self.node_primary_Ir, self.from_bus.node_Vr, 1)
-        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, self.tr * math.cos(self.ang))
-        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, self.tr * math.sin(self.ang))
 
         #Imaginary
         Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, 1)
         Y.stamp(self.node_primary_Ii, self.from_bus.node_Vi, 1)
-        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, self.tr * math.sin(self.ang))
-        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, self.tr * math.cos(self.ang))
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, -self.tr * math.cos(self.ang))
 
         ###Secondary winding
 
         #Real
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, self.tr * math.cos(self.ang))
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, -self.tr * math.sin(self.ang))
 
         #Imaginary
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, self.tr * math.cos(self.ang))
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, self.tr * math.sin(self.ang))
 
         ###Secondary losses
 
