@@ -2,7 +2,11 @@ import numpy as np
 from scipy.sparse.linalg import spsolve
 from lib.MatrixBuilder import MatrixBuilder
 from lib.settings import Settings
+import math as math
 
+V_DIFF_MAX = 0.1
+V_MAX = 5
+V_MIN = -5
 
 class PowerFlow:
 
@@ -20,17 +24,13 @@ class PowerFlow:
         self.linear_elments = self.slack + self.branch + self.shunt + self.transformer
         self.nonlinear_elements = self.generator + self.load
 
-    def solve(self):
-        pass
+    def apply_limiting(self, v_next, v_previous, diff):
+        #voltage limiting
+        for bus in self.buses:
+            v_next[bus.node_Vr] = np.clip(v_previous[bus.node_Vr] + np.clip(diff[bus.node_Vr], -V_DIFF_MAX, V_DIFF_MAX), V_MIN, V_MAX)
+            v_next[bus.node_Vi] = np.clip(v_previous[bus.node_Vi] + np.clip(diff[bus.node_Vi], -V_DIFF_MAX, V_DIFF_MAX), V_MIN, V_MAX)
 
-    def apply_limiting(self):
-        # TODO: PART 2, STEP 1 - Develop the apply_limiting function which implements voltage and reactive power
-        #  limiting. Also, complete the else condition. Do not complete this step until you've finished Part 1.
-        #  You need to decide the input arguments and return values.
-        raise Exception("Variable limiting not implemented")
-
-    def check_error(self):
-        pass
+        return v_next
 
     def stamp_linear(self, Y: MatrixBuilder, J, v_previous):
         for element in self.linear_elments:
@@ -65,15 +65,16 @@ class PowerFlow:
             if np.isnan(v_next).any():
                 raise Exception("Error solving linear system")
 
-            err = abs(v_next - v_previous)
+            diff = v_next - v_previous
+
+            err = abs(diff)
 
             err_max = err.max()
             
-            if self.settings.limiting and err_max > self.settings.tolerance:
-                self.apply_limiting()
-
             if err_max < self.settings.tolerance:
                 return v_next
+            elif self.settings.limiting and err_max > self.settings.tolerance:
+                v_next = self.apply_limiting(v_next, v_previous, diff)
 
             v_previous = v_next
             Y.clear(retain_idx=linear_index)
