@@ -21,11 +21,11 @@ def initialize(Y_size, buses: List[Bus], generators: List[Generators], slacks: L
             Y[idx] = settings.v_init
 
     for generator in generators:
-        Y[generator.bus.node_Q] = generator.Qinit
+        Y[generator.bus.node_Q] = generator.Qinit / 100
 
     for slack in slacks:
-        Y[slack.slack_Ir] = slack.Pinit
-        Y[slack.slack_Ii] = slack.Qinit
+        Y[slack.slack_Ir] = slack.Pinit / 100
+        Y[slack.slack_Ii] = slack.Qinit / 100
 
     return Y
 
