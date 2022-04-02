@@ -83,23 +83,4 @@ class Generators:
         #Vset equation
         Y.stamp(self.bus.node_Q, self.bus.node_Vr, 2 * VR_k)
         Y.stamp(self.bus.node_Q, self.bus.node_Vi, 2 * VI_k)
-        # Vhist = Vr**2 + Vi**2 - Vset**2
-        # J = -Vhist + Vr*2.Vr + Vi*2.Vi
-        # J = Vset**2 + Vr**2 + Vi**2
         J[self.bus.node_Q] += VR_k ** 2 + VI_k ** 2 + self.Vset ** 2
-
-    def get_current(self, v):
-        V_R = v[self.bus.node_Vr]
-        V_I = v[self.bus.node_Vi]
-        Q = v[self.bus.node_Q]
-
-        I_R = (-self.P * V_R - Q * V_I) / (V_R ** 2 + V_I ** 2)
-        I_I = (-self.P * V_I + Q * V_R) / (V_R ** 2 + V_I ** 2)
-
-        return (I_R, I_I)
-    
-    def calculate_Q(self, v, new_I_R):
-        V_R = v[self.bus.node_Vr]
-        V_I = v[self.bus.node_Vi]
-
-        return -(new_I_R * (V_R ** 2 + V_I ** 2) + self.P * V_R) / V_I

@@ -4,7 +4,7 @@ from lib.MatrixBuilder import MatrixBuilder
 from lib.settings import Settings
 import math as math
 
-V_DIFF_MAX = 0.1
+V_DIFF_MAX = 1
 V_MAX = 5
 V_MIN = -5
 
