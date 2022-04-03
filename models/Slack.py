@@ -1,6 +1,6 @@
 from __future__ import division
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import _all_bus_key, _node_index
+from models.Buses import _all_bus_key
 import math
 
 class Slack:
@@ -31,9 +31,9 @@ class Slack:
         self.Pinit = Pinit / 100
         self.Qinit = Qinit / 100
 
-    def assign_nodes(self):
-        self.slack_Ir = _node_index.__next__()
-        self.slack_Ii = _node_index.__next__()
+    def assign_nodes(self, node_index):
+        self.slack_Ir = node_index.__next__()
+        self.slack_Ii = node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)

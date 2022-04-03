@@ -2,9 +2,8 @@ from __future__ import division
 from itertools import count
 import math
 
-_idsAllBuses = count(1)
-_node_index = count(0)
 _all_bus_key = {}
+_idsAllBuses = count(1)
 
 class Bus:
     def __init__(self,
@@ -50,7 +49,7 @@ class Bus:
     def get_Vi_init(self):
         return (self.node_Vi, self.Vi_init)
 
-    def assign_nodes(self):
+    def assign_nodes(self, node_index):
         """Assign nodes based on the bus type.
 
         Returns:
@@ -58,11 +57,11 @@ class Bus:
         """
         # If Slack or PQ Bus
         if self.Type == 1 or self.Type == 3:
-            self.node_Vr = _node_index.__next__()
-            self.node_Vi = _node_index.__next__()
+            self.node_Vr = node_index.__next__()
+            self.node_Vi = node_index.__next__()
 
         # If PV Bus
         elif self.Type == 2:
-            self.node_Vr = _node_index.__next__()
-            self.node_Vi = _node_index.__next__()
-            self.node_Q = _node_index.__next__()
+            self.node_Vr = node_index.__next__()
+            self.node_Vi = node_index.__next__()
+            self.node_Q = node_index.__next__()

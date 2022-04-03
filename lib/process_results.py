@@ -75,4 +75,4 @@ def display_mat_comparison(mat, results: PowerFlowResults):
         simulator_V_mag = results.bus_results[idx].V_mag
         simulator_V_ang = results.bus_results[idx].V_ang
 
-        print(f'Bus: {int(bus)} V_mag diff: {"{:.2f}".format(simulator_V_mag - V_mag)} V_ang diff: {"{:.2f}".format(simulator_V_ang - V_ang)}')
+        print(f'Bus: {int(bus)} V_mag diff: {"{:.4f}".format(simulator_V_mag - V_mag)} V_ang diff: {"{:.4f}".format(simulator_V_ang - V_ang)}')

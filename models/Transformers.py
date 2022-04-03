@@ -1,7 +1,7 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
-from models.Buses import _all_bus_key, _node_index
+from models.Buses import _all_bus_key
 import math
 
 
@@ -47,11 +47,11 @@ class Transformers:
         self.G_loss = r / (r ** 2 + x ** 2)
         self.B_loss = x / (r ** 2 + x ** 2) #source of error
 
-    def assign_nodes(self):
-        self.node_primary_Ir = _node_index.__next__()
-        self.node_primary_Ii = _node_index.__next__()
-        self.node_secondary_Vr = _node_index.__next__()
-        self.node_secondary_Vi = _node_index.__next__()
+    def assign_nodes(self, node_index):
+        self.node_primary_Ir = node_index.__next__()
+        self.node_primary_Ii = node_index.__next__()
+        self.node_secondary_Vr = node_index.__next__()
+        self.node_secondary_Vi = node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         

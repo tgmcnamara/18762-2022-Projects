@@ -5,8 +5,7 @@ from parsers.parser import parse_raw
 from lib.PowerFlow import PowerFlow
 from lib.process_results import process_results
 from lib.initialize import initialize
-from models.Buses import _node_index
-
+from itertools import count
 
 def solve(raw_data, settings: Settings):
     print("Running power flow solver...")
@@ -18,14 +17,16 @@ def solve(raw_data, settings: Settings):
     transformers = raw_data['xfmrs']
     generators = raw_data['generators']
 
+    node_index = count(0)
+
     # # # Assign System Nodes Bus by Bus # # #
     # We can use these nodes to have predetermined node number for every node in our Y matrix and J vector.
     for ele in buses + slack + transformers:
-        ele.assign_nodes()
+        ele.assign_nodes(node_index)
 
     # # # Initialize Solution Vector - V and Q values # # #
     # determine the size of the Y matrix by looking at the total number of nodes in the system
-    size_Y = _node_index.__next__()
+    size_Y = node_index.__next__()
 
     v_init = initialize(size_Y, buses, generators, slack, settings)
 

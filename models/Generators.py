@@ -5,10 +5,6 @@ from models.Buses import _all_bus_key
 
 class Generators:
     _ids = count(0)
-    RemoteBusGens = dict()
-    RemoteBusRMPCT = dict()
-    gen_bus_key_ = {}
-    total_P = 0
 
     def __init__(self,
                  bus,
