@@ -35,7 +35,7 @@ class Slack:
         self.slack_Ir = node_index.__next__()
         self.slack_Ii = node_index.__next__()
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous):
+    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
         Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)
         Y.stamp(self.slack_Ir, self.bus.node_Vr, 1)
         J[self.slack_Ir] = self.Vr_set

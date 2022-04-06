@@ -43,11 +43,14 @@ class Shunts:
         self.G = G_MW / 100
         self.B = B_MVAR / 100
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous):
+    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+        scaled_G = self.G * (1 - tx_factor)
+        scaled_B = self.B * (1 - tx_factor)
+
         #Real
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, self.G)
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, -self.B)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, scaled_G)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, scaled_B)
 
         #Imaginary
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, self.B)
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, self.G)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, scaled_B)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, scaled_B)

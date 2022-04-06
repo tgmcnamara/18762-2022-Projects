@@ -53,7 +53,7 @@ class Transformers:
         self.node_secondary_Vr = node_index.__next__()
         self.node_secondary_Vi = node_index.__next__()
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous):
+    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
         
         # I_O + I_T
 

@@ -4,6 +4,8 @@ from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import _all_bus_key
 
+TX_LARGE_G = 1000
+TX_LARGE_B = 1000
 
 class Branches:
     _ids = count(0)
@@ -45,11 +47,10 @@ class Branches:
 
         self.B_line = b / 2
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous):
-        
-        ###Series Current
-        #I_r = G * (Vrn - Vrm) + B * (Vin - Vim)
-        #I_i = G * (Vin - Vim) - B * (Vrn - Vrm)
+    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+        scaled_G = TX_LARGE_G * tx_factor + self.G * (1 - tx_factor)
+        scaled_B = TX_LARGE_B * tx_factor + self.B * (1 - tx_factor)
+        scaled_B_line = self.B_line * (1 - tx_factor)
         
         Vrn = self.from_bus.node_Vr
         Vin = self.from_bus.node_Vi
@@ -58,37 +59,37 @@ class Branches:
         Vim = self.to_bus.node_Vi
 
         #From Bus - Real
-        Y.stamp(Vrn, Vrn, self.G)
-        Y.stamp(Vrn, Vrm, -self.G)
-        Y.stamp(Vrn, Vin, self.B)
-        Y.stamp(Vrn, Vim, -self.B)
+        Y.stamp(Vrn, Vrn, scaled_G)
+        Y.stamp(Vrn, Vrm, -scaled_G)
+        Y.stamp(Vrn, Vin, scaled_B)
+        Y.stamp(Vrn, Vim, -scaled_B)
 
         #From Bus - Imaginary
-        Y.stamp(Vin, Vin, self.G)
-        Y.stamp(Vin, Vim, -self.G)
-        Y.stamp(Vin, Vrn, -self.B)
-        Y.stamp(Vin, Vrm, self.B)
+        Y.stamp(Vin, Vin, scaled_G)
+        Y.stamp(Vin, Vim, -scaled_G)
+        Y.stamp(Vin, Vrn, -scaled_B)
+        Y.stamp(Vin, Vrm, scaled_B)
 
         #To Bus - Real
-        Y.stamp(Vrm, Vrn, -self.G)
-        Y.stamp(Vrm, Vrm, self.G)
-        Y.stamp(Vrm, Vin, -self.B)
-        Y.stamp(Vrm, Vim, self.B)
+        Y.stamp(Vrm, Vrn, -scaled_G)
+        Y.stamp(Vrm, Vrm, scaled_G)
+        Y.stamp(Vrm, Vin, -scaled_B)
+        Y.stamp(Vrm, Vim, scaled_B)
 
         #To Bus - Imaginary
-        Y.stamp(Vim, Vin, -self.G)
-        Y.stamp(Vim, Vim, self.G)
-        Y.stamp(Vim, Vrn, self.B)
-        Y.stamp(Vim, Vrm, -self.B)
+        Y.stamp(Vim, Vin, -scaled_G)
+        Y.stamp(Vim, Vim, scaled_G)
+        Y.stamp(Vim, Vrn, scaled_B)
+        Y.stamp(Vim, Vrm, -scaled_B)
 
         ###Shunt Current
 
         #From Bus - Real/Imaginary
-        Y.stamp(Vrn, Vin, -self.B_line)
-        Y.stamp(Vin, Vrn, self.B_line)
+        Y.stamp(Vrn, Vin, -scaled_B_line)
+        Y.stamp(Vin, Vrn, scaled_B_line)
 
         #To Bus - Real/Imaginary
-        Y.stamp(Vrm, Vim, -self.B_line)
-        Y.stamp(Vim, Vrm, self.B_line)
+        Y.stamp(Vrm, Vim, -scaled_B_line)
+        Y.stamp(Vim, Vrm, scaled_B_line)
 
 

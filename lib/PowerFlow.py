@@ -39,9 +39,9 @@ class PowerFlow:
 
         return v_next
 
-    def stamp_linear(self, Y: MatrixBuilder, J, v_previous):
+    def stamp_linear(self, Y: MatrixBuilder, J, v_previous, tx_factor):
         for element in self.linear_elments:
-            element.stamp(Y, J, v_previous)
+            element.stamp(Y, J, v_previous, tx_factor)
             Y.assert_valid()
 
     def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
@@ -50,13 +50,26 @@ class PowerFlow:
             Y.assert_valid()
 
     def run_powerflow(self, v_init):
+        tx_factor = 1 if self.settings.tx_stepping else 0
+
+        iterations = 0
+        v_final = np.copy(v_init)
+
+        while tx_factor >= 0:
+            (v_final, iteration_num) = self.run_powerflow_inner(v_init, tx_factor)
+            iterations += iteration_num
+            tx_factor -= 0.01
+
+        return (v_final, iterations)
+
+    def run_powerflow_inner(self, v_init, tx_factor):
 
         v_previous = np.copy(v_init)
 
         Y = MatrixBuilder(self.settings, self.size_Y)
         J_linear = [0] * len(v_init)
 
-        self.stamp_linear(Y, J_linear, v_previous)
+        self.stamp_linear(Y, J_linear, v_previous, tx_factor)
 
         linear_index = Y.get_usage()
 
