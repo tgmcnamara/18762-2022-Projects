@@ -1,6 +1,7 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
+from models.Branches import TX_LARGE_B, TX_LARGE_G
 from models.Buses import _all_bus_key
 import math
 
@@ -54,7 +55,11 @@ class Transformers:
         self.node_secondary_Vi = node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
-        
+        scaled_tr = (1 - self.tr) * tx_factor + self.tr
+        scaled_angle = self.ang - self.ang * tx_factor
+        scaled_G = TX_LARGE_G * self.G_loss * tx_factor + self.G_loss
+        scaled_B = TX_LARGE_B * self.B_loss * tx_factor + self.B_loss
+
         # I_O + I_T
 
         ###Primary winding
@@ -62,24 +67,24 @@ class Transformers:
         #Real
         Y.stamp(self.from_bus.node_Vr, self.node_primary_Ir, 1)
         Y.stamp(self.node_primary_Ir, self.from_bus.node_Vr, 1)
-        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, self.tr * math.sin(self.ang))
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, -scaled_tr * math.cos(scaled_angle))
+        Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, scaled_tr * math.sin(scaled_angle))
 
         #Imaginary
         Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, 1)
         Y.stamp(self.node_primary_Ii, self.from_bus.node_Vi, 1)
-        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, -self.tr * math.sin(self.ang))
-        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, -self.tr * math.cos(self.ang))
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, -scaled_tr * math.sin(scaled_angle))
+        Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, -scaled_tr * math.cos(scaled_angle))
 
         ###Secondary winding
 
         #Real
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, -self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -scaled_tr * math.cos(scaled_angle))
+        Y.stamp(self.node_secondary_Vr, self.node_primary_Ii, -scaled_tr * math.sin(scaled_angle))
 
         #Imaginary
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -self.tr * math.cos(self.ang))
-        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, self.tr * math.sin(self.ang))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -scaled_tr * math.cos(scaled_angle))
+        Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, scaled_tr * math.sin(scaled_angle))
 
         ###Secondary losses
 
@@ -89,26 +94,26 @@ class Transformers:
         Vim = self.to_bus.node_Vi
 
         #From Bus - Real
-        Y.stamp(Vrn, Vrn, self.G_loss)
-        Y.stamp(Vrn, Vrm, -self.G_loss)
-        Y.stamp(Vrn, Vin, self.B_loss)
-        Y.stamp(Vrn, Vim, -self.B_loss)
+        Y.stamp(Vrn, Vrn, scaled_G)
+        Y.stamp(Vrn, Vrm, -scaled_G)
+        Y.stamp(Vrn, Vin, scaled_B)
+        Y.stamp(Vrn, Vim, -scaled_B)
 
         #From Bus - Imaginary
-        Y.stamp(Vin, Vin, self.G_loss)
-        Y.stamp(Vin, Vim, -self.G_loss)
-        Y.stamp(Vin, Vrn, -self.B_loss)
-        Y.stamp(Vin, Vrm, self.B_loss)
+        Y.stamp(Vin, Vin, scaled_G)
+        Y.stamp(Vin, Vim, -scaled_G)
+        Y.stamp(Vin, Vrn, -scaled_B)
+        Y.stamp(Vin, Vrm, scaled_B)
 
         #To Bus - Real
-        Y.stamp(Vrm, Vrn, -self.G_loss)
-        Y.stamp(Vrm, Vrm, self.G_loss)
-        Y.stamp(Vrm, Vin, -self.B_loss)
-        Y.stamp(Vrm, Vim, self.B_loss)
+        Y.stamp(Vrm, Vrn, -scaled_G)
+        Y.stamp(Vrm, Vrm, scaled_G)
+        Y.stamp(Vrm, Vin, -scaled_B)
+        Y.stamp(Vrm, Vim, scaled_B)
 
         #To Bus - Imaginary
-        Y.stamp(Vim, Vin, -self.G_loss)
-        Y.stamp(Vim, Vim, self.G_loss)
-        Y.stamp(Vim, Vrn, self.B_loss)
-        Y.stamp(Vim, Vrm, -self.B_loss)
+        Y.stamp(Vim, Vin, -scaled_G)
+        Y.stamp(Vim, Vim, scaled_G)
+        Y.stamp(Vim, Vrn, scaled_B)
+        Y.stamp(Vim, Vrm, -scaled_B)
 

@@ -4,8 +4,8 @@ from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import _all_bus_key
 
-TX_LARGE_G = 1000
-TX_LARGE_B = 1000
+TX_LARGE_G = 100
+TX_LARGE_B = 100
 
 class Branches:
     _ids = count(0)
@@ -48,8 +48,8 @@ class Branches:
         self.B_line = b / 2
 
     def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
-        scaled_G = TX_LARGE_G * tx_factor + self.G * (1 - tx_factor)
-        scaled_B = TX_LARGE_B * tx_factor + self.B * (1 - tx_factor)
+        scaled_G = TX_LARGE_G * self.G * tx_factor + self.G
+        scaled_B = TX_LARGE_B * self.B * tx_factor + self.B
         scaled_B_line = self.B_line * (1 - tx_factor)
         
         Vrn = self.from_bus.node_Vr

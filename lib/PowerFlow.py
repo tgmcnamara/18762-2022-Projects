@@ -7,6 +7,8 @@ import math as math
 V_DIFF_MAX = 1
 V_MAX = 5
 V_MIN = -5
+TX_ITERATIONS = 100
+TX_SCALE = 1.0 / TX_ITERATIONS
 
 class PowerFlow:
 
@@ -50,17 +52,18 @@ class PowerFlow:
             Y.assert_valid()
 
     def run_powerflow(self, v_init):
-        tx_factor = 1 if self.settings.tx_stepping else 0
+        tx_factor = TX_ITERATIONS if self.settings.tx_stepping else 0
 
         iterations = 0
-        v_final = np.copy(v_init)
+        v_next = np.copy(v_init)
 
         while tx_factor >= 0:
-            (v_final, iteration_num) = self.run_powerflow_inner(v_init, tx_factor)
+            (v_final, iteration_num) = self.run_powerflow_inner(v_init, tx_factor * TX_SCALE)
             iterations += iteration_num
-            tx_factor -= 0.01
+            tx_factor -= 1
+            v_next = v_final
 
-        return (v_final, iterations)
+        return (v_next, iterations)
 
     def run_powerflow_inner(self, v_init, tx_factor):
 
