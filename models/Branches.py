@@ -3,9 +3,10 @@ from itertools import count
 
 from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import _all_bus_key
+from models.shared import stamp_line
 
-TX_LARGE_G = 100
-TX_LARGE_B = 100
+TX_LARGE_G = 1000
+TX_LARGE_B = 1000
 
 class Branches:
     _ids = count(0)
@@ -52,44 +53,22 @@ class Branches:
         scaled_B = TX_LARGE_B * self.B * tx_factor + self.B
         scaled_B_line = self.B_line * (1 - tx_factor)
         
-        Vrn = self.from_bus.node_Vr
-        Vin = self.from_bus.node_Vi
+        Vr_from = self.from_bus.node_Vr
+        Vi_from = self.from_bus.node_Vi
 
-        Vrm = self.to_bus.node_Vr
-        Vim = self.to_bus.node_Vi
+        Vr_to = self.to_bus.node_Vr
+        Vi_to = self.to_bus.node_Vi
 
-        #From Bus - Real
-        Y.stamp(Vrn, Vrn, scaled_G)
-        Y.stamp(Vrn, Vrm, -scaled_G)
-        Y.stamp(Vrn, Vin, scaled_B)
-        Y.stamp(Vrn, Vim, -scaled_B)
-
-        #From Bus - Imaginary
-        Y.stamp(Vin, Vin, scaled_G)
-        Y.stamp(Vin, Vim, -scaled_G)
-        Y.stamp(Vin, Vrn, -scaled_B)
-        Y.stamp(Vin, Vrm, scaled_B)
-
-        #To Bus - Real
-        Y.stamp(Vrm, Vrn, -scaled_G)
-        Y.stamp(Vrm, Vrm, scaled_G)
-        Y.stamp(Vrm, Vin, -scaled_B)
-        Y.stamp(Vrm, Vim, scaled_B)
-
-        #To Bus - Imaginary
-        Y.stamp(Vim, Vin, -scaled_G)
-        Y.stamp(Vim, Vim, scaled_G)
-        Y.stamp(Vim, Vrn, scaled_B)
-        Y.stamp(Vim, Vrm, -scaled_B)
+        stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, scaled_G, scaled_B)
 
         ###Shunt Current
 
         #From Bus - Real/Imaginary
-        Y.stamp(Vrn, Vin, -scaled_B_line)
-        Y.stamp(Vin, Vrn, scaled_B_line)
+        Y.stamp(Vr_from, Vi_from, -scaled_B_line)
+        Y.stamp(Vi_from, Vr_from, scaled_B_line)
 
         #To Bus - Real/Imaginary
-        Y.stamp(Vrm, Vim, -scaled_B_line)
-        Y.stamp(Vim, Vrm, scaled_B_line)
+        Y.stamp(Vr_to, Vi_to, -scaled_B_line)
+        Y.stamp(Vi_to, Vr_to, scaled_B_line)
 
 

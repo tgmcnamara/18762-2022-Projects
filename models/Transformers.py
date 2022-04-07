@@ -5,6 +5,8 @@ from models.Branches import TX_LARGE_B, TX_LARGE_G
 from models.Buses import _all_bus_key
 import math
 
+from models.shared import stamp_line
+
 
 class Transformers:
     _ids = count(0)
@@ -88,32 +90,10 @@ class Transformers:
 
         ###Secondary losses
 
-        Vrn = self.node_secondary_Vr
-        Vin = self.node_secondary_Vi
-        Vrm = self.to_bus.node_Vr
-        Vim = self.to_bus.node_Vi
+        Vr_from = self.node_secondary_Vr
+        Vi_from = self.node_secondary_Vi
+        Vr_to = self.to_bus.node_Vr
+        Vi_to = self.to_bus.node_Vi
 
-        #From Bus - Real
-        Y.stamp(Vrn, Vrn, scaled_G)
-        Y.stamp(Vrn, Vrm, -scaled_G)
-        Y.stamp(Vrn, Vin, scaled_B)
-        Y.stamp(Vrn, Vim, -scaled_B)
-
-        #From Bus - Imaginary
-        Y.stamp(Vin, Vin, scaled_G)
-        Y.stamp(Vin, Vim, -scaled_G)
-        Y.stamp(Vin, Vrn, -scaled_B)
-        Y.stamp(Vin, Vrm, scaled_B)
-
-        #To Bus - Real
-        Y.stamp(Vrm, Vrn, -scaled_G)
-        Y.stamp(Vrm, Vrm, scaled_G)
-        Y.stamp(Vrm, Vin, -scaled_B)
-        Y.stamp(Vrm, Vim, scaled_B)
-
-        #To Bus - Imaginary
-        Y.stamp(Vim, Vin, -scaled_G)
-        Y.stamp(Vim, Vim, scaled_G)
-        Y.stamp(Vim, Vrn, scaled_B)
-        Y.stamp(Vim, Vrm, -scaled_B)
+        stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, scaled_G, scaled_B)
 
