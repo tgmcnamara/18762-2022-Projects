@@ -1,10 +1,9 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
-from models.Branches import TX_B_SCALAR, TX_G_SCALAR
+from models.Branches import TX_LARGE_G, TX_LARGE_B
 from models.Buses import _all_bus_key
 import math
-
 from models.shared import stamp_line
 
 
@@ -64,8 +63,8 @@ class Transformers:
 
         scaled_tr = self.tr + (1 - self.tr) * tx_factor 
         scaled_angle = self.ang_rad - self.ang_rad * tx_factor
-        scaled_G = self.G_loss + TX_G_SCALAR * self.G_loss * tx_factor
-        scaled_B = self.B_loss + TX_B_SCALAR * self.B_loss * tx_factor
+        scaled_G = self.G_loss + TX_LARGE_G * self.G_loss * tx_factor
+        scaled_B = self.B_loss + TX_LARGE_B * self.B_loss * tx_factor
 
         ###Primary Winding Current
 
