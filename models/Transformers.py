@@ -1,7 +1,7 @@
 from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
-from models.Branches import TX_LARGE_B, TX_LARGE_G
+from models.Branches import TX_B_SCALAR, TX_G_SCALAR
 from models.Buses import _all_bus_key
 import math
 
@@ -45,10 +45,12 @@ class Transformers:
         self.x = x
 
         self.tr = tr
-        self.ang = ang * math.pi / 180.
+        self.ang_rad = ang * math.pi / 180.
 
         self.G_loss = r / (r ** 2 + x ** 2)
         self.B_loss = x / (r ** 2 + x ** 2) #source of error
+
+        self.status = status
 
     def assign_nodes(self, node_index):
         self.node_primary_Ir = node_index.__next__()
@@ -57,28 +59,36 @@ class Transformers:
         self.node_secondary_Vi = node_index.__next__()
 
     def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
-        scaled_tr = (1 - self.tr) * tx_factor + self.tr
-        scaled_angle = self.ang - self.ang * tx_factor
-        scaled_G = TX_LARGE_G * self.G_loss * tx_factor + self.G_loss
-        scaled_B = TX_LARGE_B * self.B_loss * tx_factor + self.B_loss
+        if not self.status:
+            return
 
-        # I_O + I_T
+        scaled_tr = self.tr + (1 - self.tr) * tx_factor 
+        scaled_angle = self.ang_rad - self.ang_rad * tx_factor
+        scaled_G = self.G_loss + TX_G_SCALAR * self.G_loss * tx_factor
+        scaled_B = self.B_loss + TX_B_SCALAR * self.B_loss * tx_factor
 
-        ###Primary winding
+        ###Primary Winding Current
 
         #Real
         Y.stamp(self.from_bus.node_Vr, self.node_primary_Ir, 1)
+
+        #Imaginary
+        Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, 1)
+
+        ###Primary Winding Voltage
+
+        #Real
         Y.stamp(self.node_primary_Ir, self.from_bus.node_Vr, 1)
         Y.stamp(self.node_primary_Ir, self.node_secondary_Vr, -scaled_tr * math.cos(scaled_angle))
         Y.stamp(self.node_primary_Ir, self.node_secondary_Vi, scaled_tr * math.sin(scaled_angle))
 
+
         #Imaginary
-        Y.stamp(self.from_bus.node_Vi, self.node_primary_Ii, 1)
         Y.stamp(self.node_primary_Ii, self.from_bus.node_Vi, 1)
         Y.stamp(self.node_primary_Ii, self.node_secondary_Vr, -scaled_tr * math.sin(scaled_angle))
         Y.stamp(self.node_primary_Ii, self.node_secondary_Vi, -scaled_tr * math.cos(scaled_angle))
 
-        ###Secondary winding
+        ###Secondary Winding Current
 
         #Real
         Y.stamp(self.node_secondary_Vr, self.node_primary_Ir, -scaled_tr * math.cos(scaled_angle))
@@ -88,7 +98,7 @@ class Transformers:
         Y.stamp(self.node_secondary_Vi, self.node_primary_Ii, -scaled_tr * math.cos(scaled_angle))
         Y.stamp(self.node_secondary_Vi, self.node_primary_Ir, scaled_tr * math.sin(scaled_angle))
 
-        ###Secondary losses
+        ###Secondary Losses
 
         Vr_from = self.node_secondary_Vr
         Vi_from = self.node_secondary_Vi

@@ -36,9 +36,14 @@ class Branches:
 
         self.B_line = b / 2
 
+        self.status = status
+
     def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
-        scaled_G = TX_LARGE_G * self.G * tx_factor + self.G
-        scaled_B = TX_LARGE_B * self.B * tx_factor + self.B
+        if not self.status:
+            return
+
+        scaled_G = self.G + TX_G_SCALAR * self.G * tx_factor
+        scaled_B = self.B + TX_B_SCALAR * self.B * tx_factor
         scaled_B_line = self.B_line * (1 - tx_factor)
         
         Vr_from = self.from_bus.node_Vr
