@@ -30,8 +30,8 @@ class Bus:
         self.node_Vi = None  # imaginary voltage node at a bus
         self.node_Q = None  # reactive power or voltage contstraint node at a bus
 
-        self.Vr_init = Vm_init * math.cos(Va_init)
-        self.Vi_init = Vm_init * math.sin(Va_init)
+        self.Vr_init = Vm_init * math.cos(Va_init * math.pi / 180)
+        self.Vi_init = Vm_init * math.sin(Va_init * math.pi / 180)
 
         # initialize the bus key
         self.idAllBuses = _idsAllBuses.__next__()
