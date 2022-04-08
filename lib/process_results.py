@@ -34,7 +34,7 @@ class BusResult:
         self.V_r = V_r
         self.V_i = V_i
         self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
-        self.V_ang = math.tanh(V_i / V_r)  * 57.3
+        self.V_ang = math.atan2(V_i, V_r)  * 180 / math.pi
     
     def __str__(self) -> str:
         return f'Bus {self.bus.Bus} V_mag (pu): {"{:.3f}".format(self.V_mag)}, V_ang (deg): {"{:.3f}".format(self.V_ang)}'
