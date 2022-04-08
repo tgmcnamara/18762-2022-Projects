@@ -59,8 +59,8 @@ def process_results(raw_data, v_final, duration_seconds):
     slack = raw_data["slack"][0]
     slack_Ir = v_final[slack.slack_Ir]
     slack_Vr = slack.Vr_set
-    P = slack_Vr * slack_Ir * math.cos(slack.ang)
-    Q = slack_Vr * slack_Ir * math.sin(slack.ang)
+    P = slack_Vr * slack_Ir * math.cos(slack.ang_rad)
+    Q = slack_Vr * slack_Ir * math.sin(slack.ang_rad)
     generator_results.append(GeneratorResult(generator, P, Q, True))
 
     return PowerFlowResults(bus_results, generator_results, duration_seconds)

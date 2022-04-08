@@ -23,10 +23,10 @@ class Slack:
 
         self.bus = _all_bus_key[bus]
         self.Vset = Vset
-        self.ang = ang
+        self.ang_rad = ang * math.pi / 180
 
-        self.Vr_set = self.Vset * math.cos(self.ang)
-        self.Vi_set = self.Vset * math.sin(self.ang)
+        self.Vr_set = self.Vset * math.cos(self.ang_rad)
+        self.Vi_set = self.Vset * math.sin(self.ang_rad)
 
         self.Pinit = Pinit / 100
         self.Qinit = Qinit / 100
