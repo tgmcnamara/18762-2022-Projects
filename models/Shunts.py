@@ -49,8 +49,8 @@ class Shunts:
 
         #Real
         Y.stamp(self.bus.node_Vr, self.bus.node_Vr, scaled_G)
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, scaled_B)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, -scaled_B)
 
         #Imaginary
         Y.stamp(self.bus.node_Vi, self.bus.node_Vr, scaled_B)
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, scaled_B)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, scaled_G)
