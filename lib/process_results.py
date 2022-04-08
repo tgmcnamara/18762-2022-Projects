@@ -51,8 +51,8 @@ def process_results(raw_data, v_final, duration_seconds):
     generator_results = []
 
     for generator in raw_data["generators"]:
-        Q = v_final[generator.bus.node_Q]
-        P = generator.P
+        Q = -v_final[generator.bus.node_Q]
+        P = -generator.P
 
         generator_results.append(GeneratorResult(generator, P, Q, False))
 
