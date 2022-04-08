@@ -2,6 +2,7 @@ from __future__ import division
 from itertools import count
 from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import _all_bus_key
+from models.Loads import calculate_PQ_dIr_dVi, calculate_PQ_dIr_dVr
 
 class Generators:
     _ids = count(0)
@@ -37,46 +38,49 @@ class Generators:
         self.id = self._ids.__next__()
 
         self.bus = _all_bus_key[bus]
-        self.P = P / 100
+        self.P = -P / 100
         self.Vset = Vset
 
-        self.Qinit = Qinit / 100
+        self.Qinit = -Qinit / 100
 
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Q_k = v_previous[self.bus.node_Q]
-        VR_k = v_previous[self.bus.node_Vr]
-        VI_k = v_previous[self.bus.node_Vi]
-
-        IG_denominator = (VR_k ** 2 + VI_k ** 2)
-        dIG_denominator = IG_denominator ** 2
+        Vr_k = v_previous[self.bus.node_Vr]
+        Vi_k = v_previous[self.bus.node_Vi]
 
         #Real current
-        dIR_dQ_k = -VI_k / IG_denominator
-        dIR_dVR_k = (self.P * (VR_k ** 2 - VI_k ** 2) + 2 * Q_k * VR_k * VI_k) / dIG_denominator
-        dIR_dVI_k = (Q_k * (VI_k ** 2 - VR_k ** 2) + 2 * self.P * VR_k * VI_k) / dIG_denominator
+        dIr_dQ_k = Vi_k / (Vr_k ** 2 + Vi_k ** 2)
+        dIr_dVr_k = calculate_PQ_dIr_dVr(Vr_k, Vi_k, self.P, Q_k)
+        dIr_dVi_k = calculate_PQ_dIr_dVi(Vr_k, Vi_k, self.P, Q_k)
 
-        Y.stamp(self.bus.node_Vr, self.bus.node_Q, dIR_dQ_k)
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, dIR_dVR_k)
-        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, dIR_dVI_k)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Q, dIr_dQ_k)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vr, dIr_dVr_k)
+        Y.stamp(self.bus.node_Vr, self.bus.node_Vi, dIr_dVi_k)
 
-        IR_k = (-self.P * VR_k - Q_k * VI_k) / IG_denominator
+        Ir_k = (self.P * Vr_k + Q_k * Vi_k) / (Vr_k ** 2 + Vi_k ** 2)
 
-        J[self.bus.node_Vr] += -IR_k + dIR_dQ_k * Q_k + dIR_dVR_k * VR_k + dIR_dVI_k * VI_k
+        J[self.bus.node_Vr] += -Ir_k + dIr_dQ_k * Q_k + dIr_dVr_k * Vr_k + dIr_dVi_k * Vi_k
 
         #Imaginary current
-        dII_dQ_k = VR_k / IG_denominator
-        dII_dVR_k = (Q_k * (VI_k ** 2 - VR_k ** 2) + 2 * self.P * VR_k * VI_k) / dIG_denominator
-        dII_dVI_k = (self.P * (VI_k ** 2 - VR_k ** 2) - 2 * Q_k * VR_k * VI_k) / dIG_denominator
+        dIi_dQ_k = -Vr_k / (Vr_k ** 2 + Vi_k ** 2)
+        dIi_dVr_k = dIr_dVi_k
+        dIi_dVi_k = -dIr_dVr_k
 
-        Y.stamp(self.bus.node_Vi, self.bus.node_Q, dII_dQ_k)
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dII_dVR_k)
-        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dII_dVI_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Q, dIi_dQ_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vr, dIi_dVr_k)
+        Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dIi_dVi_k)
 
-        II_k = (- self.P * VI_k + Q_k * VR_k) / IG_denominator
+        Ii_k = (self.P * Vi_k - Q_k * Vr_k) / (Vr_k ** 2 + Vi_k ** 2)
 
-        J[self.bus.node_Vi] += -II_k + dII_dQ_k * Q_k + dII_dVR_k * VR_k + dII_dVI_k * VI_k
+        J[self.bus.node_Vi] += -Ii_k + dIi_dQ_k * Q_k + dIi_dVr_k * Vr_k + dIi_dVi_k * Vi_k
 
         #Vset equation
-        Y.stamp(self.bus.node_Q, self.bus.node_Vr, 2 * VR_k)
-        Y.stamp(self.bus.node_Q, self.bus.node_Vi, 2 * VI_k)
-        J[self.bus.node_Q] += VR_k ** 2 + VI_k ** 2 + self.Vset ** 2
+        dVset_dVr = -2 * Vr_k
+        dVset_dVi = -2 * Vi_k
+
+        Y.stamp(self.bus.node_Q, self.bus.node_Vr, dVset_dVr)
+        Y.stamp(self.bus.node_Q, self.bus.node_Vi, dVset_dVi)
+
+        VSet_k = self.Vset ** 2 - Vr_k ** 2 - Vi_k ** 2
+
+        J[self.bus.node_Q] += -VSet_k + dVset_dVr * Vr_k + dVset_dVi * Vi_k
