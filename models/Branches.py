@@ -5,8 +5,8 @@ from lib.MatrixBuilder import MatrixBuilder
 from models.Buses import _all_bus_key
 from models.shared import stamp_line
 
-TX_LARGE_G = 1000
-TX_LARGE_B = 1000
+TX_LARGE_G = 20
+TX_LARGE_B = 20
 
 class Branches:
     _ids = count(0)

@@ -2,11 +2,11 @@ import numpy as np
 from scipy.sparse.linalg import spsolve
 from lib.MatrixBuilder import MatrixBuilder
 from lib.settings import Settings
-import math as math
 
-V_DIFF_MAX = 1
-V_MAX = 5
-V_MIN = -5
+
+V_DIFF_MAX = 0.2
+V_MAX = 2
+V_MIN = -0.5
 TX_ITERATIONS = 100
 TX_SCALE = 1.0 / TX_ITERATIONS
 
@@ -27,6 +27,11 @@ class PowerFlow:
         self.linear_elments = self.slack + self.branch + self.shunt + self.transformer
         self.nonlinear_elements = self.generator + self.load
 
+        self.bus_mask = [False] * size_Y
+        for bus in self.buses:
+            self.bus_mask[bus.node_Vr] = True
+            self.bus_mask[bus.node_Vi] = True
+
     def solve(self, Y, J):
         if self.settings.use_sparse:
             return spsolve(Y, J)
@@ -34,10 +39,11 @@ class PowerFlow:
             return np.linalg.solve(Y, J)
 
     def apply_limiting(self, v_next, v_previous, diff):
-        #voltage limiting
-        for bus in self.buses:
-            v_next[bus.node_Vr] = np.clip(v_previous[bus.node_Vr] + np.clip(diff[bus.node_Vr], -V_DIFF_MAX, V_DIFF_MAX), V_MIN, V_MAX)
-            v_next[bus.node_Vi] = np.clip(v_previous[bus.node_Vi] + np.clip(diff[bus.node_Vi], -V_DIFF_MAX, V_DIFF_MAX), V_MIN, V_MAX)
+        #Voltage limiting
+        diff_clip = np.clip(diff, -V_DIFF_MAX, V_DIFF_MAX)
+        v_next_clip = np.clip(v_previous + diff_clip, V_MIN, V_MAX)
+
+        v_next[self.bus_mask] = v_next_clip[self.bus_mask]
 
         return v_next
 
@@ -58,6 +64,9 @@ class PowerFlow:
         v_next = np.copy(v_init)
 
         while tx_factor >= 0:
+            if tx_factor % 10 == 0:
+                print(f'Tx factor: {tx_factor}')
+
             (v_final, iteration_num) = self.run_powerflow_inner(v_init, tx_factor * TX_SCALE)
             iterations += iteration_num
             tx_factor -= 1
@@ -96,7 +105,7 @@ class PowerFlow:
             
             if err_max < self.settings.tolerance:
                 return (v_next, iteration_num)
-            elif self.settings.limiting and err_max > self.settings.tolerance:
+            elif self.settings.V_limiting and err_max > self.settings.tolerance:
                 v_next = self.apply_limiting(v_next, v_previous, diff)
 
             v_previous = v_next
@@ -118,3 +127,9 @@ class PowerFlow:
             map[f'slack-{slack.bus.Bus}-Ii'] = slack.slack_Ii
 
         return map
+
+    def dump_Y(self, Y):
+        for idx_row in range(len(Y)):
+            for idx_col in range(len(Y)):
+                if Y[idx_row, idx_col] > 0:
+                    print(f'row: {idx_row}, col: {idx_col}, val:{Y[idx_row, idx_col]}')
