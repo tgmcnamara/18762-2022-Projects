@@ -43,6 +43,9 @@ class Generators:
 
         self.Qinit = -Qinit / 100
 
+        self.Qmax = Qmax
+        self.Qmin = Qmin
+
     def stamp(self, Y: MatrixBuilder, J, v_previous):
         Q_k = v_previous[self.bus.node_Q]
         Vr_k = v_previous[self.bus.node_Vr]
