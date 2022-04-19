@@ -57,7 +57,7 @@ class Transformers:
         self.node_secondary_Vr = node_index.__next__()
         self.node_secondary_Vi = node_index.__next__()
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+    def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         if not self.status:
             return
 
@@ -105,4 +105,7 @@ class Transformers:
         Vi_to = self.to_bus.node_Vi
 
         stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, scaled_G, scaled_B)
+
+    def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
+        pass
 

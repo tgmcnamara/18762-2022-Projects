@@ -35,7 +35,7 @@ class Slack:
         self.slack_Ir = node_index.__next__()
         self.slack_Ii = node_index.__next__()
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+    def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)
         Y.stamp(self.slack_Ir, self.bus.node_Vr, 1)
         J[self.slack_Ir] = self.Vr_set
@@ -43,4 +43,7 @@ class Slack:
         Y.stamp(self.bus.node_Vi, self.slack_Ii, 1)
         Y.stamp(self.slack_Ii, self.bus.node_Vi, 1)
         J[self.slack_Ii] = self.Vi_set
+
+    def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
+        raise Exception("Slack is not included for optimization")
 

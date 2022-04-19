@@ -1,9 +1,8 @@
 from __future__ import division
 from itertools import count
 import math
-
-_all_bus_key = {}
-_idsAllBuses = count(1)
+import typing
+from lib.MatrixBuilder import MatrixBuilder
 
 class Bus:
     def __init__(self,
@@ -26,9 +25,13 @@ class Bus:
         self.Type = Type
 
         # initialize all nodes
-        self.node_Vr = None  # real voltage node at a bus
-        self.node_Vi = None  # imaginary voltage node at a bus
-        self.node_Q = None  # reactive power or voltage contstraint node at a bus
+        self.node_Vr: int # real voltage node at a bus
+        self.node_Vi: int # imaginary voltage node at a bus
+        self.node_Q: int # reactive power or voltage contstraint node at a bus
+
+        self.node_Vr = None
+        self.node_Vi = None
+        self.node_Q = None
 
         self.Vr_init = Vm_init * math.cos(Va_init * math.pi / 180)
         self.Vi_init = Vm_init * math.sin(Va_init * math.pi / 180)
@@ -50,18 +53,39 @@ class Bus:
         return (self.node_Vi, self.Vi_init)
 
     def assign_nodes(self, node_index):
-        """Assign nodes based on the bus type.
-
-        Returns:
-            None
-        """
-        # If Slack or PQ Bus
-        if self.Type == 1 or self.Type == 3:
-            self.node_Vr = node_index.__next__()
-            self.node_Vi = node_index.__next__()
+        self.node_Vr = next(node_index)
+        self.node_Vi = next(node_index)
 
         # If PV Bus
-        elif self.Type == 2:
-            self.node_Vr = node_index.__next__()
-            self.node_Vi = node_index.__next__()
-            self.node_Q = node_index.__next__()
+        if self.Type == 2:
+            self.node_Q = next(node_index)
+
+        self.node_Ir_aug = next(node_index)
+        self.node_Ii_aug = next(node_index)
+
+        self.node_lambda_Vr = next(node_index)
+        self.node_lambda_Vi = next(node_index)
+
+        self.node_lambda_Ir_slack = next(node_index)
+        self.node_lambda_Ii_slack = next(node_index)
+
+        # If PV Bus
+        if self.Type == 2:
+            self.node_lambda_Q = next(node_index)
+
+    def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
+        #Augmented current KCL contribution
+        Y.stamp(self.node_Vr, self.node_Ir_aug, 1)
+        Y.stamp(self.node_Vi, self.node_Ii_aug, 1)
+
+    def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
+        #Augment current dLagrange / dI_aug
+        Y.stamp(self.node_Ir_aug, self.node_Ir_aug, 2)
+        Y.stamp(self.node_Ir_aug, self.node_lambda_Ir_slack, 1)
+
+        Y.stamp(self.node_Ii_aug, self.node_Ii_aug, 2)
+        Y.stamp(self.node_Ii_aug, self.node_lambda_Ii_slack, 1)
+
+_all_bus_key: typing.Dict[int, Bus]
+_all_bus_key = {}
+_idsAllBuses = count(1)

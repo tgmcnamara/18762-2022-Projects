@@ -24,7 +24,11 @@ class PowerFlow:
         self.shunt = raw_data['shunts']
         self.load = raw_data['loads']
 
-        self.linear_elments = self.slack + self.branch + self.shunt + self.transformer
+        if settings.infeasibility_analysis:
+            self.linear_elments = self.branch + self.shunt + self.transformer + self.buses
+        else:
+            self.linear_elments = self.branch + self.shunt + self.transformer + self.slack
+
         self.nonlinear_elements = self.generator + self.load
 
         self.bus_mask = [False] * size_Y
@@ -47,15 +51,17 @@ class PowerFlow:
 
         return v_next
 
-    def stamp_linear(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+    def stamp_linear(self, Y: MatrixBuilder, J, tx_factor):
         for element in self.linear_elments:
-            element.stamp(Y, J, v_previous, tx_factor)
-            Y.assert_valid()
+            element.stamp_primal_linear(Y, J, tx_factor)
+
+        if self.settings.infeasibility_analysis:
+            for element in self.linear_elments:
+                element.stamp_dual_linear(Y, J, tx_factor)
 
     def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         for element in self.nonlinear_elements:
-            element.stamp(Y, J, v_previous)
-            Y.assert_valid()
+            element.stamp_nonlinear(Y, J, v_previous)
 
     def run_powerflow(self, v_init):
         tx_factor = TX_ITERATIONS if self.settings.tx_stepping else 0
@@ -112,24 +118,3 @@ class PowerFlow:
             Y.clear(retain_idx=linear_index)
 
         raise Exception("Exceeded maximum NR iterations")
-    
-    def dump_index_map(self):
-        map = {}
-
-        for bus in self.buses:
-            map[f'bus-{bus.Bus}-Vr'] = bus.node_Vr
-            map[f'bus-{bus.Bus}-Vi'] = bus.node_Vi
-            if bus.node_Q != None:
-                map[f'bus-{bus.Bus}-Q'] = bus.node_Q
-        
-        for slack in self.slack:
-            map[f'slack-{slack.bus.Bus}-Ir'] = slack.slack_Ir
-            map[f'slack-{slack.bus.Bus}-Ii'] = slack.slack_Ii
-
-        return map
-
-    def dump_Y(self, Y):
-        for idx_row in range(len(Y)):
-            for idx_col in range(len(Y)):
-                if Y[idx_row, idx_col] > 0:
-                    print(f'row: {idx_row}, col: {idx_col}, val:{Y[idx_row, idx_col]}')

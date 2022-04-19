@@ -38,13 +38,11 @@ class Branches:
 
         self.status = status
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+    def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         if not self.status:
             return
 
-        scaled_G = self.G + TX_LARGE_G * self.G * tx_factor
-        scaled_B = self.B + TX_LARGE_B * self.B * tx_factor
-        scaled_B_line = self.B_line * (1 - tx_factor)
+        (scaled_G, scaled_B, scaled_B_line) = self.get_scaled_conductances(tx_factor)
         
         Vr_from = self.from_bus.node_Vr
         Vi_from = self.from_bus.node_Vi
@@ -63,5 +61,36 @@ class Branches:
         #To Bus - Real/Imaginary
         Y.stamp(Vr_to, Vi_to, -scaled_B_line)
         Y.stamp(Vi_to, Vr_to, scaled_B_line)
+    
+    def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
+        if not self.status:
+            return
+        
+        (scaled_G, scaled_B, scaled_B_line) = self.get_scaled_conductances(tx_factor)
+
+        Vr_to = self.from_bus.node_lambda_Vr
+        Vi_to = self.from_bus.node_lambda_Vi
+
+        Vr_from = self.to_bus.node_lambda_Vr
+        Vi_from = self.to_bus.node_lambda_Vi
+
+        stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, scaled_G, -scaled_B)
+
+        #From Bus - Real/Imaginary
+        Y.stamp(Vr_from, Vi_from, scaled_B_line)
+        Y.stamp(Vi_from, Vr_from, -scaled_B_line)
+
+        #To Bus - Real/Imaginary
+        Y.stamp(Vr_to, Vi_to, scaled_B_line)
+        Y.stamp(Vi_to, Vr_to, -scaled_B_line)
+    
+    def get_scaled_conductances(self, tx_factor):
+        scaled_G = self.G + TX_LARGE_G * self.G * tx_factor
+        scaled_B = self.B + TX_LARGE_B * self.B * tx_factor
+        scaled_B_line = self.B_line * (1 - tx_factor)
+
+        return (scaled_G, scaled_B, scaled_B_line)
+        
+
 
 

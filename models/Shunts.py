@@ -43,7 +43,7 @@ class Shunts:
         self.G = G_MW / 100
         self.B = B_MVAR / 100
 
-    def stamp(self, Y: MatrixBuilder, J, v_previous, tx_factor):
+    def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         scaled_G = self.G * (1 - tx_factor)
         scaled_B = self.B * (1 - tx_factor)
 
@@ -54,3 +54,6 @@ class Shunts:
         #Imaginary
         Y.stamp(self.bus.node_Vi, self.bus.node_Vr, scaled_B)
         Y.stamp(self.bus.node_Vi, self.bus.node_Vi, scaled_G)
+
+    def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
+        pass

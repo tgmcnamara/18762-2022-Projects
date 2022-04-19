@@ -41,7 +41,7 @@ class Loads:
         self.P = P / 100
         self.Q = Q / 100
     
-    def stamp(self, Y: MatrixBuilder, J, v_previous):
+    def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         Vr_k = v_previous[self.bus.node_Vr]
         Vi_k = v_previous[self.bus.node_Vi]
 
