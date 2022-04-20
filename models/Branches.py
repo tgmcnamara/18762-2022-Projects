@@ -68,21 +68,21 @@ class Branches:
         
         (scaled_G, scaled_B, scaled_B_line) = self.get_scaled_conductances(tx_factor)
 
-        Vr_to = self.from_bus.node_lambda_Vr
-        Vi_to = self.from_bus.node_lambda_Vi
+        Lambr_from = self.from_bus.node_lambda_Vr
+        Lambi_from = self.from_bus.node_lambda_Vi
 
-        Vr_from = self.to_bus.node_lambda_Vr
-        Vi_from = self.to_bus.node_lambda_Vi
+        Lambr_to = self.to_bus.node_lambda_Vr
+        Lambi_to = self.to_bus.node_lambda_Vi
 
-        stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, scaled_G, -scaled_B)
+        stamp_line(Y, Lambr_from, Lambr_to, Lambi_from, Lambi_to, scaled_G, -scaled_B)
 
         #From Bus - Real/Imaginary
-        Y.stamp(Vr_from, Vi_from, scaled_B_line)
-        Y.stamp(Vi_from, Vr_from, -scaled_B_line)
+        Y.stamp(Lambr_from, Lambi_from, scaled_B_line)
+        Y.stamp(Lambi_from, Lambr_from, -scaled_B_line)
 
         #To Bus - Real/Imaginary
-        Y.stamp(Vr_to, Vi_to, scaled_B_line)
-        Y.stamp(Vi_to, Vr_to, -scaled_B_line)
+        Y.stamp(Lambr_to, Lambi_to, scaled_B_line)
+        Y.stamp(Lambi_to, Lambr_to, -scaled_B_line)
     
     def get_scaled_conductances(self, tx_factor):
         scaled_G = self.G + TX_LARGE_G * self.G * tx_factor

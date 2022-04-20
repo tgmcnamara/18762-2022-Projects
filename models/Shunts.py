@@ -44,8 +44,7 @@ class Shunts:
         self.B = B_MVAR / 100
 
     def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
-        scaled_G = self.G * (1 - tx_factor)
-        scaled_B = self.B * (1 - tx_factor)
+        (scaled_G, scaled_B) = self.get_scaled_conductances(tx_factor)
 
         #Real
         Y.stamp(self.bus.node_Vr, self.bus.node_Vr, scaled_G)
@@ -56,4 +55,18 @@ class Shunts:
         Y.stamp(self.bus.node_Vi, self.bus.node_Vi, scaled_G)
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
-        pass
+        (scaled_G, scaled_B) = self.get_scaled_conductances(tx_factor)
+
+        #Real
+        Y.stamp(self.bus.node_lambda_Vr, self.bus.node_lambda_Vr, scaled_G)
+        Y.stamp(self.bus.node_lambda_Vr, self.bus.node_lambda_Vi, scaled_B)
+
+        #Imaginary
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Vr, -scaled_B)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Vi, scaled_G)
+
+    def get_scaled_conductances(self, tx_factor):
+        scaled_G = self.G * (1 - tx_factor)
+        scaled_B = self.B * (1 - tx_factor)
+
+        return (scaled_G, scaled_B)

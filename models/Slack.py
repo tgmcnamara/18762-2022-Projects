@@ -31,9 +31,12 @@ class Slack:
         self.Pinit = Pinit / 100
         self.Qinit = Qinit / 100
 
-    def assign_nodes(self, node_index):
-        self.slack_Ir = node_index.__next__()
-        self.slack_Ii = node_index.__next__()
+    def assign_nodes(self, node_index, infeasibility_analysis):
+        if infeasibility_analysis:
+            return
+
+        self.slack_Ir = next(node_index)
+        self.slack_Ii = next(node_index)
 
     def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)

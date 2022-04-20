@@ -52,13 +52,16 @@ class Bus:
     def get_Vi_init(self):
         return (self.node_Vi, self.Vi_init)
 
-    def assign_nodes(self, node_index):
+    def assign_nodes(self, node_index, infeasibility_analysis):
         self.node_Vr = next(node_index)
         self.node_Vi = next(node_index)
 
         # If PV Bus
         if self.Type == 2:
             self.node_Q = next(node_index)
+
+        if not infeasibility_analysis:
+            return
 
         self.node_Ir_aug = next(node_index)
         self.node_Ii_aug = next(node_index)

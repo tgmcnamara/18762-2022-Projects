@@ -20,9 +20,9 @@ def solve(raw_data, settings: Settings):
     node_index = count(0)
 
     for ele in buses + slack + transformers:
-        ele.assign_nodes(node_index)
+        ele.assign_nodes(node_index, settings.infeasibility_analysis)
 
-    size_Y = node_index.__next__()
+    size_Y = next(node_index)
 
     v_init = initialize(size_Y, buses, generators, slack, settings)
 
