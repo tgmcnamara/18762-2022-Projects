@@ -32,11 +32,12 @@ class Slack:
         self.Qinit = Qinit / 100
 
     def assign_nodes(self, node_index, infeasibility_analysis):
-        if infeasibility_analysis:
-            return
-
         self.slack_Ir = next(node_index)
         self.slack_Ii = next(node_index)
+
+        if infeasibility_analysis:
+            self.slack_lambda_Ir = next(node_index)
+            self.slack_lambda_Ii = next(node_index)
 
     def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)
@@ -48,5 +49,9 @@ class Slack:
         J[self.slack_Ii] = self.Vi_set
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
-        raise Exception("Slack is not included for optimization")
+        Y.stamp(self.bus.node_lambda_Vr, self.node_lambda_Vr, 1)
+        Y.stamp(self.node_lambda_Vr, self.node_lambda_Vr, 1)
+
+        Y.stamp(self.bus.node_lambda_Vi, self.node_lambda_Vi, 1)
+        Y.stamp(self.node_lambda_Vi, self.node_lambda_Vi, 1)
 

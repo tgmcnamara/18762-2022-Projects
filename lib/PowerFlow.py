@@ -24,10 +24,10 @@ class PowerFlow:
         self.shunt = raw_data['shunts']
         self.load = raw_data['loads']
 
+        self.linear_elments = self.branch + self.shunt + self.transformer + self.slack
+
         if settings.infeasibility_analysis:
-            self.linear_elments = self.branch + self.shunt + self.transformer + self.buses
-        else:
-            self.linear_elments = self.branch + self.shunt + self.transformer + self.slack
+            self.linear_elments += self.buses
 
         self.nonlinear_elements = self.generator + self.load
 
@@ -61,7 +61,11 @@ class PowerFlow:
 
     def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         for element in self.nonlinear_elements:
-            element.stamp_nonlinear(Y, J, v_previous)
+            element.stamp_primal_nonlinear(Y, J, v_previous)
+
+        if self.settings.infeasibility_analysis:
+            for element in self.nonlinear_elements:
+                element.stamp_dual_nonlinear(Y, J, v_previous)
 
     def run_powerflow(self, v_init):
         tx_factor = TX_ITERATIONS if self.settings.tx_stepping else 0
