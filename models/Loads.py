@@ -41,7 +41,7 @@ class Loads:
         self.P = P / 100
         self.Q = Q / 100
     
-    def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
+    def stamp_primal_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         Vr_k = v_previous[self.bus.node_Vr]
         Vi_k = v_previous[self.bus.node_Vi]
 
@@ -66,6 +66,9 @@ class Loads:
         Y.stamp(self.bus.node_Vi, self.bus.node_Vi, dIi_dVi_k)
 
         J[self.bus.node_Vi] += -Ii_k + dIi_dVr_k * Vr_k + dIi_dVi_k * Vi_k
+    
+    def stamp_dual_nonlinear(self, Y: MatrixBuilder, J, v_previous):
+        pass
 
 
 

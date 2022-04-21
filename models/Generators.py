@@ -43,10 +43,10 @@ class Generators:
 
         self.Qinit = -Qinit / 100
 
-        self.Qmax = Qmax
-        self.Qmin = Qmin
+        self.Qmax = -Qmax
+        self.Qmin = -Qmin
 
-    def stamp_nonlinear(self, Y: MatrixBuilder, J, v_previous):
+    def stamp_primal_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         Q_k = v_previous[self.bus.node_Q]
         Vr_k = v_previous[self.bus.node_Vr]
         Vi_k = v_previous[self.bus.node_Vi]
@@ -87,3 +87,6 @@ class Generators:
         VSet_k = self.Vset ** 2 - Vr_k ** 2 - Vi_k ** 2
 
         J[self.bus.node_Q] += -VSet_k + dVset_dVr * Vr_k + dVset_dVi * Vi_k
+
+    def stamp_dual_nonlinear(self, Y: MatrixBuilder, J, v_previous):
+        raise Exception("Not implemented")
