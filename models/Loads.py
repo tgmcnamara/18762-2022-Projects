@@ -68,7 +68,45 @@ class Loads:
         J[self.bus.node_Vi] += -Ii_k + dIi_dVr_k * Vr_k + dIi_dVi_k * Vi_k
     
     def stamp_dual_nonlinear(self, Y: MatrixBuilder, J, v_previous):
-        pass
+        V_r = v_previous[self.bus.node_Vr]
+        V_i = v_previous[self.bus.node_Vi]
+        lambda_r = v_previous[self.bus.node_lambda_Vr]
+        lambda_i = v_previous[self.bus.node_lambda_Vi]
 
+        #Real Lambda
 
+        dVr_k = -2*V_r*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**2 - 2*V_r*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**2 - lambda_i*self.Q/(V_i**2 + V_r**2) + lambda_r*self.P/(V_i**2 + V_r**2)
 
+        dVr_dVr_k = 8*V_r**2*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**3 + 8*V_r**2*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**3 + 4*V_r*lambda_i*self.Q/(V_i**2 + V_r**2)**2 - 4*V_r*lambda_r*self.P/(V_i**2 + V_r**2)**2 - 2*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**2 - 2*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**2
+
+        dVr_dVi_k = 8*V_i*V_r*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**3 + 8*V_i*V_r*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**3 + 2*V_i*lambda_i*self.Q/(V_i**2 + V_r**2)**2 - 2*V_i*lambda_r*self.P/(V_i**2 + V_r**2)**2 - 2*V_r*lambda_i*self.P/(V_i**2 + V_r**2)**2 - 2*V_r*lambda_r*self.Q/(V_i**2 + V_r**2)**2
+
+        dVr_dLr_k = -2*V_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**2 + self.P/(V_i**2 + V_r**2)
+
+        dVr_dLi_k = -2*V_r*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**2 - self.Q/(V_i**2 + V_r**2)
+
+        Y.stamp(self.bus.node_lambda_Vr, self.bus.node_Vr, dVr_dVr_k)
+        Y.stamp(self.bus.node_lambda_Vr, self.bus.node_Vi, dVr_dVi_k)
+        Y.stamp(self.bus.node_lambda_Vr, self.bus.node_lambda_Vr, dVr_dLr_k)
+        Y.stamp(self.bus.node_lambda_Vr, self.bus.node_lambda_Vi, dVr_dLi_k)
+
+        J[self.bus.node_lambda_Vr] += -dVr_k + dVr_dVr_k * V_r + dVr_dVi_k * V_i + dVr_dLr_k * lambda_r + dVr_dLi_k * lambda_i
+
+        #Imaginary Lambda
+
+        dVi_k = -2*V_i*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**2 - 2*V_i*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**2 + lambda_i*self.P/(V_i**2 + V_r**2) + lambda_r*self.Q/(V_i**2 + V_r**2)
+
+        dVi_dVr_k = 8*V_i*V_r*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**3 + 8*V_i*V_r*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**3 + 2*V_i*lambda_i*self.Q/(V_i**2 + V_r**2)**2 - 2*V_i*lambda_r*self.P/(V_i**2 + V_r**2)**2 - 2*V_r*lambda_i*self.P/(V_i**2 + V_r**2)**2 - 2*V_r*lambda_r*self.Q/(V_i**2 + V_r**2)**2
+
+        dVi_dVi_k = 8*V_i**2*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**3 + 8*V_i**2*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**3 - 4*V_i*lambda_i*self.P/(V_i**2 + V_r**2)**2 - 4*V_i*lambda_r*self.Q/(V_i**2 + V_r**2)**2 - 2*lambda_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**2 - 2*lambda_r*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**2
+
+        dVi_dLr_k = -2*V_i*(V_i*self.Q + V_r*self.P)/(V_i**2 + V_r**2)**2 + self.Q/(V_i**2 + V_r**2)
+
+        dVi_dLi_k = -2*V_i*(V_i*self.P - V_r*self.Q)/(V_i**2 + V_r**2)**2 + self.P/(V_i**2 + V_r**2)
+
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_Vr, dVi_dVr_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_Vi, dVi_dVi_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Vr, dVi_dLr_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Vi, dVi_dLi_k)
+
+        J[self.bus.node_lambda_Vi] += -dVi_k + dVi_dVr_k * V_r + dVi_dVi_k * V_i + dVi_dLr_k * lambda_r + dVi_dLi_k * lambda_i
