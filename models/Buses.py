@@ -63,14 +63,14 @@ class Bus:
         if not infeasibility_analysis:
             return
 
-        self.node_Ir_aug = next(node_index)
-        self.node_Ii_aug = next(node_index)
+        self.node_Ir_inf = next(node_index)
+        self.node_Ii_inf = next(node_index)
 
         self.node_lambda_Vr = next(node_index)
         self.node_lambda_Vi = next(node_index)
 
-        self.node_lambda_Ir_slack = next(node_index)
-        self.node_lambda_Ii_slack = next(node_index)
+        self.node_lambda_Ir_inf = next(node_index)
+        self.node_lambda_Ii_inf = next(node_index)
 
         # If PV Bus
         if self.Type == 2:
@@ -78,16 +78,16 @@ class Bus:
 
     def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
         #Augmented current KCL contribution
-        Y.stamp(self.node_Vr, self.node_Ir_aug, 1)
-        Y.stamp(self.node_Vi, self.node_Ii_aug, 1)
+        Y.stamp(self.node_Vr, self.node_Ir_inf, 1)
+        Y.stamp(self.node_Vi, self.node_Ii_inf, 1)
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
         #Augment current dLagrange / dI_aug
-        Y.stamp(self.node_Ir_aug, self.node_Ir_aug, 2)
-        Y.stamp(self.node_Ir_aug, self.node_lambda_Ir_slack, 1)
+        Y.stamp(self.node_Ir_inf, self.node_Ir_inf, 2)
+        Y.stamp(self.node_Ir_inf, self.node_lambda_Ir_inf, 1)
 
-        Y.stamp(self.node_Ii_aug, self.node_Ii_aug, 2)
-        Y.stamp(self.node_Ii_aug, self.node_lambda_Ii_slack, 1)
+        Y.stamp(self.node_Ii_inf, self.node_Ii_inf, 2)
+        Y.stamp(self.node_Ii_inf, self.node_lambda_Ii_inf, 1)
 
 _all_bus_key: typing.Dict[int, Bus]
 _all_bus_key = {}
