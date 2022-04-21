@@ -121,4 +121,28 @@ class Generators:
 
         J[self.bus.node_lambda_Vr] += -dVr_k + dVr_dVr_k * V_r + dVr_dVi_k * V_i + dVr_dQ_k * Q + dVr_dLr_k * lambda_r + dVr_dLi_k * lambda_i + dVr_dLQ_k * lambda_Q
 
+        #Imaginary Lambda
+        
+        dVi_k = Q*lambda_r/(V_i**2 + V_r**2) - 2*V_i*lambda_Q - 2*V_i*lambda_i*(-Q*V_r + V_i*self.P)/(V_i**2 + V_r**2)**2 - 2*V_i*lambda_r*(Q*V_i + V_r*self.P)/(V_i**2 + V_r**2)**2 + lambda_i*self.P/(V_i**2 + V_r**2)
+
+        dVi_dVr_k = 2*Q*V_i*lambda_i/(V_i**2 + V_r**2)**2 - 2*Q*V_r*lambda_r/(V_i**2 + V_r**2)**2 + 8*V_i*V_r*lambda_i*(-Q*V_r + V_i*self.P)/(V_i**2 + V_r**2)**3 + 8*V_i*V_r*lambda_r*(Q*V_i + V_r*self.P)/(V_i**2 + V_r**2)**3 - 2*V_i*lambda_r*self.P/(V_i**2 + V_r**2)**2 - 2*V_r*lambda_i*self.P/(V_i**2 + V_r**2)**2
+
+        dVi_dVi_k = -4*Q*V_i*lambda_r/(V_i**2 + V_r**2)**2 + 8*V_i**2*lambda_i*(-Q*V_r + V_i*self.P)/(V_i**2 + V_r**2)**3 + 8*V_i**2*lambda_r*(Q*V_i + V_r*self.P)/(V_i**2 + V_r**2)**3 - 4*V_i*lambda_i*self.P/(V_i**2 + V_r**2)**2 - 2*lambda_Q - 2*lambda_i*(-Q*V_r + V_i*self.P)/(V_i**2 + V_r**2)**2 - 2*lambda_r*(Q*V_i + V_r*self.P)/(V_i**2 + V_r**2)**2
+
+        dVi_dQ_k = -2*V_i**2*lambda_r/(V_i**2 + V_r**2)**2 + 2*V_i*V_r*lambda_i/(V_i**2 + V_r**2)**2 + lambda_r/(V_i**2 + V_r**2)
+
+        dVi_dLr_k = Q/(V_i**2 + V_r**2) - 2*V_i*(Q*V_i + V_r*self.P)/(V_i**2 + V_r**2)**2
+
+        dVi_dLi_k = -2*V_i*(-Q*V_r + V_i*self.P)/(V_i**2 + V_r**2)**2 + self.P/(V_i**2 + V_r**2)
+
+        dVi_dLQ_k = -2*V_i
+
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_Vr, dVi_dVr_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_Vi, dVi_dVi_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_Q, dVi_dQ_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Vr, dVi_dLr_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Vi, dVi_dLi_k)
+        Y.stamp(self.bus.node_lambda_Vi, self.bus.node_lambda_Q, dVi_dLQ_k)
+
+        J[self.bus.node_lambda_Vi] += -dVi_k + dVi_dVr_k * V_r + dVi_dVi_k * V_i + dVi_dQ_k * Q + dVi_dLr_k * lambda_r + dVi_dLi_k * lambda_i + dVi_dLQ_k * lambda_Q
 
