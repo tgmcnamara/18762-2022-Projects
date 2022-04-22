@@ -146,3 +146,23 @@ class Generators:
 
         J[self.bus.node_lambda_Vi] += -dVi_k + dVi_dVr_k * V_r + dVi_dVi_k * V_i + dVi_dQ_k * Q + dVi_dLr_k * lambda_r + dVi_dLi_k * lambda_i + dVi_dLQ_k * lambda_Q
 
+        # Vset Lambda
+
+        dQ_k = V_i*lambda_r/(V_i**2 + V_r**2) - V_r*lambda_i/(V_i**2 + V_r**2)
+
+        dQ_dVr_k = -2*V_i*V_r*lambda_r/(V_i**2 + V_r**2)**2 + 2*V_r**2*lambda_i/(V_i**2 + V_r**2)**2 - lambda_i/(V_i**2 + V_r**2)
+
+        dQ_dVi_k = -2*V_i**2*lambda_r/(V_i**2 + V_r**2)**2 + 2*V_i*V_r*lambda_i/(V_i**2 + V_r**2)**2 + lambda_r/(V_i**2 + V_r**2)
+
+        dQ_dLr_k = V_i/(V_i**2 + V_r**2)
+
+        dQ_dLi_k = -V_r/(V_i**2 + V_r**2)
+
+        Y.stamp(self.bus.node_lambda_Q, self.bus.node_Vr, dQ_dVr_k)
+        Y.stamp(self.bus.node_lambda_Q, self.bus.node_Vi, dQ_dVi_k)
+        Y.stamp(self.bus.node_lambda_Q, self.bus.node_lambda_Vr, dQ_dLr_k)
+        Y.stamp(self.bus.node_lambda_Q, self.bus.node_lambda_Vi, dQ_dLi_k)
+
+        J[self.bus.node_lambda_Q] += -dQ_k + dQ_dVr_k * V_r + dQ_dVi_k * V_i + dQ_dLr_k * lambda_r + dQ_dLi_k * lambda_i
+
+
