@@ -91,7 +91,7 @@ class PowerFlow:
         Y = MatrixBuilder(self.settings, self.size_Y)
         J_linear = [0] * len(v_init)
 
-        self.stamp_linear(Y, J_linear, v_previous, tx_factor)
+        self.stamp_linear(Y, J_linear, tx_factor)
 
         linear_index = Y.get_usage()
 
