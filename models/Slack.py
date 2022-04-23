@@ -49,9 +49,22 @@ class Slack:
         J[self.slack_Ii] = self.Vi_set
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
-        Y.stamp(self.bus.node_lambda_Vr, self.node_lambda_Vr, 1)
-        Y.stamp(self.node_lambda_Vr, self.node_lambda_Vr, 1)
+        ### Cheating a bit. These are primal variables, but we don't want to stamp this unless
+        #we're performing infeasibility analysis.
+        Y.stamp(self.slack_Ir, self.slack_Ir, 1)
+        Y.stamp(self.slack_Ii, self.slack_Ii, 1)
 
-        Y.stamp(self.bus.node_lambda_Vi, self.node_lambda_Vi, 1)
-        Y.stamp(self.node_lambda_Vi, self.node_lambda_Vi, 1)
+        ### Actual duals are below:
+
+        #dVr & dVi
+        Y.stamp(self.bus.node_lambda_Vr, self.slack_lambda_Ir, 1)
+        Y.stamp(self.bus.node_lambda_Vi, self.slack_lambda_Ii, 1)
+
+        #dIsr & dIsi
+        Y.stamp(self.slack_lambda_Ir, self.slack_lambda_Ir, 1)
+        Y.stamp(self.slack_lambda_Ir, self.bus.node_lambda_Vr, 1)
+
+        Y.stamp(self.slack_lambda_Ii, self.slack_lambda_Ii, 1)
+        Y.stamp(self.slack_lambda_Ii, self.bus.node_lambda_Vi, 1)
+
 

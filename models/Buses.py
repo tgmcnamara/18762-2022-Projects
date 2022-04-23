@@ -63,11 +63,11 @@ class Bus:
         if not infeasibility_analysis:
             return
 
-        self.node_Ir_inf = next(node_index)
-        self.node_Ii_inf = next(node_index)
-
         self.node_lambda_Vr = next(node_index)
         self.node_lambda_Vi = next(node_index)
+
+        self.node_Ir_inf = next(node_index)
+        self.node_Ii_inf = next(node_index)
 
         self.node_lambda_Ir_inf = next(node_index)
         self.node_lambda_Ii_inf = next(node_index)
@@ -82,7 +82,11 @@ class Bus:
         Y.stamp(self.node_Vi, self.node_Ii_inf, 1)
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
-        #Augment current dLagrange / dI_aug
+        #lambda portion
+        Y.stamp(self.node_lambda_Ir_inf, self.node_lambda_Vr, 1)
+        Y.stamp(self.node_lambda_Ii_inf, self.node_lambda_Vi, 1)
+
+        #Objective function portion
         Y.stamp(self.node_Ir_inf, self.node_Ir_inf, 2)
         Y.stamp(self.node_Ir_inf, self.node_lambda_Ir_inf, 1)
 
