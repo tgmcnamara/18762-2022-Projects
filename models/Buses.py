@@ -69,29 +69,23 @@ class Bus:
         self.node_Ir_inf = next(node_index)
         self.node_Ii_inf = next(node_index)
 
-        self.node_lambda_Ir_inf = next(node_index)
-        self.node_lambda_Ii_inf = next(node_index)
-
         # If PV Bus
         if self.Type == 2:
             self.node_lambda_Q = next(node_index)
 
     def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
-        #Augmented current KCL contribution
+        #Infeasibility current KCL contribution
         Y.stamp(self.node_Vr, self.node_Ir_inf, 1)
         Y.stamp(self.node_Vi, self.node_Ii_inf, 1)
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
         #lambda portion
-        Y.stamp(self.node_lambda_Ir_inf, self.node_lambda_Vr, 1)
-        Y.stamp(self.node_lambda_Ii_inf, self.node_lambda_Vi, 1)
+        Y.stamp(self.node_Ir_inf, self.node_lambda_Vr, 1)
+        Y.stamp(self.node_Ii_inf, self.node_lambda_Vi, 1)
 
         #Objective function portion
         Y.stamp(self.node_Ir_inf, self.node_Ir_inf, 2)
-        Y.stamp(self.node_Ir_inf, self.node_lambda_Ir_inf, 1)
-
         Y.stamp(self.node_Ii_inf, self.node_Ii_inf, 2)
-        Y.stamp(self.node_Ii_inf, self.node_lambda_Ii_inf, 1)
 
 _all_bus_key: typing.Dict[int, Bus]
 _all_bus_key = {}

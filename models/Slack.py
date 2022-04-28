@@ -40,31 +40,24 @@ class Slack:
             self.slack_lambda_Ii = next(node_index)
 
     def stamp_primal_linear(self, Y: MatrixBuilder, J, tx_factor):
+        #Slack currents in KCL
         Y.stamp(self.bus.node_Vr, self.slack_Ir, 1)
+        Y.stamp(self.bus.node_Vi, self.slack_Ii, 1)
+
+        #Vset eqns
         Y.stamp(self.slack_Ir, self.bus.node_Vr, 1)
         J[self.slack_Ir] = self.Vr_set
 
-        Y.stamp(self.bus.node_Vi, self.slack_Ii, 1)
         Y.stamp(self.slack_Ii, self.bus.node_Vi, 1)
         J[self.slack_Ii] = self.Vi_set
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
-        ### Cheating a bit. These are primal variables, but we don't want to stamp this unless
-        #we're performing infeasibility analysis.
-        Y.stamp(self.slack_Ir, self.slack_Ir, 1)
-        Y.stamp(self.slack_Ii, self.slack_Ii, 1)
-
-        ### Actual duals are below:
-
         #dVr & dVi
         Y.stamp(self.bus.node_lambda_Vr, self.slack_lambda_Ir, 1)
         Y.stamp(self.bus.node_lambda_Vi, self.slack_lambda_Ii, 1)
 
         #dIsr & dIsi
-        Y.stamp(self.slack_lambda_Ir, self.slack_lambda_Ir, 1)
         Y.stamp(self.slack_lambda_Ir, self.bus.node_lambda_Vr, 1)
-
-        Y.stamp(self.slack_lambda_Ii, self.slack_lambda_Ii, 1)
         Y.stamp(self.slack_lambda_Ii, self.bus.node_lambda_Vi, 1)
 
 
