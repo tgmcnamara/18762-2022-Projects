@@ -16,6 +16,9 @@ raw_data = parse_raw(casename)
 
 settings = Settings(max_iters=30, flat_start=False, infeasibility_analysis=True, tx_stepping=False)
 
-result = solve(raw_data, settings)
+is_success, result = solve(raw_data, settings)
 
 result.display()
+
+if not is_success:
+    print("SOLVER FAILED")

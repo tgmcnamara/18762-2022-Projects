@@ -72,17 +72,21 @@ class PowerFlow:
 
         iterations = 0
         v_next = np.copy(v_init)
+        is_success = False
 
         while tx_factor >= 0:
             if tx_factor % 10 == 0:
                 print(f'Tx factor: {tx_factor}')
 
-            (v_final, iteration_num) = self.run_powerflow_inner(v_init, tx_factor * TX_SCALE)
+            is_success, v_final, iteration_num = self.run_powerflow_inner(v_init, tx_factor * TX_SCALE)
             iterations += iteration_num
             tx_factor -= 1
             v_next = v_final
 
-        return (v_next, iterations)
+            if not is_success:
+                break
+
+        return (is_success, v_next, iterations)
 
     def run_powerflow_inner(self, v_init, tx_factor):
 
@@ -114,11 +118,11 @@ class PowerFlow:
             err_max = err.max()
             
             if err_max < self.settings.tolerance:
-                return (v_next, iteration_num)
+                return (True, v_next, iteration_num)
             elif self.settings.V_limiting and err_max > self.settings.tolerance:
                 v_next = self.apply_limiting(v_next, v_previous, diff)
 
             v_previous = v_next
             Y.clear(retain_idx=linear_index)
 
-        raise Exception("Exceeded maximum NR iterations")
+        return (False, v_next, iteration_num)

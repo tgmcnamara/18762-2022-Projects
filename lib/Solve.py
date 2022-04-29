@@ -28,9 +28,12 @@ def solve(raw_data, settings: Settings):
 
     powerflow = PowerFlow(settings, raw_data, size_Y)
 
-    (v_final, iteration_num) = powerflow.run_powerflow(v_init)
+    is_success, v_final, iteration_num = powerflow.run_powerflow(v_init)
 
-    print(f'Power flow solver converged after {iteration_num} iterations.')
+    if is_success:
+        print(f'Power flow solver converged after {iteration_num} iterations.')
+    else:
+        print(f'Power flow solver FAILED after {iteration_num} iterations.')
 
     end_time = time.perf_counter_ns()
 
@@ -40,4 +43,4 @@ def solve(raw_data, settings: Settings):
 
     results = process_results(raw_data, v_final, duration_seconds)
 
-    return results
+    return (is_success, results)
