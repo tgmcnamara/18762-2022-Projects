@@ -1,7 +1,36 @@
 import math
+from typing import List
+
+class GeneratorResult:
+    def __init__(self, generator, P, Q, is_slack):
+        self.generator = generator
+        self.P = P * 100
+        self.Q = Q * 100
+        self.is_slack = is_slack
+
+    def __str__(self) -> str:
+        name = "Slack" if self.is_slack else "Generator"
+        return f'{name} @ bus {self.generator.bus.Bus} P (MW): {"{:.2f}".format(self.P)}, Q (MVar): {"{:.2f}".format(self.Q)}'
+
+class BusResult:
+    def __init__(self, bus, V_r, V_i, I_inf_r, I_inf_i):
+        self.bus = bus
+        self.V_r = V_r
+        self.V_i = V_i
+        self.I_inf_r = I_inf_r
+        self.I_inf_i = I_inf_i
+        self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
+        self.V_ang = math.atan2(V_i, V_r)  * 180 / math.pi
+    
+    def __str__(self) -> str:
+        v_mag_str = "{:.3f}".format(self.V_mag)
+        v_ang_str = "{:.3f}".format(self.V_ang)
+        i_inf_r = "{:.2f}".format(self.I_inf_r)
+        i_inf_i = "{:.2f}".format(self.I_inf_i)
+        return f'Bus {self.bus.Bus} V_mag (pu): {v_mag_str}, V_ang (deg): {v_ang_str}, I_inf_r: {i_inf_r}, I_inf_i: {i_inf_i}'
 
 class PowerFlowResults:
-    def __init__(self, bus_results, generator_results, duration_seconds):
+    def __init__(self, bus_results: List[BusResult], generator_results: List[GeneratorResult], duration_seconds):
         self.bus_results = bus_results
         self.generator_results = generator_results
         self.duration_seconds = duration_seconds
@@ -17,27 +46,10 @@ class PowerFlowResults:
         for gen in self.generator_results:
             print(gen)
 
-class GeneratorResult:
-    def __init__(self, generator, P, Q, is_slack):
-        self.generator = generator
-        self.P = P * 100
-        self.Q = Q * 100
-        self.is_slack = is_slack
+        print("Total Infeasibility Current:")
+        inf_total_str = "{:.3f}".format(sum((bus.I_inf_r + bus.I_inf_i) for bus in self.bus_results))
+        print(inf_total_str)
 
-    def __str__(self) -> str:
-        name = "Slack" if self.is_slack else "Generator"
-        return f'{name} @ bus {self.generator.bus.Bus} P (MW): {"{:.2f}".format(self.P)}, Q (MVar): {"{:.2f}".format(self.Q)}'
-
-class BusResult:
-    def __init__(self, bus, V_r, V_i):
-        self.bus = bus
-        self.V_r = V_r
-        self.V_i = V_i
-        self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
-        self.V_ang = math.atan2(V_i, V_r)  * 180 / math.pi
-    
-    def __str__(self) -> str:
-        return f'Bus {self.bus.Bus} V_mag (pu): {"{:.3f}".format(self.V_mag)}, V_ang (deg): {"{:.3f}".format(self.V_ang)}'
 
 def process_results(raw_data, v_final, duration_seconds):
     bus_results = []
@@ -45,8 +57,10 @@ def process_results(raw_data, v_final, duration_seconds):
     for bus in raw_data['buses']:
         V_r = v_final[bus.node_Vr]
         V_i = v_final[bus.node_Vi]
+        I_inf_r = v_final[bus.node_Ir_inf]
+        I_inf_i = v_final[bus.node_Ii_inf]
         
-        bus_results.append(BusResult(bus, V_r, V_i))
+        bus_results.append(BusResult(bus, V_r, V_i, I_inf_r, I_inf_i))
 
     generator_results = []
 

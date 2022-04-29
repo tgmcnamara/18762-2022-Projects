@@ -14,11 +14,8 @@ casename = 'testcases/GS-4_stressed.RAW'
 
 raw_data = parse_raw(casename)
 
-settings = Settings(max_iters=30, flat_start=False, infeasibility_analysis=True, tx_stepping=True)
+settings = Settings(max_iters=30, flat_start=False, infeasibility_analysis=True, tx_stepping=False)
 
 result = solve(raw_data, settings)
 
 result.display()
-
-#mat = loadmat(f'testcases/output-{casename}.mat')
-#display_mat_comparison(mat, result)
