@@ -47,8 +47,9 @@ class PowerFlowResults:
             print(gen)
 
         print("Total Infeasibility Current:")
-        inf_total_str = "{:.3f}".format(sum((bus.I_inf_r + bus.I_inf_i) for bus in self.bus_results))
-        print(inf_total_str)
+        inf_total_r_str = "{:.2f}".format(sum((bus.I_inf_r) for bus in self.bus_results))
+        inf_total_i_str = "{:.2f}".format(sum((bus.I_inf_i) for bus in self.bus_results))
+        print(f'Real: {inf_total_r_str}, Imag: {inf_total_i_str}')
 
 
 def process_results(raw_data, v_final, duration_seconds):
