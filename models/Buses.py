@@ -79,7 +79,7 @@ class Bus:
         Y.stamp(self.node_Vi, self.node_Ii_inf, 1)
 
     def stamp_dual_linear(self, Y: MatrixBuilder, J, tx_factor):
-        #lambda portion
+        #dX portion
         Y.stamp(self.node_Ir_inf, self.node_lambda_Vr, 1)
         Y.stamp(self.node_Ii_inf, self.node_lambda_Vi, 1)
 
