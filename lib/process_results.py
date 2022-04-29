@@ -13,12 +13,14 @@ class GeneratorResult:
         return f'{name} @ bus {self.generator.bus.Bus} P (MW): {"{:.2f}".format(self.P)}, Q (MVar): {"{:.2f}".format(self.Q)}'
 
 class BusResult:
-    def __init__(self, bus, V_r, V_i, I_inf_r, I_inf_i):
+    def __init__(self, bus, V_r, V_i, I_inf_r, I_inf_i, lambda_r, lambda_i):
         self.bus = bus
         self.V_r = V_r
         self.V_i = V_i
         self.I_inf_r = I_inf_r
         self.I_inf_i = I_inf_i
+        self.lambda_r = lambda_r
+        self.lambda_i = lambda_i
         self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
         self.V_ang = math.atan2(V_i, V_r)  * 180 / math.pi
     
@@ -27,7 +29,9 @@ class BusResult:
         v_ang_str = "{:.3f}".format(self.V_ang)
         i_inf_r = "{:.2f}".format(self.I_inf_r)
         i_inf_i = "{:.2f}".format(self.I_inf_i)
-        return f'Bus {self.bus.Bus} V_mag (pu): {v_mag_str}, V_ang (deg): {v_ang_str}, I_inf_r: {i_inf_r}, I_inf_i: {i_inf_i}'
+        lambda_r = "{:.2f}".format(self.lambda_r)
+        lambda_i = "{:.2f}".format(self.lambda_i)
+        return f'Bus {self.bus.Bus} V_mag (pu): {v_mag_str}, V_ang (deg): {v_ang_str}, I_inf_r: {i_inf_r}, I_inf_i: {i_inf_i}, lambda_r: {lambda_r}, lambda_i: {lambda_i}'
 
 class PowerFlowResults:
     def __init__(self, bus_results: List[BusResult], generator_results: List[GeneratorResult], duration_seconds):
@@ -60,8 +64,10 @@ def process_results(raw_data, v_final, duration_seconds):
         V_i = v_final[bus.node_Vi]
         I_inf_r = v_final[bus.node_Ir_inf]
         I_inf_i = v_final[bus.node_Ii_inf]
+        lambda_r = v_final[bus.node_lambda_Vr]
+        lambda_i = v_final[bus.node_lambda_Vi]
         
-        bus_results.append(BusResult(bus, V_r, V_i, I_inf_r, I_inf_i))
+        bus_results.append(BusResult(bus, V_r, V_i, I_inf_r, I_inf_i, lambda_r, lambda_i))
 
     generator_results = []
 
