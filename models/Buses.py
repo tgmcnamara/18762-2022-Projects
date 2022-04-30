@@ -52,6 +52,18 @@ class Bus:
     def get_Vi_init(self):
         return (self.node_Vi, self.Vi_init)
 
+    def get_Lr_init(self):
+        return (self.node_lambda_Vr, 1e-4)
+
+    def get_Li_init(self):
+        return (self.node_lambda_Vr, 1e-4)
+
+    def get_LQ_init(self):
+        if self.Type == 2:
+            return (self.node_lambda_Q, 1e-4)
+        else:
+            return (None, None)
+
     def assign_nodes(self, node_index, infeasibility_analysis):
         self.node_Vr = next(node_index)
         self.node_Vi = next(node_index)
