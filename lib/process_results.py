@@ -39,16 +39,18 @@ class PowerFlowResults:
         self.generator_results = generator_results
         self.duration_seconds = duration_seconds
 
-    def display(self):
+    def display(self, verbose=True):
         print("Bus Results:")
 
-        for bus in self.bus_results:
-            print(bus)
+        if verbose:
+            for bus in self.bus_results:
+                print(bus)
 
         print("Generator Results:")
 
-        for gen in self.generator_results:
-            print(gen)
+        if verbose:
+            for gen in self.generator_results:
+                print(gen)
 
         print("Total Infeasibility Current:")
         inf_total_r_str = "{:.2f}".format(sum((bus.I_inf_r) for bus in self.bus_results))
