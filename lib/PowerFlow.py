@@ -79,7 +79,7 @@ class PowerFlow:
                 print(f'Tx factor: {tx_factor}')
 
             is_success, v_final, iteration_num = self.run_powerflow_inner(v_init, tx_factor * TX_SCALE)
-            iterations += iteration_num + 1
+            iterations = iteration_num + 1
             tx_factor -= 1
             v_next = v_final
 
