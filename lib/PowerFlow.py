@@ -86,7 +86,7 @@ class PowerFlow:
             if not is_success:
                 break
 
-        return (is_success, v_next, iterations)
+        return (is_success, v_next, iterations, tx_factor * TX_SCALE)
 
     def run_powerflow_inner(self, v_init, tx_factor):
 
