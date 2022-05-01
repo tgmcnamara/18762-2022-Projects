@@ -1,6 +1,7 @@
 import unittest
 from lib.MatrixBuilder import MatrixBuilder
 from lib.Solve import solve
+from lib.process_results import assert_mat_comparison
 from lib.settings import Settings
 from models.Branches import Branches
 from models.Buses import Bus
@@ -9,100 +10,26 @@ from models.Loads import Loads
 from models.Shunts import Shunts
 from models.Slack import Slack
 from models.Transformers import Transformers
+from parsers.parser import parse_raw
+from scipy.io import loadmat
 
 class PowerFlowTests(unittest.TestCase):
-    def test_generator(self):
-        b = Bus(1, 2, 1, 0, None)
-        b.assign_nodes()
-        generator = Generators(1, 200, 1, None, None, None, None, None, None, None, None)
+    def test_GS_4_prior_solution(self):
+        casename = 'testcases/GS-4_prior_solution.RAW'
+        raw_data = parse_raw(casename)
+        is_success, results = solve(raw_data)
+        self.assertTrue(is_success)
 
-        settings = Settings(debug=True, max_iters=30)
+        mat_result = loadmat("testcases/output-GS-4.mat")
 
-        Y = MatrixBuilder(settings)
-        J = [0, 0, 0]
-        v_prev = [0.9819, -0.01673, 190]
+        assert_mat_comparison(mat_result, results)
 
-        generator.stamp(Y, J, v_prev)
+    def test_IEEE_14_prior_solution(self):
+        casename = 'testcases/IEEE-14_prior_solution.RAW'
+        raw_data = parse_raw(casename)
+        is_success, results = solve(raw_data)
+        self.assertTrue(is_success)
 
-        matrix = Y.to_matrix().todense()
+        mat_result = loadmat("testcases/output-IEEE-14.mat")
 
-        print(matrix)
-        print(J)
-
-    def test_load(self):
-        b = Bus(1, 2, 1, 0, None)
-        b.assign_nodes()
-        load = Loads(1, 200, 100, None, None, None, None, None, None)
-
-        settings = Settings(debug=True, max_iters=30)
-
-        Y = MatrixBuilder(settings)
-        J = [0, 0]
-        v_prev = [0.9819, -0.01673]
-
-        load.stamp(Y, J, v_prev)
-
-        matrix = Y.to_matrix().todense()
-
-        print(matrix)
-        print(J)
-
-    def test_branch(self):
-        b1 = Bus(1, 1, 1, 0, None)
-        b1.assign_nodes()
-        b2 = Bus(2, 1, 1, 0, None)
-        b2.assign_nodes()
-
-        branch = Branches(1, 2, 1.00800E-2, 5.04000E-2, 1.02500E-1, None, None, None, None)
-
-        settings = Settings(debug=True, max_iters=30)
-
-        Y = MatrixBuilder(settings)
-        J = [0, 0]
-        v_prev = None
-
-        branch.stamp(Y, J, v_prev)
-
-        matrix = Y.to_matrix().todense()
-
-        print(matrix)
-        print(J)
-    
-    def test_shunt(self):
-        b = Bus(1, 2, 1, 0, None)
-        b.assign_nodes()
-        shunt = Shunts(1, 0, 19.0, 0, None, None, None, None, None, None, None)
-
-        settings = Settings(debug=True, max_iters=30)
-
-        Y = MatrixBuilder(settings)
-        J = [0, 0]
-        v_prev = [0.9819, -0.01673]
-
-        shunt.stamp(Y, J, v_prev)
-
-        matrix = Y.to_matrix().todense()
-
-        print(matrix)
-        print(J)
-
-    def test_transformer(self):
-        b1 = Bus(1, 1, 1, 0, None)
-        b1.assign_nodes()
-        b2 = Bus(2, 1, 1, 0, None)
-        b2.assign_nodes()
-
-        transformer = Transformers(1, 2, 1e-07, 0.20912, None, 0.978, 0.0, None, None, None)
-        transformer.assign_nodes()
-
-        settings = Settings(debug=True, max_iters=30)
-
-        Y = MatrixBuilder(settings)
-        J = [0, 0]
-        v_prev = None
-
-        transformer.stamp(Y, J, v_prev)
-
-        matrix = Y.to_matrix().todense()
-
-        print(matrix)
+        assert_mat_comparison(mat_result, results)

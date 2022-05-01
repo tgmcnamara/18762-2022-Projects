@@ -108,3 +108,21 @@ def display_mat_comparison(mat, results: PowerFlowResults):
         simulator_V_ang = results.bus_results[idx].V_ang
 
         print(f'Bus: {int(bus)} V_mag diff: {"{:.4f}".format(simulator_V_mag - V_mag)} V_ang diff: {"{:.4f}".format(simulator_V_ang - V_ang)}')
+
+def assert_mat_comparison(mat, results: PowerFlowResults):
+    for idx in range(len(mat['sol']['bus'][0][0])):
+        bus = mat['sol']['bus'][0][0][idx][0]
+        V_mag = mat['sol']['bus'][0][0][idx][7]
+        V_ang = mat['sol']['bus'][0][0][idx][8]
+
+        simulator_V_mag = results.bus_results[idx].V_mag
+        simulator_V_ang = results.bus_results[idx].V_ang
+        
+        mag_diff = abs(V_mag - simulator_V_mag)
+        ang_diff = abs(V_ang - simulator_V_ang)
+
+        if mag_diff >= 1e-4:
+            raise Exception(f'Bus {results.bus_results[idx].bus.Bus} magnitude is off by {"{:.4f}".format(mag_diff)}')
+
+        if ang_diff >= 1e-4:
+            raise Exception(f'Bus {results.bus_results[idx].bus.Bus} angle is off by {"{:.4f}".format(ang_diff)}')
