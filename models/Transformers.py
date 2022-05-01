@@ -155,7 +155,7 @@ class Transformers:
         Vr_to = self.to_bus.node_lambda_Vr
         Vi_to = self.to_bus.node_lambda_Vi
 
-        stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, G, B)
+        stamp_line(Y, Vr_from, Vr_to, Vi_from, Vi_to, G, -B)
     
     def get_scaled_constants(self, tx_factor):
         scaled_tr = self.tr + (1 - self.tr) * tx_factor 
