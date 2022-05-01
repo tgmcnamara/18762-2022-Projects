@@ -7,7 +7,7 @@ from lib.process_results import process_results
 from lib.initialize import initialize
 from itertools import count
 
-def solve(raw_data, settings: Settings):
+def solve(raw_data, settings: Settings = Settings()):
     print("Running power flow solver...")
 
     start_time = time.perf_counter_ns()
@@ -41,6 +41,6 @@ def solve(raw_data, settings: Settings):
 
     print(f'Ran for {"{:.3f}".format(duration_seconds)} seconds')
 
-    results = process_results(raw_data, v_final, duration_seconds)
+    results = process_results(raw_data, v_final, duration_seconds, settings)
 
     return (is_success, results)

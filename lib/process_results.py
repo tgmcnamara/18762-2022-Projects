@@ -1,6 +1,8 @@
 import math
 from typing import List
 
+from lib.settings import Settings
+
 class GeneratorResult:
     def __init__(self, generator, P, Q, is_slack):
         self.generator = generator
@@ -58,16 +60,23 @@ class PowerFlowResults:
         print(f'Real: {inf_total_r_str}, Imag: {inf_total_i_str}')
 
 
-def process_results(raw_data, v_final, duration_seconds):
+def process_results(raw_data, v_final, duration_seconds, settings: Settings):
     bus_results = []
     
     for bus in raw_data['buses']:
         V_r = v_final[bus.node_Vr]
         V_i = v_final[bus.node_Vi]
-        I_inf_r = v_final[bus.node_Ir_inf]
-        I_inf_i = v_final[bus.node_Ii_inf]
-        lambda_r = v_final[bus.node_lambda_Vr]
-        lambda_i = v_final[bus.node_lambda_Vi]
+
+        if settings.infeasibility_analysis:
+            I_inf_r = v_final[bus.node_Ir_inf]
+            I_inf_i = v_final[bus.node_Ii_inf]
+            lambda_r = v_final[bus.node_lambda_Vr]
+            lambda_i = v_final[bus.node_lambda_Vi]
+        else:
+            I_inf_r = 0
+            I_inf_i = 0
+            lambda_r = 0
+            lambda_i = 0
         
         bus_results.append(BusResult(bus, V_r, V_i, I_inf_r, I_inf_i, lambda_r, lambda_i))
 
