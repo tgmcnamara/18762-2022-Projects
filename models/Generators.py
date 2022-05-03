@@ -43,8 +43,8 @@ class Generators:
 
         self.Qinit = -Qinit / 100
 
-        self.Qmax = -Qmax
-        self.Qmin = -Qmin
+        self.Qmax = -Qmax / 100
+        self.Qmin = -Qmin / 100
 
     def stamp_primal_nonlinear(self, Y: MatrixBuilder, J, v_previous):
         Q_k = v_previous[self.bus.node_Q]
