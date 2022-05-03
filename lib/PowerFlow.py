@@ -4,10 +4,10 @@ from lib.MatrixBuilder import MatrixBuilder
 from lib.settings import Settings
 
 
-V_DIFF_MAX = 0.2
+V_DIFF_MAX = 1
 V_MAX = 2
-V_MIN = -0.5
-TX_ITERATIONS = 100
+V_MIN = -2
+TX_ITERATIONS = 1000
 TX_SCALE = 1.0 / TX_ITERATIONS
 
 class PowerFlow:
