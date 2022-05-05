@@ -1,7 +1,8 @@
 import math
 from typing import List
-
+import pandas as pd
 from lib.settings import Settings
+from models.Buses import Bus
 
 class GeneratorResult:
     def __init__(self, generator, P, Q, is_slack):
@@ -15,7 +16,7 @@ class GeneratorResult:
         return f'{name} @ bus {self.generator.bus.Bus} P (MW): {"{:.2f}".format(self.P)}, Q (MVar): {"{:.2f}".format(self.Q)}'
 
 class BusResult:
-    def __init__(self, bus, V_r, V_i, I_inf_r, I_inf_i, lambda_r, lambda_i):
+    def __init__(self, bus: Bus, V_r, V_i, I_inf_r, I_inf_i, lambda_r, lambda_i):
         self.bus = bus
         self.V_r = V_r
         self.V_i = V_i
@@ -148,3 +149,28 @@ def assert_mat_comparison(mat, results: PowerFlowResults):
 
         if ang_diff >= 1e-4:
             raise Exception(f'Bus {results.bus_results[idx].bus.Bus} angle is off by {"{:.4f}".format(ang_diff)}')
+
+def print_infeas_comparison(casename, results: PowerFlowResults):
+    resultfile = f'result_comparison/{casename}.infeas.csv'
+
+    df = pd.read_csv(resultfile)
+
+    bus_lookup = {}
+
+    for result in results.bus_results:
+        bus_lookup[result.bus.Bus] = result.get_infeasible()
+
+    I_r_diff_sum = 0
+    I_i_diff_sum = 0
+
+    for index, row in df.iterrows():
+        bus_num = row['Bus']
+        I_r_comp = float(row['Infeasibility Current Real'].replace("[", "").replace("]", ""))
+        I_i_comp = float(row['Infeasibility Current Imag'].replace("[", "").replace("]", ""))
+
+        I_r, I_i = bus_lookup[bus_num]
+
+        I_r_diff_sum += abs(I_r - I_r_comp)
+        I_i_diff_sum += abs(I_i - I_i_comp)
+    
+    print(f'Reported cumulative difference (abs): I_r: {I_r_diff_sum}, I_i: {I_i_diff_sum}')
