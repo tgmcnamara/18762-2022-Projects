@@ -163,7 +163,7 @@ def print_infeas_comparison(casename, results: PowerFlowResults):
     I_r_diff_sum = 0
     I_i_diff_sum = 0
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         bus_num = row['Bus']
         I_r_comp = float(row['Infeasibility Current Real'].replace("[", "").replace("]", ""))
         I_i_comp = float(row['Infeasibility Current Imag'].replace("[", "").replace("]", ""))
