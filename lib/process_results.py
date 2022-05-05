@@ -26,6 +26,9 @@ class BusResult:
         self.V_mag = math.sqrt(V_r ** 2 + V_i ** 2)
         self.V_ang = math.atan2(V_i, V_r)  * 180 / math.pi
     
+    def get_infeasible(self):
+        return (self.I_inf_r, self.I_inf_i)
+
     def __str__(self) -> str:
         v_mag_str = "{:.3f}".format(self.V_mag)
         v_ang_str = "{:.3f}".format(self.V_ang)
@@ -58,6 +61,25 @@ class PowerFlowResults:
         inf_total_r_str = "{:.2f}".format(sum((bus.I_inf_r) for bus in self.bus_results))
         inf_total_i_str = "{:.2f}".format(sum((bus.I_inf_i) for bus in self.bus_results))
         print(f'Real: {inf_total_r_str}, Imag: {inf_total_i_str}')
+    
+    def report_infeasible(self):
+        largest = []
+
+        for bus_result in self.bus_results:
+            (I_r, I_i) = bus_result.get_infeasible()
+            if abs(I_r) < 1e-5 and abs(I_i) < 1e-5:
+                continue
+
+            if len(largest) == 0:
+                largest.append(bus_result)
+                continue
+
+            (I_r_next, I_i_next) = largest[-1].get_infeasible()
+
+            if abs(I_r) >= abs(I_r_next) or abs(I_i) >= abs(I_i_next):
+                largest.append(bus_result)
+
+        return largest[-3:]
 
 
 def process_results(raw_data, v_final, duration_seconds, settings: Settings):
