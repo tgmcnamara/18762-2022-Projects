@@ -58,9 +58,12 @@ class PowerFlowResults:
             for gen in self.generator_results:
                 print(gen)
 
-        print("Total Infeasibility Current:")
-        inf_total_r_str = "{:.2f}".format(sum((bus.I_inf_r) for bus in self.bus_results))
-        inf_total_i_str = "{:.2f}".format(sum((bus.I_inf_i) for bus in self.bus_results))
+        inf_total_r = sum(abs(bus.I_inf_r) for bus in self.bus_results)
+        inf_total_i = sum(abs(bus.I_inf_i) for bus in self.bus_results)
+
+        print("Total Infeasibility Current (abs):")
+        inf_total_r_str = "{:.3f}".format(inf_total_r)
+        inf_total_i_str = "{:.3f}".format(inf_total_i)
         print(f'Real: {inf_total_r_str}, Imag: {inf_total_i_str}')
     
     def report_infeasible(self):
@@ -173,4 +176,8 @@ def print_infeas_comparison(casename, results: PowerFlowResults):
         I_r_diff_sum += abs(I_r - I_r_comp)
         I_i_diff_sum += abs(I_i - I_i_comp)
     
-    print(f'Reported cumulative difference (abs): I_r: {I_r_diff_sum}, I_i: {I_i_diff_sum}')
+    I_r_diff_sum_str = "{:.3f}".format(I_r_diff_sum)
+    I_r_diff_sum_str = "{:.3f}".format(I_i_diff_sum)
+
+    print('Reported cumulative infeasibility difference (abs):')
+    print(f'I_r: {I_r_diff_sum_str}, I_i: {I_r_diff_sum_str}')
