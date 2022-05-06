@@ -30,34 +30,13 @@ changing the original repository.
 git clone https://github.com/YOUR-USERNAME/18762-2022-Projects
 ```
 ### Step 3: Change branches to the appropriate project
-For example, for Project 1, you would execute:
+For example, for Project 2, you would execute:
 ```
 cd <path to 18762-2022-Projects>
-git checkout project1
+git checkout project2
 ```
 
-### Step 4: Create a working directory for yourself and copy the distribution files into it
-For example, For Project 1, if you wanted to copy all the files we have provided into your working directory (on a MAC), you would execute:
-```
-cd <path to 18762-2022-Projects>
-mkdir YOUR-ANDREWID
-mkdir YOUR-ANDREWID/classes
-cp -r classes YOUR-ANDREWID/classes
-mkdir YOUR-ANDREWID/lib
-cp -r lib YOUR-ANDREWID/lib
-mkdir YOUR-ANDREWID/scripts
-cp -r scripts YOUR-ANDREWID/scripts
-mkdir YOUR-ANDREWID/testcases
-cp -r testcases YOUR-ANDREWID/testcases
-mkdir YOUR-ANDREWID/testcases
-cp -r testcases YOUR-ANDREWID/testcases
-mkdir YOUR-ANDREWID/validate
-cp -r validate YOUR-ANDREWID/validate
-cp -r run_solver.py YOUR-ANDREWID/run_solver.py
-```
-You will work on your solution in this working directory. Please do this for each project you work on.
-
-### Step 5: Implement your solution
+### Step 4: Implement your solution
 Implement your solution to the project assignment within the working directory.
 
 ## Submission
@@ -80,4 +59,3 @@ Under the title field, please put the name of the project you're submitting. Und
 comments you'd like to make about your project submission. Next, set the **Assignee** to tgmcnamara and 
 the **Milestone** to the project you've just completed. Finally, submit the pull request.
 ![pull_form](docs/media/GitHub-PullRequest-Title-Description.png)
-
