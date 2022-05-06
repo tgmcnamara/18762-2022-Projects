@@ -163,6 +163,9 @@ def print_infeas_comparison(casename, results: PowerFlowResults):
     for result in results.bus_results:
         bus_lookup[result.bus.Bus] = result.get_infeasible()
 
+    l2_sum = 0
+    l2_sum_comp = 0
+
     I_r_diff_sum = 0
     I_i_diff_sum = 0
 
@@ -173,11 +176,27 @@ def print_infeas_comparison(casename, results: PowerFlowResults):
 
         I_r, I_i = bus_lookup[bus_num]
 
-        I_r_diff_sum += abs(I_r - I_r_comp)
-        I_i_diff_sum += abs(I_i - I_i_comp)
-    
-    I_r_diff_sum_str = "{:.3f}".format(I_r_diff_sum)
-    I_r_diff_sum_str = "{:.3f}".format(I_i_diff_sum)
+        l2_sum += I_r ** 2
+        l2_sum += I_i ** 2
 
-    print('Reported cumulative infeasibility difference (abs):')
-    print(f'I_r: {I_r_diff_sum_str}, I_i: {I_r_diff_sum_str}')
+        l2_sum_comp += I_r_comp ** 2
+        l2_sum_comp += I_i_comp ** 2
+
+        I_r_diff_sum += abs(I_r - I_r_comp) / I_r
+        I_i_diff_sum += abs(I_i - I_i_comp) / I_i
+
+    l2_sum_str = "{:.3f}".format(math.sqrt(l2_sum))
+
+    print("L2 norm:")
+    print(l2_sum_str)
+
+    l2_sum_comp_str = "{:.3f}".format(math.sqrt(l2_sum_comp))
+
+    print("Comparison solution L2 norm:")
+    print(l2_sum_comp_str)
+
+    I_r_diff_sum_str = "{:.1f}".format(I_r_diff_sum / len(df) * 100)
+    I_r_diff_sum_str = "{:.1f}".format(I_i_diff_sum / len(df) * 100)
+
+    print('Average percent difference with comparison solution:')
+    print(f'I_r: {I_r_diff_sum_str}%, I_i: {I_r_diff_sum_str}%')
